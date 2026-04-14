@@ -1271,11 +1271,36 @@
     <span class="pm-idade" id="hdr-idade">—</span>
   </div>
   <p class="subtitle">Arquivos da Ordem Jedi · Primeira Galáxia</p>
-  <div class="user-badge" id="user-badge" onclick="sairSessao()" title="Trocar Guardião">
-    <div class="user-badge-avatar" id="user-badge-avatar">?</div>
-    <span class="user-badge-name" id="user-badge-name">—</span>
-    <span class="user-badge-exit">↩</span>
+  <div class="user-badge" id="user-badge" title="Opções do Guardião">
+    <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)">?</div>
+    <span class="user-badge-name" id="user-badge-name" onclick="abrirMenuGuardiao(event)">—</span>
+    <span class="user-badge-exit" onclick="sairSessao()" title="Sair" style="cursor:pointer;padding:4px">↩</span>
   </div>
+
+<!-- MENU GUARDIÃO -->
+<div id="menu-guardiao" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:8500" onclick="fecharMenuGuardiao()">
+  <div style="position:absolute;right:12px;top:120px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
+    <button onclick="abrirTrocaEmoji()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">✏️</span> Trocar emoji
+    </button>
+    <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">↩</span> Trocar Guardião
+    </button>
+  </div>
+</div>
+
+<!-- MODAL TROCAR EMOJI -->
+<div id="modal-troca-emoji" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:320px">
+    <div class="modal-icon">✏️</div>
+    <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">TROCAR EMBLEMA</div>
+    <div class="emoji-grid" id="emoji-grid-troca" style="margin-bottom:16px"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" onclick="confirmarTrocaEmoji()">💾 Confirmar</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharTrocaEmoji()">Cancelar</button>
+    </div>
+  </div>
+</div>
 </header>
 <div class="saber-line"></div>
 
@@ -1666,7 +1691,52 @@ for (let i = 0; i < 120; i++) {
 
 // ── PWA: MANIFEST + SERVICE WORKER INLINE ──
 (function() {
-  // Manifest
+
+  // Gera ícone PNG via Canvas (único formato que iOS aceita corretamente)
+  function gerarIconePNG(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    // Fundo azul escuro com cantos arredondados
+    const r = size * 0.18;
+    ctx.beginPath();
+    ctx.moveTo(r, 0); ctx.lineTo(size-r, 0);
+    ctx.quadraticCurveTo(size,0,size,r);
+    ctx.lineTo(size,size-r);
+    ctx.quadraticCurveTo(size,size,size-r,size);
+    ctx.lineTo(r,size);
+    ctx.quadraticCurveTo(0,size,0,size-r);
+    ctx.lineTo(0,r);
+    ctx.quadraticCurveTo(0,0,r,0);
+    ctx.closePath();
+    ctx.fillStyle = '#020b18';
+    ctx.fill();
+    // Brilho azul sutil
+    const grad = ctx.createRadialGradient(size*0.35, size*0.3, 0, size*0.5, size*0.5, size*0.7);
+    grad.addColorStop(0, 'rgba(0,100,200,0.25)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+    // Emoji 🛸 centralizado
+    ctx.font = `${size * 0.52}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🛸', size * 0.5, size * 0.54);
+    // Texto "ARTHUR" pequeno embaixo
+    ctx.font = `bold ${size * 0.1}px Arial`;
+    ctx.fillStyle = 'rgba(0,212,255,0.7)';
+    ctx.fillText('ARTHUR', size * 0.5, size * 0.86);
+    return c.toDataURL('image/png');
+  }
+
+  const icon192 = gerarIconePNG(192);
+  const icon512 = gerarIconePNG(512);
+  const icon180 = gerarIconePNG(180); // apple-touch-icon
+
+  // Apple Touch Icon (o mais importante para iOS)
+  document.getElementById('pwa-icon').href = icon180;
+
+  // Manifest com PNG
   const manifest = {
     name: 'Crônicas do Padawan Arthur',
     short_name: 'Padawan Arthur',
@@ -1677,26 +1747,18 @@ for (let i = 0; i < 120; i++) {
     theme_color: '#020b18',
     orientation: 'portrait',
     icons: [
-      { src: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" fill="#020b18" rx="32"/><text x="96" y="130" text-anchor="middle" font-size="110">🛸</text></svg>`), sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
-      { src: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#020b18" rx="80"/><text x="256" y="350" text-anchor="middle" font-size="300">🛸</text></svg>`), sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+      { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
     ]
   };
   const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-  const mUrl = URL.createObjectURL(blob);
-  document.getElementById('pwa-manifest').href = mUrl;
-
-  // Apple touch icon via SVG
-  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><rect width="180" height="180" fill="#020b18" rx="30"/><text x="90" y="128" text-anchor="middle" font-size="110">🛸</text></svg>`;
-  const iconUrl = 'data:image/svg+xml,' + encodeURIComponent(iconSvg);
-  document.getElementById('pwa-icon').href = iconUrl;
+  document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
 
   // Service Worker inline para offline
   if ('serviceWorker' in navigator) {
     const swCode = `
-const CACHE = 'padawan-arthur-v1';
-const FONTS = [
-  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap'
-];
+const CACHE = 'padawan-arthur-v2';
+const FONTS = ['https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FONTS)).catch(()=>{}));
   self.skipWaiting();
@@ -1708,8 +1770,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('fonts.g') || e.request.url.includes('fonts.gstatic')) {
     e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
+      caches.open(CACHE).then(c => c.put(e.request, res.clone()));
       return res;
     })));
     return;
@@ -1717,8 +1778,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });`;
     const swBlob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl  = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
   }
 })();
 
@@ -1951,6 +2011,49 @@ function atualizarBadge() {
 
 function nomeAutor(id) {
   return id ? (GUARDIOES[id]?.nome || id) : '—';
+}
+
+// ── MENU GUARDIÃO ──
+function abrirMenuGuardiao(e) {
+  e.stopPropagation();
+  document.getElementById('menu-guardiao').style.display = 'block';
+}
+function fecharMenuGuardiao() {
+  document.getElementById('menu-guardiao').style.display = 'none';
+}
+
+// ── TROCAR EMOJI DO PERFIL ──
+let _emojiTrocaPendente = null;
+
+function abrirTrocaEmoji() {
+  fecharMenuGuardiao();
+  _emojiTrocaPendente = GUARDIOES[usuarioAtual]?.emoji || '🧑';
+  const grid = document.getElementById('emoji-grid-troca');
+  grid.innerHTML = EMOJIS_DISPONIVEIS.map(e => `
+    <button class="emoji-btn ${e === _emojiTrocaPendente ? 'sel' : ''}" onclick="selecionarEmojiTroca('${e}',this)">${e}</button>
+  `).join('');
+  document.getElementById('modal-troca-emoji').style.display = 'flex';
+}
+
+function selecionarEmojiTroca(emoji, btn) {
+  _emojiTrocaPendente = emoji;
+  document.querySelectorAll('#emoji-grid-troca .emoji-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function confirmarTrocaEmoji() {
+  if (!_emojiTrocaPendente || !usuarioAtual) return;
+  GUARDIOES[usuarioAtual].emoji = _emojiTrocaPendente;
+  saveGuardioes(GUARDIOES);
+  atualizarBadge();
+  renderListaGuardioes();
+  fecharTrocaEmoji();
+  showToast('✨ Emblema atualizado!');
+}
+
+function fecharTrocaEmoji() {
+  document.getElementById('modal-troca-emoji').style.display = 'none';
+  _emojiTrocaPendente = null;
 }
 
 // ── AUTO-LOCK POR INATIVIDADE ──
