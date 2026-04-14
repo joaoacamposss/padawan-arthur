@@ -2,7 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Padawan Arthur">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#020b18">
+<meta name="description" content="Crônicas do Padawan Arthur · Ordem Jedi">
+<link rel="manifest" id="pwa-manifest">
+<link rel="apple-touch-icon" id="pwa-icon">
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -860,6 +868,119 @@
   }
   .btn-del-vac-extra:hover { background: rgba(200,30,30,0.35); color: #ff6b6b; }
 
+  .btn-novo-guardiao {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    border: 1px dashed rgba(0,180,255,0.3);
+    border-radius: 10px;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-novo-guardiao:hover {
+    border-color: var(--blue-neon);
+    color: var(--blue-neon);
+    background: rgba(0,180,255,0.05);
+  }
+
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .emoji-btn {
+    font-size: 1.4rem;
+    padding: 6px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background: rgba(0,20,50,0.6);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .emoji-btn:hover  { background: rgba(0,60,130,0.5); }
+  .emoji-btn.sel    { border-color: var(--blue-neon); background: rgba(0,100,200,0.3); box-shadow: 0 0 8px rgba(0,180,255,0.3); }
+
+  /* ── PIN KEYPAD ── */
+  .pin-display {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0 8px;
+  }
+  .pin-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,180,255,0.4);
+    background: transparent;
+    transition: all 0.15s;
+  }
+  .pin-dot.filled {
+    background: var(--blue-neon);
+    border-color: var(--blue-neon);
+    box-shadow: 0 0 8px var(--blue-neon);
+  }
+  .pin-dot.error {
+    background: var(--red-saber);
+    border-color: var(--red-saber);
+    box-shadow: 0 0 8px var(--red-saber);
+    animation: shake 0.3s ease;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)}
+  }
+  .pin-error {
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.62rem;
+    color: var(--red-saber);
+    min-height: 18px;
+    margin-bottom: 16px;
+    letter-spacing: 0.08em;
+  }
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+  .pin-key {
+    background: linear-gradient(135deg, rgba(0,40,90,0.8), rgba(0,20,50,0.9));
+    border: 1px solid rgba(0,180,255,0.2);
+    border-radius: 50%;
+    width: 64px; height: 64px;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pin-key:active {
+    transform: scale(0.9);
+    background: linear-gradient(135deg, rgba(0,80,180,0.8), rgba(0,50,120,0.9));
+    box-shadow: 0 0 15px rgba(0,180,255,0.4);
+  }
+  .pin-key-back, .pin-key-del {
+    background: transparent;
+    border-color: rgba(0,180,255,0.1);
+    color: var(--text-dim);
+    font-size: 1rem;
+  }
+
   /* ── LOGIN ── */
   #tela-login {
     position: fixed; inset: 0; z-index: 9000;
@@ -1075,24 +1196,70 @@
     <div class="login-title">PADAWAN ARTHUR</div>
     <div class="login-sub">Arquivos da Ordem Jedi · Acesso Restrito</div>
     <div class="login-saber"></div>
-    <div class="login-label">Identifique-se, Guardião da Força</div>
-    <div class="login-btns">
-      <button class="btn-guardian" onclick="fazerLogin('joao')">
-        <div class="guardian-avatar">🧔</div>
-        <div>
-          <div class="guardian-info-name">João</div>
-          <div class="guardian-info-role">Guardião da Força · Pai do Padawan</div>
-        </div>
-      </button>
-      <button class="btn-guardian" onclick="fazerLogin('nadyne')">
-        <div class="guardian-avatar">👩</div>
-        <div>
-          <div class="guardian-info-name">Nadyne</div>
-          <div class="guardian-info-role">Guardiã da Força · Mãe do Padawan</div>
-        </div>
-      </button>
+
+    <!-- Passo 1: Escolher guardião -->
+    <div id="login-step-1">
+      <div class="login-label">Identifique-se, Guardião da Força</div>
+      <div class="login-btns" id="lista-guardioes-login"></div>
+      <div style="margin-top:14px">
+        <button class="btn-novo-guardiao" onclick="abrirCadastroGuardiao()">＋ Novo Guardião da Força</button>
+      </div>
+    </div>
+
+    <!-- Passo 2: Digitar senha -->
+    <div id="login-step-2" style="display:none">
+      <div class="login-label" id="login-nome-label">Digite o código da Força</div>
+      <div class="pin-display" id="pin-display">
+        <span class="pin-dot" id="pd0"></span>
+        <span class="pin-dot" id="pd1"></span>
+        <span class="pin-dot" id="pd2"></span>
+        <span class="pin-dot" id="pd3"></span>
+        <span class="pin-dot" id="pd4"></span>
+        <span class="pin-dot" id="pd5"></span>
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="pinDigito('1')">1</button>
+        <button class="pin-key" onclick="pinDigito('2')">2</button>
+        <button class="pin-key" onclick="pinDigito('3')">3</button>
+        <button class="pin-key" onclick="pinDigito('4')">4</button>
+        <button class="pin-key" onclick="pinDigito('5')">5</button>
+        <button class="pin-key" onclick="pinDigito('6')">6</button>
+        <button class="pin-key" onclick="pinDigito('7')">7</button>
+        <button class="pin-key" onclick="pinDigito('8')">8</button>
+        <button class="pin-key" onclick="pinDigito('9')">9</button>
+        <button class="pin-key pin-key-back" onclick="voltarLogin()">↩</button>
+        <button class="pin-key" onclick="pinDigito('0')">0</button>
+        <button class="pin-key pin-key-del" onclick="pinApagar()">⌫</button>
+      </div>
+    </div>
+
+    <!-- Passo 3: Cadastrar novo guardião -->
+    <div id="login-step-3" style="display:none">
+      <div class="login-label">Novo Guardião da Força</div>
+      <div style="margin-bottom:12px">
+        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">NOME DO GUARDIÃO</label>
+        <input type="text" id="novo-guardiao-nome" maxlength="20" placeholder="ex: Ana, Pedro..."
+          style="width:100%;text-align:center;font-family:'Orbitron',monospace;font-size:1rem;letter-spacing:0.05em">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:8px">EMBLEMA DO GUARDIÃO</label>
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </div>
+      <div class="login-saber" style="margin:14px 0"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="salvarNovoGuardiao()">⚡ Criar Guardião</button>
+        <button class="btn" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);font-size:0.68rem" onclick="voltarLogin()">Cancelar</button>
+      </div>
     </div>
   </div>
+</div>
+
+<!-- BANNER INSTALAÇÃO iOS -->
+<div id="ios-install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:8000;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.98));border-top:1px solid rgba(0,180,255,0.3);padding:14px 16px;text-align:center;box-shadow:0 -4px 20px rgba(0,0,0,0.5)">
+  <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:6px">⚡ INSTALAR COMO APP</div>
+  <div style="font-size:0.78rem;color:var(--text-dim);line-height:1.5">Toque em <strong style="color:var(--white)">Compartilhar</strong> <span style="font-size:1rem">⬆️</span> e depois em<br><strong style="color:var(--blue-neon)">"Adicionar à Tela de Início"</strong></div>
+  <button onclick="document.getElementById('ios-install-banner').style.display='none'" style="margin-top:10px;background:transparent;border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);padding:5px 16px;border-radius:20px;font-size:0.7rem;cursor:pointer;font-family:'Orbitron',monospace">Fechar</button>
 </div>
 
 <header>
@@ -1497,26 +1664,281 @@ for (let i = 0; i < 120; i++) {
   starsEl.appendChild(s);
 }
 
-// ── SISTEMA DE LOGIN ──
-const SESSION_KEY = 'arthur_guardian_v1';
-const GUARDIOES = {
-  joao:   { nome: 'João',   emoji: '🧔', papel: 'Guardião · Pai' },
-  nadyne: { nome: 'Nadyne', emoji: '👩', papel: 'Guardiã · Mãe'  },
+// ── PWA: MANIFEST + SERVICE WORKER INLINE ──
+(function() {
+  // Manifest
+  const manifest = {
+    name: 'Crônicas do Padawan Arthur',
+    short_name: 'Padawan Arthur',
+    description: 'Arquivos da Ordem Jedi · Diário do Padawan Arthur',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#020b18',
+    theme_color: '#020b18',
+    orientation: 'portrait',
+    icons: [
+      { src: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" fill="#020b18" rx="32"/><text x="96" y="130" text-anchor="middle" font-size="110">🛸</text></svg>`), sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+      { src: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#020b18" rx="80"/><text x="256" y="350" text-anchor="middle" font-size="300">🛸</text></svg>`), sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const mUrl = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = mUrl;
+
+  // Apple touch icon via SVG
+  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><rect width="180" height="180" fill="#020b18" rx="30"/><text x="90" y="128" text-anchor="middle" font-size="110">🛸</text></svg>`;
+  const iconUrl = 'data:image/svg+xml,' + encodeURIComponent(iconSvg);
+  document.getElementById('pwa-icon').href = iconUrl;
+
+  // Service Worker inline para offline
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'padawan-arthur-v1';
+const FONTS = [
+  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap'
+];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FONTS)).catch(()=>{}));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.url.includes('fonts.g') || e.request.url.includes('fonts.gstatic')) {
+    e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    })));
+    return;
+  }
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl  = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
+})();
+
+// ── SISTEMA DE AUTENTICAÇÃO COM SENHA + AES-256 ──
+const SENHA_CORRETA = '120326';
+const SESSION_KEY   = 'arthur_guardian_v1';
+const AUTO_LOCK_MS  = 5 * 60 * 1000; // 5 min inatividade
+
+// ── GUARDIÕES DINÂMICOS ──
+const GUARDIOES_KEY = 'arthur_guardioes_v1';
+const EMOJIS_DISPONIVEIS = ['🧔','👩','👨','👱','🧕','👴','👵','🧑','🧒','👦','👧','🧔‍♀️','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','🧑‍🚀','🧙','🧝','🦸','🧑‍⚕️','🧑‍🏫','⚔️','🛸','🌟','💫'];
+
+const GUARDIOES_DEFAULT = {
+  joao:   { nome: 'João',   emoji: '🧔', papel: 'Guardião da Força · Pai do Padawan' },
+  nadyne: { nome: 'Nadyne', emoji: '👩', papel: 'Guardiã da Força · Mãe do Padawan'  },
 };
 
+function loadGuardioes() {
+  try {
+    const raw = localStorage.getItem(GUARDIOES_KEY);
+    return raw ? JSON.parse(raw) : { ...GUARDIOES_DEFAULT };
+  } catch(e) { return { ...GUARDIOES_DEFAULT }; }
+}
+
+function saveGuardioes(g) {
+  try { localStorage.setItem(GUARDIOES_KEY, JSON.stringify(g)); } catch(e) {}
+}
+
+let GUARDIOES = loadGuardioes();
+
+// Garante defaults sempre presentes
+if (!GUARDIOES.joao)   GUARDIOES.joao   = GUARDIOES_DEFAULT.joao;
+if (!GUARDIOES.nadyne) GUARDIOES.nadyne = GUARDIOES_DEFAULT.nadyne;
+
+let _emojiSelecionado = '🧑';
+
+function renderListaGuardioes() {
+  const lista = document.getElementById('lista-guardioes-login');
+  if (!lista) return;
+  lista.innerHTML = Object.entries(GUARDIOES).map(([id, g]) => `
+    <button class="btn-guardian" onclick="escolherGuardiao('${id}')">
+      <div class="guardian-avatar">${g.emoji}</div>
+      <div style="flex:1;text-align:left">
+        <div class="guardian-info-name">${g.nome}</div>
+        <div class="guardian-info-role">${g.papel}</div>
+      </div>
+      ${id !== 'joao' && id !== 'nadyne' ? `
+        <button onclick="event.stopPropagation();removerGuardiao('${id}')"
+          style="background:none;border:none;color:rgba(255,100,100,0.5);font-size:0.9rem;cursor:pointer;padding:4px;margin-left:4px" title="Remover">✕</button>
+      ` : ''}
+    </button>
+  `).join('');
+}
+
+function abrirCadastroGuardiao() {
+  _emojiSelecionado = '🧑';
+  document.getElementById('novo-guardiao-nome').value = '';
+  document.getElementById('login-step-1').style.display = 'none';
+  document.getElementById('login-step-3').style.display = 'block';
+
+  // Renderiza grid de emojis
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = EMOJIS_DISPONIVEIS.map(e => `
+    <button class="emoji-btn ${e === _emojiSelecionado ? 'sel' : ''}" onclick="selecionarEmoji('${e}',this)">${e}</button>
+  `).join('');
+}
+
+function selecionarEmoji(emoji, btn) {
+  _emojiSelecionado = emoji;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function salvarNovoGuardiao() {
+  const nome = document.getElementById('novo-guardiao-nome').value.trim();
+  if (!nome) { alert('⚠️ Digite o nome do Guardião!'); return; }
+  const id = 'g_' + Date.now();
+  GUARDIOES[id] = {
+    nome,
+    emoji: _emojiSelecionado,
+    papel: 'Guardião da Força'
+  };
+  saveGuardioes(GUARDIOES);
+  voltarLogin();
+  showToast('✨ Novo Guardião criado!');
+}
+
+function removerGuardiao(id) {
+  if (!confirm(`Remover o Guardião "${GUARDIOES[id]?.nome}"?`)) return;
+  delete GUARDIOES[id];
+  saveGuardioes(GUARDIOES);
+  renderListaGuardioes();
+}
+
+function voltarLogin() {
+  _pinAtual = '';
+  _guardiaoPendente = null;
+  document.getElementById('login-step-2').style.display = 'none';
+  document.getElementById('login-step-3').style.display = 'none';
+  document.getElementById('login-step-1').style.display = 'block';
+  document.getElementById('pin-error').textContent = '';
+  atualizarPinDisplay();
+  renderListaGuardioes();
+}
+
+// Renderiza lista ao carregar
+renderListaGuardioes();
+
 let usuarioAtual = null;
+let _guardiaoPendente = null;
+let _pinAtual = '';
+let _pinTentativas = 0;
+let _autoLockTimer = null;
+
+// ── CRIPTOGRAFIA AES-256 (Web Crypto API) ──
+const CRYPTO_KEY_RAW = new TextEncoder().encode(SENHA_CORRETA.padEnd(32,'0').slice(0,32));
+let _cryptoKey = null;
+
+async function getCryptoKey() {
+  if (_cryptoKey) return _cryptoKey;
+  _cryptoKey = await crypto.subtle.importKey(
+    'raw', CRYPTO_KEY_RAW, { name:'AES-GCM' }, false, ['encrypt','decrypt']
+  );
+  return _cryptoKey;
+}
+
+async function encriptar(texto) {
+  try {
+    const key = await getCryptoKey();
+    const iv  = crypto.getRandomValues(new Uint8Array(12));
+    const enc = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, new TextEncoder().encode(texto));
+    const buf = new Uint8Array(iv.length + enc.byteLength);
+    buf.set(iv); buf.set(new Uint8Array(enc), iv.length);
+    return btoa(String.fromCharCode(...buf));
+  } catch(e) { return texto; }
+}
+
+async function decriptar(b64) {
+  try {
+    const key = await getCryptoKey();
+    const buf = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const iv  = buf.slice(0,12);
+    const dec = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, buf.slice(12));
+    return new TextDecoder().decode(dec);
+  } catch(e) { return null; }
+}
+
+// ── PIN KEYPAD ──
+function escolherGuardiao(id) {
+  _guardiaoPendente = id;
+  _pinAtual = '';
+  _pinTentativas = 0;
+  document.getElementById('login-step-1').style.display = 'none';
+  document.getElementById('login-step-2').style.display = 'block';
+  const g = GUARDIOES[id];
+  document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Digite o Código da Força`;
+  atualizarPinDisplay();
+}
+
+function pinDigito(d) {
+  if (_pinAtual.length >= 6) return;
+  _pinAtual += d;
+  atualizarPinDisplay();
+  if (_pinAtual.length === 6) {
+    setTimeout(verificarSenha, 80);
+  }
+}
+
+function pinApagar() {
+  _pinAtual = _pinAtual.slice(0,-1);
+  atualizarPinDisplay();
+}
+
+function atualizarPinDisplay() {
+  for (let i = 0; i < 6; i++) {
+    const dot = document.getElementById('pd' + i);
+    dot.className = 'pin-dot' + (i < _pinAtual.length ? ' filled' : '');
+  }
+}
+
+function verificarSenha() {
+  if (_pinAtual === SENHA_CORRETA) {
+    document.getElementById('pin-error').textContent = '';
+    fazerLogin(_guardiaoPendente);
+  } else {
+    _pinTentativas++;
+    _pinAtual = '';
+    // Shake animation
+    for (let i = 0; i < 6; i++) {
+      const dot = document.getElementById('pd' + i);
+      dot.className = 'pin-dot error';
+    }
+    const delay = Math.min(1000 * _pinTentativas, 5000);
+    document.getElementById('pin-error').textContent =
+      _pinTentativas >= 3 ? `Acesso negado. Aguarde ${delay/1000}s` : 'Código incorreto — tente novamente';
+    setTimeout(() => {
+      atualizarPinDisplay();
+      document.getElementById('pin-error').textContent = _pinTentativas >= 3 ? '' : document.getElementById('pin-error').textContent;
+    }, delay);
+  }
+}
 
 function fazerLogin(id) {
   usuarioAtual = id;
-  try { sessionStorage.setItem(SESSION_KEY, id); } catch(e) {}
   document.getElementById('tela-login').style.display = 'none';
   atualizarBadge();
+  iniciarAutoLock();
   renderAll();
 }
 
 function sairSessao() {
   usuarioAtual = null;
+  _pinAtual = '';
+  _guardiaoPendente = null;
+  if (_autoLockTimer) clearTimeout(_autoLockTimer);
   try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
+  document.getElementById('login-step-1').style.display = 'block';
+  document.getElementById('login-step-2').style.display = 'none';
+  atualizarPinDisplay();
+  document.getElementById('pin-error').textContent = '';
   document.getElementById('tela-login').style.display = 'flex';
 }
 
@@ -1531,34 +1953,85 @@ function nomeAutor(id) {
   return id ? (GUARDIOES[id]?.nome || id) : '—';
 }
 
-// Verifica sessão existente
+// ── AUTO-LOCK POR INATIVIDADE ──
+function resetAutoLock() {
+  if (!usuarioAtual) return;
+  if (_autoLockTimer) clearTimeout(_autoLockTimer);
+  _autoLockTimer = setTimeout(() => {
+    if (usuarioAtual) sairSessao();
+  }, AUTO_LOCK_MS);
+}
+
+function iniciarAutoLock() {
+  ['touchstart','click','keydown','scroll'].forEach(ev =>
+    document.addEventListener(ev, resetAutoLock, { passive: true })
+  );
+  resetAutoLock();
+}
+
+// Sempre mostra tela de login ao abrir — sessão só lembra QUEM é o guardião
+// mas ainda exige o PIN para entrar
 (function() {
   try {
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved && GUARDIOES[saved]) {
-      usuarioAtual = saved;
-      document.getElementById('tela-login').style.display = 'none';
-      atualizarBadge();
+      // Pré-seleciona o guardião mas ainda exige PIN
+      _guardiaoPendente = saved;
+      document.getElementById('login-step-1').style.display = 'none';
+      document.getElementById('login-step-2').style.display = 'block';
+      const g = GUARDIOES[saved];
+      document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Digite o Código da Força`;
+      atualizarPinDisplay();
     }
   } catch(e) {}
 })();
 
 
-const KEY = 'diario_arthur_v1';
+const KEY = 'diario_arthur_v2_enc';
 
-function loadData() {
+async function loadData() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (!raw) return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
+    // Tenta decriptar (v2 criptografado)
+    const dec = await decriptar(raw);
+    if (dec) return JSON.parse(dec);
+    // Fallback: tenta JSON puro (dados legados v1)
+    const legado = localStorage.getItem('diario_arthur_v1');
+    if (legado) return JSON.parse(legado);
   } catch(e) {}
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
 
-function saveData(data) {
-  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
+async function saveData(data) {
+  try {
+    const json = JSON.stringify(data);
+    const enc  = await encriptar(json);
+    localStorage.setItem(KEY, enc);
+  } catch(e) {
+    // Fallback sem cripto
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e2) {}
+  }
 }
 
-let db = loadData();
+// Carregamento async dos dados
+let db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
+loadData().then(d => { db = d; });
+
+// ── DETECÇÃO iOS PARA BANNER DE INSTALAÇÃO ──
+(function() {
+  const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isInStandalone = window.navigator.standalone === true;
+  if (isIos && !isInStandalone) {
+    const shown = sessionStorage.getItem('ios_banner_shown');
+    if (!shown) {
+      setTimeout(() => {
+        document.getElementById('ios-install-banner').style.display = 'block';
+        sessionStorage.setItem('ios_banner_shown','1');
+      }, 3000);
+    }
+  }
+})();
 
 // ── UTILS ──
 const quotes = [
@@ -2503,7 +2976,12 @@ function renderAll() {
   renderMesversario();
   renderVacinas();
 }
-renderAll();
+
+// Aguarda dados carregarem antes de renderizar
+loadData().then(d => {
+  db = d;
+  if (usuarioAtual) renderAll();
+});
 </script>
 </body>
 </html>
