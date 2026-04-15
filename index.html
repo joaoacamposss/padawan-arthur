@@ -1515,6 +1515,9 @@
     <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">📖</span> Glossário Galáctico
     </button>
+    <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">☁️</span> Sincronizar dados locais
+    </button>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
     <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">↩</span> Trocar Guardião
@@ -2032,7 +2035,114 @@
   </div>
 </div>
 
-<!-- MODAL FOTO ARTHUR -->
+<!-- MODAL NOVIDADES — banner ao fazer login -->
+<div id="modal-novidades" style="
+  display:none;
+  position:fixed;inset:0;
+  z-index:999998;
+  background:rgba(2,11,24,0.88);
+  align-items:flex-end;justify-content:center;
+  padding-bottom:env(safe-area-inset-bottom,16px);
+  animation:fadeIn 0.3s ease;
+">
+  <div style="
+    background:linear-gradient(135deg,rgba(0,30,70,0.99),rgba(2,15,40,0.99));
+    border:1px solid rgba(0,180,255,0.3);
+    border-radius:16px 16px 12px 12px;
+    padding:20px 18px 18px;
+    max-width:400px;width:calc(100% - 24px);
+    margin-bottom:8px;
+    box-shadow:0 -4px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0,180,255,0.08);
+  ">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="font-size:1.6rem" id="nov-emoji">🌌</div>
+      <div style="flex:1">
+        <div style="font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;color:#00d4ff;letter-spacing:0.08em">NOVIDADES NA GALÁXIA</div>
+        <div id="nov-subtitulo" style="font-size:0.68rem;color:#7ab3d4;margin-top:1px"></div>
+      </div>
+      <button onclick="fecharNovidades()" style="
+        background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);
+        border-radius:8px;color:#7ab3d4;width:32px;height:32px;
+        cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;
+        flex-shrink:0;
+      ">✕</button>
+    </div>
+
+    <!-- Lista de novidades -->
+    <div id="nov-lista" style="
+      display:flex;flex-direction:column;gap:7px;
+      margin-bottom:14px;
+    "></div>
+
+    <!-- Tempo desde última visita -->
+    <div id="nov-tempo" style="
+      font-size:0.62rem;color:rgba(122,179,212,0.5);
+      font-family:'Orbitron',monospace;letter-spacing:0.05em;
+      text-align:right;margin-bottom:12px;
+    "></div>
+
+    <button onclick="fecharNovidades()" style="
+      width:100%;padding:12px;
+      background:linear-gradient(135deg,rgba(0,60,130,0.5),rgba(0,30,80,0.6));
+      border:1px solid rgba(0,180,255,0.3);border-radius:10px;
+      color:#00d4ff;font-family:'Orbitron',monospace;
+      font-size:0.68rem;letter-spacing:0.06em;cursor:pointer;
+    ">⚡ Entendido — ver crônicas</button>
+  </div>
+</div>
+
+<!-- MODAL SINCRONIZAR DADOS LOCAIS → NUVEM -->
+<div id="modal-migracao" style="
+  display:none;
+  position:fixed;inset:0;
+  z-index:999999;
+  background:rgba(2,11,24,0.95);
+  align-items:center;justify-content:center;
+  padding:20px;
+">
+  <div style="
+    background:linear-gradient(135deg,rgba(5,25,55,0.99),rgba(3,15,35,0.99));
+    border:1px solid rgba(57,255,20,0.35);
+    border-radius:16px;
+    padding:24px 20px;
+    max-width:340px;width:100%;
+    text-align:center;
+    box-shadow:0 0 40px rgba(57,255,20,0.1),0 8px 32px rgba(0,0,0,0.6);
+  ">
+    <div style="font-size:2.2rem;margin-bottom:10px">☁️</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#7fff60;letter-spacing:0.1em;margin-bottom:8px">SINCRONIZAR COM A NUVEM</div>
+    <div style="font-size:0.85rem;color:#e8f4fd;line-height:1.6;margin-bottom:6px">
+      Envia todos os dados salvos localmente neste dispositivo para o Firebase.
+    </div>
+    <div style="font-size:0.75rem;color:#7ab3d4;line-height:1.5;margin-bottom:18px">
+      Use uma vez ao migrar para a versão nova. Dados já existentes na nuvem <strong style="color:#e8f4fd">não serão apagados</strong> — os registros locais serão <strong style="color:#e8f4fd">adicionados</strong>.
+    </div>
+
+    <!-- Status / progresso -->
+    <div id="migr-status" style="
+      display:none;
+      background:rgba(0,20,50,0.6);
+      border:1px solid rgba(0,180,255,0.2);
+      border-radius:10px;
+      padding:12px 14px;
+      margin-bottom:14px;
+      font-size:0.78rem;
+      color:#7ab3d4;
+      text-align:left;
+      line-height:1.7;
+    "></div>
+
+    <div id="migr-btns" class="modal-btns">
+      <button class="btn" style="flex:1;background:linear-gradient(135deg,#1a5c1a,#0d3d0d);border:1px solid rgba(57,255,20,0.4);color:#7fff60;box-shadow:0 0 12px rgba(57,255,20,0.15)" onclick="executarMigracao()">
+        ☁️ Sincronizar agora
+      </button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharMigracao()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
 <div id="modal-foto-arthur" class="modal-overlay" style="display:none">
   <div class="modal-box" style="max-width:300px">
     <div class="modal-icon">🛸</div>
@@ -2427,6 +2537,8 @@ function fazerLogin(id) {
     db = d;
     renderAll();
     iniciarSyncTempoReal();
+    // Verifica novidades de outros guardiões após 1s (deixa a tela carregar primeiro)
+    setTimeout(() => verificarNovidades(id), 1000);
   });
   // Sync guardiões em tempo real
   GUARDIOES_REF.onSnapshot(snap => {
@@ -2613,13 +2725,12 @@ async function loadData() {
   try {
     const snap = await DOC_REF.get();
     if (snap.exists) {
-      const d = snap.data();
-      // Cache local para uso offline
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
-      return d;
+      const { _ultimaAtualizacao, ...dados } = snap.data();
+      // Salva cache local sem o metadado de atualização
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
+      return dados;
     }
   } catch(e) {
-    // Offline — usa cache local
     const cache = localStorage.getItem(LOCAL_KEY);
     if (cache) return JSON.parse(cache);
   }
@@ -2629,10 +2740,22 @@ async function loadData() {
 async function saveData(data) {
   // Sempre salva local imediatamente
   localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+  // Registra timestamp da última atualização com autor
+  const agora = Date.now();
+  const autor  = usuarioAtual ? (GUARDIOES[usuarioAtual]?.nome || 'Guardião') : 'Guardião';
   try {
-    await DOC_REF.set(data);
+    await DOC_REF.set({
+      ...data,
+      _ultimaAtualizacao: {
+        ts:      agora,
+        autor,
+        mamadas: (data.mamadas    || []).length,
+        duvidas: (data.duvidas    || []).length,
+        eventos: (data.eventos    || []).length,
+        mesvers: (data.mesversario|| []).length,
+      }
+    });
   } catch(e) {
-    // Offline — dados ficam no cache, sincroniza quando voltar
     console.warn('Firebase offline, dados em cache local');
   }
 }
@@ -2642,12 +2765,15 @@ function iniciarSyncTempoReal() {
   DOC_REF.onSnapshot(snap => {
     if (!snap.exists) return;
     const novos = snap.data();
-    // Só atualiza se os dados são diferentes dos locais (evita loop)
-    const local = JSON.stringify(db);
-    const remoto = JSON.stringify(novos);
+    // Remove metadado antes de comparar — _ultimaAtualizacao não é dado do app
+    const { _ultimaAtualizacao: _a, ...dadosNovos } = novos;
+    const { _ultimaAtualizacao: _b, ...dadosLocais } = db;
+    const local  = JSON.stringify(dadosLocais);
+    const remoto = JSON.stringify(dadosNovos);
+    // Só atualiza se os dados reais são diferentes (evita loop por _ultimaAtualizacao)
     if (local !== remoto) {
-      db = novos;
-      localStorage.setItem(LOCAL_KEY, remoto);
+      db = dadosNovos;
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosNovos));
       if (usuarioAtual) renderAll();
     }
   }, err => console.warn('Sync error:', err));
@@ -4337,6 +4463,309 @@ function exportarAgendaICS() {
   gerarICS(futuros, 'missoes-padawan-arthur.ics');
   showToast(`📅 ${futuros.length} missão(ões) exportada(s) para o Calendário!`);
 }
+
+// ── SISTEMA DE NOVIDADES — banner ao fazer login ──
+// Chave por guardião: guarda timestamp da última vez que esse guardião esteve online
+const NOVIDADES_KEY = (id) => `arthur_ultima_visita_${id}`;
+
+async function verificarNovidades(idGuardiao) {
+  try {
+    // Lê dados do Firebase para pegar _ultimaAtualizacao
+    const snap = await DOC_REF.get();
+    if (!snap.exists) return;
+
+    const data    = snap.data();
+    const ult     = data._ultimaAtualizacao;
+    if (!ult || !ult.ts) return;
+
+    // Quando este guardião esteve online pela última vez
+    const ultimaVisita = parseInt(localStorage.getItem(NOVIDADES_KEY(idGuardiao)) || '0');
+
+    // Se a última atualização foi feita por OUTRO guardião DEPOIS da última visita deste
+    const outroGuardiao = ult.autor !== (GUARDIOES[idGuardiao]?.nome || '');
+    const maisRecente   = ult.ts > ultimaVisita;
+
+    if (outroGuardiao && maisRecente && ultimaVisita > 0) {
+      // Calcula diferenças em relação ao que este guardião viu da última vez
+      const cacheAnterior = JSON.parse(localStorage.getItem('arthur_snapshot_' + idGuardiao) || 'null');
+
+      const novidades = [];
+
+      if (cacheAnterior) {
+        const deltaMam = (data.mamadas    || []).length - (cacheAnterior.mamadas    || 0);
+        const deltaDuv = (data.duvidas    || []).length - (cacheAnterior.duvidas    || 0);
+        const deltaEv  = (data.eventos    || []).length - (cacheAnterior.eventos    || 0);
+        const deltaMes = (data.mesversario|| []).length - (cacheAnterior.mesversario|| 0);
+        if (deltaMam > 0) novidades.push({ icon:'🍼', texto: `${deltaMam} nova${deltaMam>1?'s':''} recarga${deltaMam>1?'s':''} de energia` });
+        if (deltaDuv > 0) novidades.push({ icon:'📜', texto: `${deltaDuv} nova${deltaDuv>1?'s':''} missiva${deltaDuv>1?'s':''}` });
+        if (deltaEv  > 0) novidades.push({ icon:'🗺️', texto: `${deltaEv} nova${deltaEv>1?'s':''} missão${deltaEv>1?'ões':''}` });
+        if (deltaMes > 0) novidades.push({ icon:'🌙', texto: `${deltaMes} nova${deltaMes>1?'s':''} órbita${deltaMes>1?'s':''}` });
+      } else {
+        // Primeira vez — mostra totais
+        if ((data.mamadas    ||[]).length > 0) novidades.push({ icon:'🍼', texto:`${(data.mamadas||[]).length} recargas nas crônicas` });
+        if ((data.duvidas    ||[]).length > 0) novidades.push({ icon:'📜', texto:`${(data.duvidas||[]).length} missivas nas crônicas` });
+        if ((data.eventos    ||[]).length > 0) novidades.push({ icon:'🗺️', texto:`${(data.eventos||[]).length} missões nas crônicas` });
+        if ((data.mesversario||[]).length > 0) novidades.push({ icon:'🌙', texto:`${(data.mesversario||[]).length} órbitas nas crônicas` });
+      }
+
+      if (novidades.length > 0) {
+        exibirBannerNovidades(ult.autor, ult.ts, ultimaVisita, novidades);
+      }
+    }
+
+    // Salva snapshot do estado atual para próxima comparação
+    localStorage.setItem('arthur_snapshot_' + idGuardiao, JSON.stringify({
+      mamadas:     (data.mamadas    ||[]).length,
+      duvidas:     (data.duvidas    ||[]).length,
+      eventos:     (data.eventos    ||[]).length,
+      mesversario: (data.mesversario||[]).length,
+    }));
+
+    // Atualiza timestamp desta visita
+    localStorage.setItem(NOVIDADES_KEY(idGuardiao), String(Date.now()));
+
+  } catch(e) {
+    // Silencioso — falha na verificação de novidades não deve atrapalhar o app
+  }
+}
+
+function exibirBannerNovidades(autor, tsAtualizacao, tsUltimaVisita, novidades) {
+  // Subtítulo com nome do outro guardião
+  document.getElementById('nov-subtitulo').textContent = `${autor} atualizou as crônicas`;
+
+  // Emoji baseado em quem atualizou
+  const isJoao = autor.toLowerCase().includes('jo');
+  document.getElementById('nov-emoji').textContent = isJoao ? '🧔' : '👩';
+
+  // Lista de novidades
+  const lista = document.getElementById('nov-lista');
+  lista.innerHTML = novidades.map(n => `
+    <div style="
+      display:flex;align-items:center;gap:10px;
+      background:rgba(0,20,50,0.6);
+      border:1px solid rgba(0,180,255,0.15);
+      border-radius:8px;padding:9px 12px;
+    ">
+      <span style="font-size:1.1rem">${n.icon}</span>
+      <span style="font-size:0.82rem;color:#e8f4fd">${n.texto}</span>
+    </div>
+  `).join('');
+
+  // Tempo desde a atualização
+  const diffMs  = Date.now() - tsAtualizacao;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffH   = Math.floor(diffMin / 60);
+  const diffD   = Math.floor(diffH / 24);
+  let tempoStr;
+  if (diffMin < 2)        tempoStr = 'agora mesmo';
+  else if (diffMin < 60)  tempoStr = `há ${diffMin} min`;
+  else if (diffH < 24)    tempoStr = `há ${diffH}h`;
+  else if (diffD === 1)   tempoStr = 'ontem';
+  else                    tempoStr = `há ${diffD} dias`;
+
+  document.getElementById('nov-tempo').textContent = `Última atualização: ${tempoStr}`;
+
+  // Exibe o modal
+  const modal = document.getElementById('modal-novidades');
+  modal.style.zIndex = '999998';
+  modal.style.display = 'flex';
+}
+
+function fecharNovidades() {
+  document.getElementById('modal-novidades').style.display = 'none';
+}
+
+function abrirMigracao() {
+  fecharMenuGuardiao();
+  const local = verificarDadosLocais();
+  const status = document.getElementById('migr-status');
+  status.style.display = 'block';
+  status.innerHTML = '';
+
+  const btns = document.getElementById('migr-btns');
+  btns.style.display = 'flex';
+  btns.innerHTML = `
+    <button class="btn" style="flex:1;background:linear-gradient(135deg,#1a5c1a,#0d3d0d);border:1px solid rgba(57,255,20,0.4);color:#7fff60;box-shadow:0 0 12px rgba(57,255,20,0.15)" onclick="executarMigracao()">☁️ Sincronizar agora</button>
+    <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharMigracao()">Cancelar</button>
+  `;
+
+  if (!local.temAlgo) {
+    status.innerHTML = '✅ Nenhum dado local encontrado — este dispositivo já está sincronizado com a nuvem.';
+    btns.innerHTML = `<button class="btn btn-full" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharMigracao()">Fechar</button>`;
+  } else {
+    status.innerHTML = `
+      📦 <strong style="color:#e8f4fd">Dados locais encontrados:</strong><br>
+      ${local.mamadas   > 0 ? `🍼 ${local.mamadas} recargas<br>` : ''}
+      ${local.duvidas   > 0 ? `📜 ${local.duvidas} missivas<br>` : ''}
+      ${local.eventos   > 0 ? `🗺️ ${local.eventos} missões<br>` : ''}
+      ${local.mesvers   > 0 ? `🌙 ${local.mesvers} órbitas<br>` : ''}
+      ${local.medicacao > 0 ? `⚗️ ${local.medicacao} elixires<br>` : ''}
+      ${local.vacStatus > 0 ? `🛡️ ${local.vacStatus} vacinas marcadas<br>` : ''}
+      ${local.extras    > 0 ? `🛡️ ${local.extras} vacinas extras<br>` : ''}
+    `.trim();
+  }
+
+  const modal = document.getElementById('modal-migracao');
+  modal.style.zIndex = '999999';
+  modal.style.display = 'flex';
+}
+
+function verificarDadosLocais() {
+  // Lê de todas as chaves possíveis — v1, v2_enc e offline
+  const chaves_main = ['diario_arthur_v1', 'diario_arthur_v2_enc', 'diario_arthur_offline'];
+  let dadosMain = null;
+  for (const k of chaves_main) {
+    try {
+      const raw = localStorage.getItem(k);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw);
+      if (parsed && (parsed.mamadas || parsed.duvidas || parsed.eventos || parsed.mesversario)) {
+        dadosMain = parsed; break;
+      }
+    } catch(e) {}
+  }
+
+  let vacStatusObj = {};
+  try { vacStatusObj = JSON.parse(localStorage.getItem('arthur_vacinas_v1')) || JSON.parse(localStorage.getItem('arthur_vacinas_offline')) || {}; } catch(e) {}
+
+  let extrasObj = {};
+  try { extrasObj = JSON.parse(localStorage.getItem('arthur_vacinas_extras_v1')) || JSON.parse(localStorage.getItem('arthur_vacinas_extras_offline')) || {}; } catch(e) {}
+
+  let medicacoesArr = [];
+  try { medicacoesArr = JSON.parse(localStorage.getItem('arthur_medicacao_offline')) || []; } catch(e) {}
+
+  const mamadas   = dadosMain?.mamadas?.length    || 0;
+  const duvidas   = dadosMain?.duvidas?.length    || 0;
+  const eventos   = dadosMain?.eventos?.length    || 0;
+  const mesvers   = dadosMain?.mesversario?.length || 0;
+  const vacSt     = Object.keys(vacStatusObj).length;
+  const extrasN   = Object.values(extrasObj).flat().length;
+  const medN      = medicacoesArr.length;
+  const temAlgo   = (mamadas + duvidas + eventos + mesvers + vacSt + extrasN + medN) > 0;
+
+  return { temAlgo, mamadas, duvidas, eventos, mesvers,
+           vacStatus: vacSt, extras: extrasN, medicacao: medN,
+           dadosMain, vacStatusObj, extrasObj, medicacoesArr };
+}
+
+async function executarMigracao() {
+  const status = document.getElementById('migr-status');
+  const btns   = document.getElementById('migr-btns');
+  btns.style.display = 'none';
+  status.style.display = 'block';
+
+  const local = verificarDadosLocais();
+  let log = [], erros = 0;
+
+  try {
+    // 1. Dados principais
+    if (local.dadosMain) {
+      status.innerHTML = '⏳ Sincronizando recargas, missivas, missões e órbitas...';
+      try {
+        const snap = await DOC_REF.get();
+        const nuvem = snap.exists ? snap.data() : { mamadas:[], duvidas:[], eventos:[], mesversario:[] };
+        const merge = (n, l) => { const ids = new Set((n||[]).map(x=>x.id)); return [...(n||[]), ...(l||[]).filter(x=>!ids.has(x.id))]; };
+        const merged = {
+          mamadas:     merge(nuvem.mamadas,     local.dadosMain.mamadas),
+          duvidas:     merge(nuvem.duvidas,     local.dadosMain.duvidas),
+          eventos:     merge(nuvem.eventos,     local.dadosMain.eventos),
+          mesversario: merge(nuvem.mesversario, local.dadosMain.mesversario),
+        };
+        await DOC_REF.set(merged);
+        db = merged;
+        const novos = [
+          merged.mamadas.length    - (nuvem.mamadas?.length    || 0),
+          merged.duvidas.length    - (nuvem.duvidas?.length    || 0),
+          merged.eventos.length    - (nuvem.eventos?.length    || 0),
+          merged.mesversario.length- (nuvem.mesversario?.length|| 0),
+        ];
+        if (novos[0] > 0) log.push(`🍼 +${novos[0]} recargas enviadas`);
+        if (novos[1] > 0) log.push(`📜 +${novos[1]} missivas enviadas`);
+        if (novos[2] > 0) log.push(`🗺️ +${novos[2]} missões enviadas`);
+        if (novos[3] > 0) log.push(`🌙 +${novos[3]} órbitas enviadas`);
+        if (novos.every(n => n === 0)) log.push('✅ Dados principais já estavam na nuvem');
+      } catch(e) { erros++; log.push('❌ Erro nos dados principais'); }
+    }
+
+    // 2. Vacinas status
+    if (Object.keys(local.vacStatusObj).length > 0) {
+      status.innerHTML = '⏳ Sincronizando escudos de proteção...';
+      try {
+        const snap = await VACINHAS_REF.get();
+        const nuvemVac = snap.exists ? (snap.data().status || {}) : {};
+        const novos = Object.keys(local.vacStatusObj).filter(k => !nuvemVac[k]).length;
+        await VACINHAS_REF.set({ status: { ...local.vacStatusObj, ...nuvemVac } });
+        vacStatus = { ...local.vacStatusObj, ...nuvemVac };
+        if (novos > 0) log.push(`🛡️ +${novos} vacinas marcadas enviadas`);
+        else log.push('✅ Vacinas já estavam na nuvem');
+      } catch(e) { erros++; log.push('❌ Erro nas vacinas'); }
+    }
+
+    // 3. Vacinas extras
+    if (Object.keys(local.extrasObj).length > 0) {
+      status.innerHTML = '⏳ Sincronizando vacinas extras...';
+      try {
+        const snap = await EXTRAS_REF.get();
+        const nuvemExt = snap.exists ? (snap.data().extras || {}) : {};
+        const mergedExt = { ...nuvemExt };
+        let novos = 0;
+        for (const [grp, lista] of Object.entries(local.extrasObj)) {
+          if (!mergedExt[grp]) mergedExt[grp] = [];
+          const ids = new Set(mergedExt[grp].map(x => x.id));
+          const novas = lista.filter(x => !ids.has(x.id));
+          mergedExt[grp] = [...mergedExt[grp], ...novas];
+          novos += novas.length;
+        }
+        await EXTRAS_REF.set({ extras: mergedExt });
+        vacExtras = mergedExt;
+        if (novos > 0) log.push(`🛡️ +${novos} vacinas extras enviadas`);
+        else log.push('✅ Vacinas extras já estavam na nuvem');
+      } catch(e) { erros++; log.push('❌ Erro nas vacinas extras'); }
+    }
+
+    // 4. Medicação
+    if (local.medicacoesArr.length > 0) {
+      status.innerHTML = '⏳ Sincronizando elixires...';
+      try {
+        const snap = await MED_REF.get();
+        const nuvemMed = snap.exists ? (snap.data().lista || []) : [];
+        const ids = new Set(nuvemMed.map(x => x.id));
+        const novas = local.medicacoesArr.filter(x => !ids.has(x.id));
+        await MED_REF.set({ lista: [...nuvemMed, ...novas] });
+        medicacoes = [...nuvemMed, ...novas];
+        if (novas.length > 0) log.push(`⚗️ +${novas.length} elixires enviados`);
+        else log.push('✅ Elixires já estavam na nuvem');
+      } catch(e) { erros++; log.push('❌ Erro nos elixires'); }
+    }
+
+    // Atualiza tela
+    renderAll();
+    renderVacinas();
+    renderMedicacao();
+
+    status.innerHTML = `
+      <strong style="color:${erros === 0 ? '#7fff60' : '#ffe066'}">${erros === 0 ? '🎉 Sincronização concluída!' : '⚠️ Sincronização parcial'}</strong><br><br>
+      ${log.length > 0 ? log.join('<br>') : '✅ Tudo já estava na nuvem'}
+      ${erros > 0 ? `<br><br>❌ ${erros} erro(s) — verifique conexão e tente novamente` : ''}
+    `;
+    btns.innerHTML = `<button class="btn btn-full" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharMigracao()">Fechar</button>`;
+    btns.style.display = 'flex';
+    if (erros === 0) showToast('☁️ Dados sincronizados com a nuvem!');
+
+  } catch(e) {
+    status.innerHTML = `❌ Erro inesperado: ${e.message || 'sem conexão'}<br>Verifique sua internet e tente novamente.`;
+    btns.innerHTML = `
+      <button class="btn" style="flex:1;background:linear-gradient(135deg,#1a5c1a,#0d3d0d);border:1px solid rgba(57,255,20,0.4);color:#7fff60" onclick="executarMigracao()">Tentar novamente</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharMigracao()">Cancelar</button>
+    `;
+    btns.style.display = 'flex';
+  }
+}
+
+function fecharMigracao() {
+  document.getElementById('modal-migracao').style.display = 'none';
+}
+
 // Fotos são salvas como base64 no localStorage (Firebase tem limite de 1MB por doc)
 const FOTO_ARTHUR_KEY   = 'arthur_foto_arthur';
 const FOTO_GUARDIOES_KEY = 'arthur_fotos_guardioes';
