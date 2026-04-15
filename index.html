@@ -2,15 +2,20 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Padawan Arthur">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#020b18">
-<meta name="description" content="Crônicas do Padawan Arthur · Ordem Jedi">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="Diário do Padawan Arthur · Ordem Jedi">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src *; font-src * data:; img-src * data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
 <link rel="manifest" id="pwa-manifest">
 <link rel="apple-touch-icon" id="pwa-icon">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -29,15 +34,37 @@
     --green-saber: #39ff14;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
     background: var(--blue-deep);
     color: var(--white);
     font-family: 'Exo 2', sans-serif;
     min-height: 100vh;
+    min-height: -webkit-fill-available;
     overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+    /* Evitar seleção de texto acidental em mobile */
+    -webkit-user-select: none;
+    user-select: none;
   }
+
+  /* Permitir seleção em inputs e textareas */
+  input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+    /* CRÍTICO: evitar zoom ao focar input no iOS (mínimo 16px) */
+    font-size: 16px !important;
+  }
+  select { font-size: 16px !important; }
+
+  /* Fix para 100vh no iOS */
+  html { height: -webkit-fill-available; }
 
   /* STARFIELD */
   #stars {
@@ -152,70 +179,66 @@
     border-bottom: 1px solid rgba(0,180,255,0.2);
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 0;
   }
   nav::-webkit-scrollbar { display: none; }
 
   nav button {
     flex: 1;
-    min-width: 80px;
-    padding: 12px 8px;
+    min-width: 72px;
+    /* Touch target mínimo 44px Apple HIG */
+    padding: 10px 6px 12px;
+    min-height: 56px;
     background: none;
     border: none;
     color: var(--text-dim);
     font-family: 'Orbitron', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.05em;
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: color 0.2s, background 0.2s;
     border-bottom: 2px solid transparent;
     white-space: nowrap;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  nav button .nav-icon { font-size: 1.3rem; }
+  nav button .nav-icon { font-size: 1.25rem; }
 
   nav button.active {
     color: var(--blue-neon);
     border-bottom-color: var(--blue-neon);
     background: rgba(0,212,255,0.05);
-    text-shadow: 0 0 10px var(--blue-neon);
-  }
-
-  nav button:hover:not(.active) {
-    color: var(--white);
-    background: rgba(0,100,200,0.1);
   }
 
   /* MAIN CONTENT */
   main {
     position: relative; z-index: 10;
-    padding: 16px;
+    padding: 12px 14px;
     max-width: 600px;
     margin: 0 auto;
-    min-height: calc(100vh - 160px);
+    /* Espaço para o safe area do iPhone na base */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    min-height: calc(100vh - 120px);
   }
 
-  .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+  .tab-panel { display: none; animation: fadeIn 0.25s ease; }
   .tab-panel.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   /* CARDS */
   .card {
     background: linear-gradient(135deg, rgba(5,25,55,0.9) 0%, rgba(3,15,35,0.95) 100%);
     border: 1px solid rgba(0,180,255,0.2);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 14px;
+    padding: 14px;
     margin-bottom: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(0,180,255,0.1);
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-
-  .card:hover {
-    border-color: rgba(0,212,255,0.4);
-    box-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 0 15px rgba(0,212,255,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(0,180,255,0.08);
   }
 
   /* SECTION TITLES */
@@ -243,9 +266,9 @@
 
   label {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--text-dim);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     letter-spacing: 0.05em;
     font-family: 'Orbitron', monospace;
   }
@@ -254,25 +277,48 @@
     width: 100%;
     background: rgba(0,20,50,0.8);
     border: 1px solid rgba(0,180,255,0.25);
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--white);
-    padding: 10px 12px;
+    /* Mínimo 16px para evitar zoom no iOS */
+    font-size: 16px !important;
     font-family: 'Exo 2', sans-serif;
-    font-size: 0.9rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    /* Touch target: altura mínima 44px */
+    min-height: 44px;
+    padding: 10px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
+    /* Sem aparência nativa em mobile */
+    -webkit-appearance: none;
+    appearance: none;
+    touch-action: manipulation;
+  }
+
+  select {
+    /* Seta customizada para select */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%237ab3d4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
   }
 
   input:focus, select:focus, textarea:focus {
     border-color: var(--blue-neon);
-    box-shadow: 0 0 0 2px rgba(0,212,255,0.15), 0 0 12px rgba(0,212,255,0.1);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
   }
 
   select option { background: #0a2040; }
-  textarea { resize: vertical; min-height: 80px; }
+  textarea {
+    resize: none;
+    min-height: 80px;
+  }
 
   .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* Em telas muito pequenas, row-2 empilha */
+  @media (max-width: 340px) {
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+  }
 
   /* BUTTONS */
   .btn {
@@ -280,40 +326,42 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 11px 20px;
-    border-radius: 8px;
+    /* Touch target mínimo 44px */
+    padding: 13px 20px;
+    min-height: 44px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
     font-family: 'Orbitron', monospace;
     font-size: 0.72rem;
     letter-spacing: 0.08em;
-    transition: all 0.25s;
+    transition: opacity 0.15s, transform 0.1s;
     font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+    /* Feedback tátil */
+    touch-action: manipulation;
   }
+  .btn:active { opacity: 0.8; transform: scale(0.97); }
 
   .btn-primary {
     background: linear-gradient(135deg, #0056b3, #0099e6);
     color: white;
-    box-shadow: 0 0 15px rgba(0,153,230,0.4);
-  }
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #0070d2, #00b8ff);
-    box-shadow: 0 0 25px rgba(0,180,255,0.6);
-    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0,153,230,0.3);
   }
 
   .btn-danger {
     background: rgba(180,30,30,0.3);
     color: #ff6b6b;
     border: 1px solid rgba(255,59,59,0.3);
-    padding: 6px 10px;
+    padding: 8px 12px;
     font-size: 0.65rem;
+    min-height: 36px;
   }
-  .btn-danger:hover { background: rgba(200,40,40,0.5); }
 
   .btn-sm {
-    padding: 7px 12px;
+    padding: 8px 12px;
     font-size: 0.65rem;
+    min-height: 36px;
   }
 
   .btn-gold {
@@ -321,7 +369,6 @@
     color: #000;
     box-shadow: 0 0 12px rgba(200,160,0,0.3);
   }
-  .btn-gold:hover { box-shadow: 0 0 20px rgba(200,160,0,0.5); }
 
   .btn-full { width: 100%; }
 
@@ -459,11 +506,12 @@
   /* TOGGLE CHECKBOX */
   /* MODAL CONFIRMAÇÃO */
   .modal-overlay {
-    position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,5,15,0.85);
+    position: fixed; inset: 0; z-index: 9500;
+    background: rgba(0,5,15,0.92);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     animation: fadeIn 0.2s ease;
+    overflow-y: auto;
   }
   .modal-box {
     background: linear-gradient(135deg, rgba(5,25,55,0.98), rgba(3,15,35,0.99));
@@ -498,24 +546,25 @@
   }
   .sub-tab {
     flex: 1;
-    padding: 10px 8px;
+    padding: 12px 8px;
+    min-height: 44px;
     background: none;
     border: none;
     color: var(--text-dim);
     font-family: 'Orbitron', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: background 0.2s, color 0.2s;
     border-right: 1px solid rgba(0,180,255,0.15);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .sub-tab:last-child { border-right: none; }
   .sub-tab.active {
     background: rgba(0,180,255,0.12);
     color: var(--blue-neon);
-    text-shadow: 0 0 8px var(--blue-neon);
   }
-  .sub-tab:hover:not(.active) { background: rgba(0,100,200,0.1); color: var(--white); }
 
   .subpanel { display: none; }
   .subpanel.active { display: block; animation: fadeIn 0.3s ease; }
@@ -981,6 +1030,80 @@
     font-size: 1rem;
   }
 
+  /* ── FOTO DO ARTHUR ── */
+  .arthur-photo-wrap {
+    position: relative;
+    width: 72px; height: 72px;
+    margin: 0 auto 8px;
+    cursor: pointer;
+  }
+  .arthur-photo {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0a2a5e, #0056b3);
+    border: 2px solid rgba(0,180,255,0.4);
+    box-shadow: 0 0 16px rgba(0,180,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .arthur-photo-wrap:hover .arthur-photo {
+    box-shadow: 0 0 24px rgba(0,180,255,0.5);
+    border-color: var(--blue-neon);
+  }
+  .arthur-photo-edit {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 22px; height: 22px;
+    background: var(--blue-bright);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    border: 1px solid rgba(0,180,255,0.5);
+  }
+
+  /* ── MODAL FOTO ── */
+  .foto-preview-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .foto-preview-circle {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(0,30,70,0.6);
+    border: 2px dashed rgba(0,180,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .foto-preview-circle img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .foto-upload-btn {
+    background: rgba(0,60,130,0.4);
+    border: 1px solid rgba(0,180,255,0.3);
+    color: var(--blue-neon);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-family: 'Orbitron', monospace;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+  .foto-upload-btn:hover { background: rgba(0,80,160,0.5); }
+  .foto-remove-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,100,100,0.6);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 4px;
+  }
+
   /* ── LOGIN ── */
   #tela-login {
     position: fixed; inset: 0; z-index: 9000;
@@ -1182,6 +1305,78 @@
     color: var(--blue-neon);
     text-shadow: 0 0 8px var(--blue-neon);
   }
+
+  /* ── FILTER BUTTONS — touch friendly ── */
+  .filter-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+    touch-action: manipulation;
+  }
+
+  /* ── FEED ITEMS — touch friendly ── */
+  .feed-item, .duvida-item, .evento-item {
+    min-height: 44px;
+    border-radius: 10px;
+  }
+
+  /* ── REPO TEMA HEADER — sem hover desktop ── */
+  .repo-tema-header { -webkit-tap-highlight-color: transparent; }
+
+  /* ── VAC ITEMS — touch targets ── */
+  .vac-item { min-height: 48px; cursor: pointer; }
+  .vac-grupo-header { min-height: 48px; }
+
+  /* ── GUARDIAN BUTTONS — touch targets ── */
+  .btn-guardian { min-height: 60px; touch-action: manipulation; }
+
+  /* ── PIN KEYS — já têm 64px, ok ── */
+  .pin-key { touch-action: manipulation; }
+
+  /* ── MODAL BOX — ajuste para telas pequenas ── */
+  .modal-box {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── EMOJI GRID — tamanho adequado para toque ── */
+  .emoji-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* ── SCROLLABLE AREAS ── */
+  .subpanel, #lista-mamadas, #lista-duvidas,
+  #lista-agenda, #lista-mesversario, #lista-vacinas,
+  #lista-medicacao {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── MEDIA QUERY: iPhone SE e telas < 375px ── */
+  @media (max-width: 374px) {
+    header h1 { font-size: 1.2rem; }
+    .stat-value { font-size: 1.3rem; }
+    main { padding: 10px 10px; }
+    .card { padding: 12px; }
+    nav button { min-width: 60px; font-size: 0.5rem; }
+  }
+
+  /* ── MEDIA QUERY: landscape em mobile ── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    header { padding: 8px 16px; }
+    .arthur-photo-wrap { display: none; }
+    header h1 { font-size: 1rem; }
+    header p.subtitle { display: none; }
+    main { padding: 8px 14px; }
+  }
+
+  /* ── DESABILITAR HOVER EM TOUCH DEVICES ── */
+  @media (hover: none) {
+    .btn:hover { opacity: 1; transform: none; box-shadow: inherit; }
+    .btn-primary:hover { background: linear-gradient(135deg, #0056b3, #0099e6); }
+    .card:hover { border-color: rgba(0,180,255,0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    .btn-guardian:hover { transform: none; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  }
 </style>
 </head>
 <body>
@@ -1209,13 +1404,33 @@
     <!-- Passo 2: Digitar senha -->
     <div id="login-step-2" style="display:none">
       <div class="login-label" id="login-nome-label">Digite o código da Força</div>
-      <div class="pin-display" id="pin-display">
+
+      <!-- Input oculto que captura o teclado nativo do celular -->
+      <input
+        type="tel"
+        id="pin-input-oculto"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="6"
+        autocomplete="off"
+        style="
+          position:absolute;opacity:0;width:1px;height:1px;
+          pointer-events:none;border:none;outline:none;
+          font-size:16px;
+        "
+        oninput="pinInputNativo(this)"
+      >
+
+      <div class="pin-display" id="pin-display" onclick="focarPinOculto()">
         <span class="pin-dot" id="pd0"></span>
         <span class="pin-dot" id="pd1"></span>
         <span class="pin-dot" id="pd2"></span>
         <span class="pin-dot" id="pd3"></span>
         <span class="pin-dot" id="pd4"></span>
         <span class="pin-dot" id="pd5"></span>
+      </div>
+      <div style="font-size:0.6rem;color:var(--text-dim);text-align:center;margin-bottom:4px;font-family:'Orbitron',monospace;letter-spacing:0.06em;opacity:0.6">
+        toque nos pontos para abrir o teclado
       </div>
       <div class="pin-error" id="pin-error"></div>
       <div class="pin-keypad">
@@ -1263,7 +1478,14 @@
 </div>
 
 <header>
-  <div class="header-emblem">🛸</div>
+  <!-- Foto do Arthur -->
+  <div class="arthur-photo-wrap" onclick="abrirFotoArthur()">
+    <div class="arthur-photo" id="arthur-photo-el">
+      <span id="arthur-photo-emoji">🛸</span>
+      <img id="arthur-photo-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </div>
+    <div class="arthur-photo-edit">✏️</div>
+  </div>
   <h1>PADAWAN ARTHUR</h1>
   <div class="padawan-meta">
     <span class="pm-nasc" id="hdr-nascimento">12/03/2026</span>
@@ -1272,36 +1494,34 @@
   </div>
   <p class="subtitle">Arquivos da Ordem Jedi · Primeira Galáxia</p>
   <div class="user-badge" id="user-badge" title="Opções do Guardião">
-    <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)">?</div>
+    <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)" style="overflow:hidden;position:relative">
+      <span id="ubadge-emoji">?</span>
+      <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </div>
     <span class="user-badge-name" id="user-badge-name" onclick="abrirMenuGuardiao(event)">—</span>
     <span class="user-badge-exit" onclick="sairSessao()" title="Sair" style="cursor:pointer;padding:4px">↩</span>
   </div>
+</header>
 
-<!-- MENU GUARDIÃO -->
-<div id="menu-guardiao" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:8500" onclick="fecharMenuGuardiao()">
-  <div style="position:absolute;right:12px;top:120px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
+<!-- MENU GUARDIÃO — fora do header para evitar stacking context -->
+<div id="menu-guardiao" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:99000" onclick="fecharMenuGuardiao()">
+  <div style="position:absolute;right:12px;top:120px;background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,40,0.99));border:1px solid rgba(0,180,255,0.3);border-radius:12px;padding:6px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,0.6)" onclick="event.stopPropagation()">
     <button onclick="abrirTrocaEmoji()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">✏️</span> Trocar emoji
     </button>
+    <button onclick="abrirTrocaFotoGuardiao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">📷</span> Trocar foto
+    </button>
+    <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">📖</span> Glossário Galáctico
+    </button>
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
     <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">↩</span> Trocar Guardião
     </button>
   </div>
 </div>
 
-<!-- MODAL TROCAR EMOJI -->
-<div id="modal-troca-emoji" class="modal-overlay" style="display:none">
-  <div class="modal-box" style="max-width:320px">
-    <div class="modal-icon">✏️</div>
-    <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">TROCAR EMBLEMA</div>
-    <div class="emoji-grid" id="emoji-grid-troca" style="margin-bottom:16px"></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" style="flex:1" onclick="confirmarTrocaEmoji()">💾 Confirmar</button>
-      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharTrocaEmoji()">Cancelar</button>
-    </div>
-  </div>
-</div>
-</header>
 <div class="saber-line"></div>
 
 <nav>
@@ -1334,7 +1554,10 @@
         <div id="relogio">--:--</div>
         <div class="today-date" id="data-hoje"></div>
       </div>
-      <div class="jedi-quote" id="jedi-quote">"Que a Força guie cada passo do Padawan Arthur"</div>
+      <div style="text-align:right;max-width:200px">
+        <div class="jedi-quote" id="jedi-quote" style="cursor:pointer" onclick="proximaQuote()" title="Próxima frase"></div>
+        <div id="jedi-quote-autor" style="font-size:0.58rem;color:rgba(255,200,0,0.45);margin-top:3px;font-style:normal;font-family:'Orbitron',monospace;letter-spacing:0.04em"></div>
+      </div>
     </div>
 
     <div class="stats-grid">
@@ -1464,46 +1687,153 @@
 
   <!-- MISSÕES -->
   <div id="tab-agenda" class="tab-panel">
-    <div class="card">
-      <div class="section-title">🗺️ Nova Missão do Padawan</div>
-      <div class="form-group">
-        <label>Nome da Missão</label>
-        <input type="text" id="a-titulo" placeholder="ex: Audiência com a Curandeira Jedi Dra. Ana">
-      </div>
-      <div class="row-2">
-        <div class="form-group">
-          <label>Ciclo Galáctico</label>
-          <input type="date" id="a-data">
-        </div>
-        <div class="form-group">
-          <label>Hora-Padrão</label>
-          <input type="time" id="a-hora">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Coordenadas / Observações</label>
-        <input type="text" id="a-local" placeholder="ex: Templo da Cura — Setor Médico, Quadrante 100">
-      </div>
-      <div class="form-group">
-        <label>Classe da Missão</label>
-        <select id="a-tipo">
-          <option value="consulta">🏥 Audiência com Curandeiro</option>
-          <option value="vacina">💉 Ritual de Proteção</option>
-          <option value="exame">🔬 Análise pela Força</option>
-          <option value="retorno">🔄 Retorno ao Templo</option>
-          <option value="outro">📌 Missão Especial</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-full" onclick="salvarEvento()">🚀 Registrar Missão</button>
+
+    <!-- SUB-ABAS MISSÕES -->
+    <div class="sub-tabs">
+      <button class="sub-tab active" id="stab-missoes" onclick="showSubTabMissoes('missoes')">🗺️ Missões</button>
+      <button class="sub-tab" id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">⚗️ Elixires</button>
     </div>
 
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="filtrarAgenda('proximos', this)">🔮 Próximas</button>
-      <button class="filter-btn" onclick="filtrarAgenda('todos', this)">📋 Todas</button>
-      <button class="filter-btn" onclick="filtrarAgenda('passados', this)">📜 Concluídas</button>
+    <!-- PAINEL MISSÕES -->
+    <div id="subpanel-missoes" class="subpanel active">
+      <div class="card">
+        <div class="section-title">🗺️ Nova Missão do Padawan</div>
+        <div class="form-group">
+          <label>Nome da Missão</label>
+          <input type="text" id="a-titulo" placeholder="ex: Audiência com a Curandeira Jedi Dra. Isabella">
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Ciclo Galáctico</label>
+            <input type="date" id="a-data">
+          </div>
+          <div class="form-group">
+            <label>Hora-Padrão</label>
+            <input type="time" id="a-hora">
+          </div>
+        </div>
+
+        <!-- CLASSE DA MISSÃO com detecção de consulta -->
+        <div class="form-group">
+          <label>Classe da Missão</label>
+          <select id="a-tipo" onchange="toggleProfissional(this.value)">
+            <option value="consulta">🏥 Audiência com Curandeiro</option>
+            <option value="vacina">💉 Ritual de Proteção</option>
+            <option value="exame">🔬 Análise pela Força</option>
+            <option value="retorno">🔄 Retorno ao Templo</option>
+            <option value="outro">📌 Missão Especial</option>
+          </select>
+        </div>
+
+        <!-- CAMPO PROFISSIONAL — aparece quando for consulta/retorno -->
+        <div class="form-group" id="campo-profissional">
+          <label>Curandeiro(a) Jedi</label>
+          <select id="a-profissional" onchange="selecionarProfissional(this.value)">
+            <option value="">— selecionar profissional —</option>
+            <option value="isabella_mazzoni">👩‍⚕️ Dra. Isabella Mazzoni — Pediatra · CRM 167072/SP</option>
+            <option value="lilian_sarli">🧘 Lilian Sarli — Fisioterapeuta · Osteopata Pediátrica</option>
+            <option value="outro_prof">✏️ Outro profissional...</option>
+          </select>
+          <input type="text" id="a-profissional-outro" placeholder="Nome do profissional"
+            style="display:none;margin-top:6px">
+          <!-- Card informativo do profissional selecionado -->
+          <div id="prof-card" style="display:none;margin-top:8px;background:rgba(0,50,120,0.3);border:1px solid rgba(0,180,255,0.2);border-radius:8px;padding:10px 12px;font-size:0.75rem;color:var(--text-dim);line-height:1.6"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Coordenadas / Observações</label>
+          <input type="text" id="a-local" placeholder="ex: Templo da Cura — Setor Médico, Quadrante 100">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="salvarEvento()">🚀 Registrar Missão</button>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filtrarAgenda('proximos', this)">🔮 Próximas</button>
+        <button class="filter-btn" onclick="filtrarAgenda('todos', this)">📋 Todas</button>
+        <button class="filter-btn" onclick="filtrarAgenda('passados', this)">📜 Concluídas</button>
+      </div>
+
+      <div id="lista-agenda"></div>
     </div>
 
-    <div id="lista-agenda"></div>
+    <!-- PAINEL MEDICAÇÃO -->
+    <div id="subpanel-medicacao" class="subpanel">
+      <div class="card">
+        <div class="section-title">⚗️ Novo Elixir da Força</div>
+
+        <!-- AUTOCOMPLETE MEDICAMENTO -->
+        <div class="form-group" style="position:relative">
+          <label>Nome do Elixir</label>
+          <input type="text" id="med-nome" placeholder="Buscar elixir (ex: Dipirona, Amoxicilina...)"
+            oninput="buscarMedicamento(this.value)" autocomplete="off">
+          <div id="med-sugestoes" style="
+            display:none;position:absolute;left:0;right:0;z-index:200;
+            background:#0d1a2e;border:1px solid rgba(0,180,255,0.3);
+            border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+            box-shadow:0 8px 20px rgba(0,0,0,0.5);
+          "></div>
+        </div>
+
+        <!-- NOME GENÉRICO (preenchido automático) -->
+        <div class="form-group">
+          <label>Essência Alquímica</label>
+          <input type="text" id="med-generico" placeholder="Preenchida automaticamente" readonly
+            style="background:rgba(0,20,50,0.3);color:var(--text-dim)">
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label>Dosagem da Força</label>
+            <input type="text" id="med-dose" placeholder="ex: 0,5 ml ou 250mg">
+          </div>
+          <div class="form-group">
+            <label>Ritmo de Administração</label>
+            <select id="med-freq">
+              <option value="se_necessario">🔄 Se necessário pela Força</option>
+              <option value="4h">⏱ A cada 4h</option>
+              <option value="6h">⏱ A cada 6h</option>
+              <option value="8h">⏱ A cada 8h</option>
+              <option value="12h">⏱ A cada 12h</option>
+              <option value="24h">⏱ 1x ao dia</option>
+              <option value="outro">✏️ Outra</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label>Ciclo Inicial</label>
+            <input type="date" id="med-inicio">
+          </div>
+          <div class="form-group">
+            <label>Ciclo Final</label>
+            <input type="date" id="med-fim">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Prescrito pelo Curandeiro</label>
+          <select id="med-indicado">
+            <option value="">— selecionar —</option>
+            <option value="Dra. Isabella Mazzoni">👩‍⚕️ Dra. Isabella Mazzoni</option>
+            <option value="Lilian Sarli">🧘 Lilian Sarli</option>
+            <option value="Automedicação">🏠 Iniciativa dos Guardiões</option>
+            <option value="Outro">✏️ Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Observações</label>
+          <input type="text" id="med-obs" placeholder="ex: aplicar após recarga de energia...">
+        </div>
+
+        <button class="btn btn-primary btn-full" onclick="salvarMedicacao()">⚗️ Ativar Elixir</button>
+      </div>
+
+      <div class="section-title" style="margin-top:4px">⚗️ Elixires Ativos</div>
+      <div id="lista-medicacao"></div>
+    </div>
+
   </div>
 
   <!-- ÓRBITAS DO PADAWAN (MESVERSÁRIO) -->
@@ -1646,29 +1976,100 @@
 
 <!-- MODAL NOVA VACINA AVULSA -->
 <div id="modal-nova-vacina" class="modal-overlay" style="display:none">
-  <div class="modal-box" style="max-width:360px;text-align:left;border-color:rgba(0,212,255,0.35)">
+  <div class="modal-box" style="max-width:380px;text-align:left;border-color:rgba(0,212,255,0.35)">
     <div class="modal-icon" style="text-align:center">🛡️</div>
     <div class="modal-title" style="text-align:center;color:var(--blue-neon);margin-bottom:4px">NOVO ESCUDO</div>
-    <div id="modal-nova-vac-grupo" style="text-align:center;font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em;margin-bottom:14px"></div>
-    <div class="form-group" style="margin-bottom:10px">
-      <label>Nome da Vacina</label>
-      <input type="text" id="nv-nome" placeholder="ex: Influenza / Gripe (dose anual)">
+    <div id="modal-nova-vac-grupo" style="text-align:center;font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.08em;margin-bottom:12px"></div>
+
+    <!-- PASSO 1: Lista de sugestões -->
+    <div id="nv-step-1">
+      <div style="font-size:0.68rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em;margin-bottom:8px;text-align:center">ESCUDOS RECOMENDADOS · NÃO OBRIGATÓRIOS</div>
+      <div id="nv-sugestoes-lista" style="max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+      <div style="margin-top:10px;border-top:1px solid rgba(0,180,255,0.15);padding-top:10px">
+        <button class="btn btn-full" style="background:rgba(0,60,130,0.4);border:1px dashed rgba(0,180,255,0.35);color:var(--blue-neon);font-size:0.68rem" onclick="abrirFormNovaVacina(null)">✏️ Cadastrar escudo personalizado</button>
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn btn-full" style="background:transparent;border:1px solid rgba(0,180,255,0.15);color:var(--text-dim);font-size:0.68rem" onclick="fecharModalNovaVacina()">Cancelar</button>
+      </div>
     </div>
-    <div class="form-group" style="margin-bottom:10px">
-      <label>Doenças Prevenidas</label>
-      <input type="text" id="nv-doenca" placeholder="ex: Gripe (influenza)">
+
+    <!-- PASSO 2: Formulário -->
+    <div id="nv-step-2" style="display:none">
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Nome da Vacina</label>
+        <input type="text" id="nv-nome" placeholder="ex: Influenza / Gripe (dose anual)">
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Doenças Prevenidas</label>
+        <input type="text" id="nv-doenca" placeholder="ex: Gripe (influenza)">
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Observações da Ordem</label>
+        <input type="text" id="nv-obs" placeholder="ex: Recomendada pela SBP">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Fonte / Referência</label>
+        <input type="text" id="nv-fonte" placeholder="ex: SBP · SBIm">
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-primary" style="flex:1" onclick="salvarNovaVacina()">🛡️ Gravar Escudo</button>
+        <button class="btn" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim)" onclick="voltarNvStep1()">← Voltar</button>
+      </div>
     </div>
-    <div class="form-group" style="margin-bottom:10px">
-      <label>Observações da Ordem</label>
-      <input type="text" id="nv-obs" placeholder="ex: Ritual anual recomendado pela SBP">
-    </div>
-    <div class="form-group" style="margin-bottom:14px">
-      <label>Fonte / Referência</label>
-      <input type="text" id="nv-fonte" placeholder="ex: PNI · SBP">
-    </div>
+  </div>
+</div>
+
+<!-- MODAL TROCAR EMOJI -->
+<div id="modal-troca-emoji" class="modal-overlay" style="display:none;z-index:99000">
+  <div class="modal-box" style="max-width:320px">
+    <div class="modal-icon">✏️</div>
+    <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">TROCAR EMBLEMA</div>
+    <div class="emoji-grid" id="emoji-grid-troca" style="margin-bottom:16px"></div>
     <div class="modal-btns">
-      <button class="btn btn-primary" style="flex:1" onclick="salvarNovaVacina()">🛡️ Gravar Escudo</button>
-      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharModalNovaVacina()">Abortar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmarTrocaEmoji()">💾 Confirmar</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharTrocaEmoji()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FOTO ARTHUR -->
+<div id="modal-foto-arthur" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:300px">
+    <div class="modal-icon">🛸</div>
+    <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO PADAWAN</div>
+    <div class="foto-preview-wrap">
+      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-arthur').click()">
+        <span id="arthur-preview-emoji">🛸</span>
+        <img id="arthur-preview-img" style="display:none;width:100%;height:100%;object-fit:cover">
+      </div>
+      <button class="foto-upload-btn" onclick="document.getElementById('input-foto-arthur').click()">📷 Escolher Foto</button>
+      <button class="foto-remove-btn" id="arthur-remove-btn" onclick="removerFotoArthur()" style="display:none">🗑 Remover foto</button>
+    </div>
+    <input type="file" id="input-foto-arthur" accept="image/*" style="display:none" onchange="previewFotoArthur(this)">
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" onclick="salvarFotoArthur()">💾 Salvar</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharFotoArthur()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FOTO GUARDIÃO -->
+<div id="modal-foto-guardiao" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:300px">
+    <div class="modal-icon">📷</div>
+    <div class="modal-title" style="color:var(--blue-neon);margin-bottom:14px">FOTO DO GUARDIÃO</div>
+    <div class="foto-preview-wrap">
+      <div class="foto-preview-circle" onclick="document.getElementById('input-foto-guardiao').click()">
+        <span id="guardiao-preview-emoji">👤</span>
+        <img id="guardiao-preview-img" style="display:none;width:100%;height:100%;object-fit:cover">
+      </div>
+      <button class="foto-upload-btn" onclick="document.getElementById('input-foto-guardiao').click()">📷 Escolher Foto</button>
+      <button class="foto-remove-btn" id="guardiao-remove-btn" onclick="removerFotoGuardiao()" style="display:none">🗑 Remover foto</button>
+    </div>
+    <input type="file" id="input-foto-guardiao" accept="image/*" style="display:none" onchange="previewFotoGuardiao(this)">
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" onclick="salvarFotoGuardiao()">💾 Salvar</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharFotoGuardiao()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1689,8 +2090,13 @@ for (let i = 0; i < 120; i++) {
   starsEl.appendChild(s);
 }
 
+// ── DETECÇÃO CAPACITOR / APP NATIVO ──
+const IS_CAPACITOR = window.Capacitor !== undefined;
+const IS_IOS_APP   = IS_CAPACITOR || window.navigator.standalone === true;
+
 // ── PWA: MANIFEST + SERVICE WORKER INLINE ──
-(function() {
+// Só ativa PWA quando não está rodando como app nativo
+if (!IS_CAPACITOR) {
 
   // Gera ícone PNG via Canvas (único formato que iOS aceita corretamente)
   function gerarIconePNG(size) {
@@ -1780,7 +2186,7 @@ self.addEventListener('fetch', e => {
     const swBlob = new Blob([swCode], {type:'application/javascript'});
     navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
   }
-})();
+} // fim if (!IS_CAPACITOR)
 
 // ── SISTEMA DE AUTENTICAÇÃO COM SENHA + AES-256 ──
 const SENHA_CORRETA = '120326';
@@ -1788,7 +2194,7 @@ const SESSION_KEY   = 'arthur_guardian_v1';
 const AUTO_LOCK_MS  = 5 * 60 * 1000; // 5 min inatividade
 
 // ── GUARDIÕES DINÂMICOS ──
-const GUARDIOES_KEY = 'arthur_guardioes_v1';
+const GUARDIOES_KEY = 'arthur_guardioes_offline';
 const EMOJIS_DISPONIVEIS = ['🧔','👩','👨','👱','🧕','👴','👵','🧑','🧒','👦','👧','🧔‍♀️','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','🧑‍🚀','🧙','🧝','🦸','🧑‍⚕️','🧑‍🏫','⚔️','🛸','🌟','💫'];
 
 const GUARDIOES_DEFAULT = {
@@ -1805,6 +2211,7 @@ function loadGuardioes() {
 
 function saveGuardioes(g) {
   try { localStorage.setItem(GUARDIOES_KEY, JSON.stringify(g)); } catch(e) {}
+  try { GUARDIOES_REF.set({ guardioes: g }); } catch(e) {}
 }
 
 let GUARDIOES = loadGuardioes();
@@ -1880,6 +2287,8 @@ function voltarLogin() {
   document.getElementById('login-step-3').style.display = 'none';
   document.getElementById('login-step-1').style.display = 'block';
   document.getElementById('pin-error').textContent = '';
+  const el = document.getElementById('pin-input-oculto');
+  if (el) el.value = '';
   atualizarPinDisplay();
   renderListaGuardioes();
 }
@@ -1927,6 +2336,25 @@ async function decriptar(b64) {
 }
 
 // ── PIN KEYPAD ──
+
+// Foca o input oculto para abrir teclado nativo
+function focarPinOculto() {
+  const el = document.getElementById('pin-input-oculto');
+  if (el) { el.value = ''; el.focus(); }
+}
+
+// Captura digitação do teclado nativo
+function pinInputNativo(input) {
+  const val = input.value.replace(/\D/g, '').slice(0, 6);
+  input.value = val;
+  // Sincroniza com _pinAtual
+  _pinAtual = val;
+  atualizarPinDisplay();
+  if (_pinAtual.length === 6) {
+    setTimeout(verificarSenha, 80);
+  }
+}
+
 function escolherGuardiao(id) {
   _guardiaoPendente = id;
   _pinAtual = '';
@@ -1936,20 +2364,26 @@ function escolherGuardiao(id) {
   const g = GUARDIOES[id];
   document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Digite o Código da Força`;
   atualizarPinDisplay();
+  // Foca automaticamente para abrir teclado
+  setTimeout(focarPinOculto, 150);
 }
 
 function pinDigito(d) {
   if (_pinAtual.length >= 6) return;
   _pinAtual += d;
   atualizarPinDisplay();
-  if (_pinAtual.length === 6) {
-    setTimeout(verificarSenha, 80);
-  }
+  // Sincroniza input oculto
+  const el = document.getElementById('pin-input-oculto');
+  if (el) el.value = _pinAtual;
+  if (_pinAtual.length === 6) setTimeout(verificarSenha, 80);
 }
 
 function pinApagar() {
-  _pinAtual = _pinAtual.slice(0,-1);
+  _pinAtual = _pinAtual.slice(0, -1);
   atualizarPinDisplay();
+  // Sincroniza input oculto
+  const el = document.getElementById('pin-input-oculto');
+  if (el) el.value = _pinAtual;
 }
 
 function atualizarPinDisplay() {
@@ -1966,6 +2400,8 @@ function verificarSenha() {
   } else {
     _pinTentativas++;
     _pinAtual = '';
+    const el = document.getElementById('pin-input-oculto');
+    if (el) el.value = '';
     // Shake animation
     for (let i = 0; i < 6; i++) {
       const dot = document.getElementById('pd' + i);
@@ -1986,7 +2422,23 @@ function fazerLogin(id) {
   document.getElementById('tela-login').style.display = 'none';
   atualizarBadge();
   iniciarAutoLock();
-  renderAll();
+  // Carrega dados e inicia sync em tempo real
+  loadData().then(d => {
+    db = d;
+    renderAll();
+    iniciarSyncTempoReal();
+  });
+  // Sync guardiões em tempo real
+  GUARDIOES_REF.onSnapshot(snap => {
+    if (!snap.exists) return;
+    const g = snap.data().guardioes;
+    if (g && JSON.stringify(GUARDIOES) !== JSON.stringify(g)) {
+      GUARDIOES = { ...GUARDIOES_DEFAULT, ...g };
+      localStorage.setItem(GUARDIOES_KEY, JSON.stringify(GUARDIOES));
+      renderListaGuardioes();
+      atualizarBadge();
+    }
+  }, () => {});
 }
 
 function sairSessao() {
@@ -2005,8 +2457,20 @@ function sairSessao() {
 function atualizarBadge() {
   const g = GUARDIOES[usuarioAtual];
   if (!g) return;
-  document.getElementById('user-badge-avatar').textContent = g.emoji;
+  // Emoji
+  document.getElementById('ubadge-emoji').textContent = g.emoji;
   document.getElementById('user-badge-name').textContent = g.nome;
+  // Foto (se tiver)
+  const foto  = fotosGuardioes[usuarioAtual];
+  const img   = document.getElementById('ubadge-foto');
+  const emoji = document.getElementById('ubadge-emoji');
+  if (foto) {
+    img.src = foto; img.style.display = 'block';
+    emoji.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    emoji.style.display = 'block';
+  }
 }
 
 function nomeAutor(id) {
@@ -2026,13 +2490,18 @@ function fecharMenuGuardiao() {
 let _emojiTrocaPendente = null;
 
 function abrirTrocaEmoji() {
-  fecharMenuGuardiao();
-  _emojiTrocaPendente = GUARDIOES[usuarioAtual]?.emoji || '🧑';
-  const grid = document.getElementById('emoji-grid-troca');
-  grid.innerHTML = EMOJIS_DISPONIVEIS.map(e => `
-    <button class="emoji-btn ${e === _emojiTrocaPendente ? 'sel' : ''}" onclick="selecionarEmojiTroca('${e}',this)">${e}</button>
-  `).join('');
-  document.getElementById('modal-troca-emoji').style.display = 'flex';
+  // Fecha o menu primeiro, espera o browser repintar, depois abre o modal
+  document.getElementById('menu-guardiao').style.display = 'none';
+  requestAnimationFrame(() => {
+    _emojiTrocaPendente = GUARDIOES[usuarioAtual]?.emoji || '🧑';
+    const grid = document.getElementById('emoji-grid-troca');
+    grid.innerHTML = EMOJIS_DISPONIVEIS.map(e => `
+      <button class="emoji-btn ${e === _emojiTrocaPendente ? 'sel' : ''}" onclick="selecionarEmojiTroca('${e}',this)">${e}</button>
+    `).join('');
+    const modal = document.getElementById('modal-troca-emoji');
+    modal.style.display = 'flex';
+    modal.style.zIndex  = '99000';
+  });
 }
 
 function selecionarEmojiTroca(emoji, btn) {
@@ -2090,36 +2559,109 @@ function iniciarAutoLock() {
 })();
 
 
-const KEY = 'diario_arthur_v2_enc';
+// ── FIREBASE ──
+const firebaseConfig = {
+  apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+  authDomain:        "padawan-arthur.firebaseapp.com",
+  projectId:         "padawan-arthur",
+  storageBucket:     "padawan-arthur.firebasestorage.app",
+  messagingSenderId: "38758983138",
+  appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+};
+
+firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+const DOC_REF   = firestore.collection('diario').doc('arthur');
+const VACINHAS_REF = firestore.collection('diario').doc('arthur_vacinas');
+const EXTRAS_REF   = firestore.collection('diario').doc('arthur_vacinas_extras');
+const GUARDIOES_REF = firestore.collection('diario').doc('arthur_guardioes');
+
+// Indicador online/offline
+function mostrarStatusConexao(online) {
+  let el = document.getElementById('status-conexao');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'status-conexao';
+    el.style.cssText = `
+      position:fixed;top:0;left:0;right:0;z-index:99999;
+      text-align:center;font-family:'Orbitron',monospace;font-size:0.6rem;
+      padding:4px;letter-spacing:0.08em;transition:all 0.3s;
+    `;
+    document.body.prepend(el);
+  }
+  if (online) {
+    el.style.background = 'rgba(0,180,100,0.85)';
+    el.style.color = '#fff';
+    el.textContent = '⚡ Força sincronizada com a nuvem';
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.style.display='none', 400); }, 2500);
+  } else {
+    el.style.display = 'block';
+    el.style.opacity = '1';
+    el.style.background = 'rgba(180,30,30,0.9)';
+    el.style.color = '#fff';
+    el.textContent = '⚠️ Sem conexão — dados locais temporários';
+  }
+}
+
+window.addEventListener('online',  () => mostrarStatusConexao(true));
+window.addEventListener('offline', () => mostrarStatusConexao(false));
+
+// ── STORAGE: FIREBASE + LOCALSTORAGE FALLBACK ──
+const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
-    // Tenta decriptar (v2 criptografado)
-    const dec = await decriptar(raw);
-    if (dec) return JSON.parse(dec);
-    // Fallback: tenta JSON puro (dados legados v1)
-    const legado = localStorage.getItem('diario_arthur_v1');
-    if (legado) return JSON.parse(legado);
-  } catch(e) {}
+    const snap = await DOC_REF.get();
+    if (snap.exists) {
+      const d = snap.data();
+      // Cache local para uso offline
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
+      return d;
+    }
+  } catch(e) {
+    // Offline — usa cache local
+    const cache = localStorage.getItem(LOCAL_KEY);
+    if (cache) return JSON.parse(cache);
+  }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
 
 async function saveData(data) {
+  // Sempre salva local imediatamente
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
   try {
-    const json = JSON.stringify(data);
-    const enc  = await encriptar(json);
-    localStorage.setItem(KEY, enc);
+    await DOC_REF.set(data);
   } catch(e) {
-    // Fallback sem cripto
-    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e2) {}
+    // Offline — dados ficam no cache, sincroniza quando voltar
+    console.warn('Firebase offline, dados em cache local');
   }
+}
+
+// Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
+function iniciarSyncTempoReal() {
+  DOC_REF.onSnapshot(snap => {
+    if (!snap.exists) return;
+    const novos = snap.data();
+    // Só atualiza se os dados são diferentes dos locais (evita loop)
+    const local = JSON.stringify(db);
+    const remoto = JSON.stringify(novos);
+    if (local !== remoto) {
+      db = novos;
+      localStorage.setItem(LOCAL_KEY, remoto);
+      if (usuarioAtual) renderAll();
+    }
+  }, err => console.warn('Sync error:', err));
 }
 
 // Carregamento async dos dados
 let db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
-loadData().then(d => { db = d; });
+loadData().then(d => {
+  db = d;
+  if (usuarioAtual) {
+    renderAll();
+    iniciarSyncTempoReal();
+  }
+});
 
 // ── DETECÇÃO iOS PARA BANNER DE INSTALAÇÃO ──
 (function() {
@@ -2138,6 +2680,7 @@ loadData().then(d => { db = d; });
 
 // ── UTILS ──
 const quotes = [
+  // ── FRASES ORIGINAIS DO APP ──
   '"Que a Força guie cada passo do Padawan Arthur"',
   '"Poderoso ele será — sinto na Força"',
   '"A Força desperta neste pequeno ser"',
@@ -2147,7 +2690,57 @@ const quotes = [
   '"O lado claro da Força habita o coração de Arthur"',
   '"Crescer é o caminho — e a jornada mal começou"',
   '"Não há fim no aprendizado de um verdadeiro Jedi"',
-  '"Que a Força esteja com o Padawan, sempre"'
+  '"Que a Força esteja com o Padawan, sempre"',
+
+  // ── FRASES CANÔNICAS ADAPTADAS AO ARTHUR ──
+  // Yoda
+  '"Faça ou não faça — tentativa não há, jovem Guardião" — Mestre Yoda',
+  '"O medo é o caminho para o lado negro. Amor é o caminho para a Força" — Mestre Yoda',
+  '"Seres luminosos somos nós — e este Padawan a luz personifica" — Mestre Yoda',
+  '"Quando 900 anos você tiver, tão bem verá o mundo? Hm!" — Mestre Yoda',
+  '"O maior professor, o fracasso é — mas Arthur aprende com amor" — Mestre Yoda',
+  '"Tudo o que aprendeu, transmita. A jornada assim continua" — Mestre Yoda',
+  '"Na Força, não há fim — apenas transformação" — Mestre Yoda',
+  '"Um Jedi usa a Força para o conhecimento, nunca para o ataque" — Mestre Yoda',
+  '"Sentir a Força ao seu redor você deve — como uma família ela é" — Mestre Yoda',
+  '"Difícil ver o futuro é — mas a Força com Arthur sempre estará" — Mestre Yoda',
+
+  // Obi-Wan Kenobi
+  '"A Força estará com você — sempre" — Obi-Wan Kenobi',
+  '"Seus olhos podem enganá-lo — confie no amor que sente" — Obi-Wan Kenobi',
+  '"Muitas das verdades às quais nos prendemos dependem do nosso ponto de vista" — Obi-Wan Kenobi',
+  '"A habilidade de falar não o torna inteligente — aja com sabedoria, Guardião" — Obi-Wan Kenobi',
+  '"Use a Força, jovem Padawan — ela sempre esteve em você" — Obi-Wan Kenobi',
+
+  // Luke Skywalker
+  '"A Força é forte em minha família — e em Arthur ela desperta" — Luke Skywalker',
+  '"Não sou o último Jedi — e Arthur será o próximo" — Luke Skywalker',
+  '"Lembre-se: seu foco determina a sua realidade" — Qui-Gon Jinn',
+
+  // Han Solo & outros
+  '"Eu tenho um mau pressentimento sobre isso... mas a Força guia Arthur" — Han Solo',
+  '"Nunca me diga as chances — este Padawan supera tudo" — Han Solo',
+  '"A rebelião renasce hoje — em cada novo dia do Padawan" — Leia Organa',
+  '"Que a Força esteja com todos nós — Guardiões e Padawan" — Leia Organa',
+  '"Não subestime o poder da Força que há neste pequeno ser" — Darth Vader',
+  '"Impressionante. Todo esforço dos Guardiões é comovente" — Darth Vader',
+
+  // Personagens da trilogia prequel
+  '"Seu foco determina a sua realidade — foque no amor, Guardião" — Qui-Gon Jinn',
+  '"O presente é tudo o que temos — cada momento com Arthur é precioso" — Qui-Gon Jinn',
+  '"Não há morte, há a Força — e na Força, Arthur sempre viverá" — Código Jedi',
+  '"Não há caos, há a Força — que ela guie cada noite sem sono" — Código Jedi',
+  '"O apego leva ao sofrimento — mas o amor, à sabedoria" — Mestre Yoda',
+
+  // The Mandalorian / universo expandido
+  '"Este é o caminho — o caminho dos Guardiões da Força" — O Mandaloriano',
+  '"Ele foi criado na Força — e na Força ele floresce" — The Mandalorian',
+  '"Onde vai ele, você vai — o vínculo entre Guardião e Padawan é eterno" — O Mandaloriano',
+
+  // Rogue One / outros
+  '"Rebelde na fralda, Jedi no coração" — Crónicas da Galáxia',
+  '"Que a Força seja sua bússola em cada choro, em cada sorriso" — Crónicas da Galáxia',
+  '"Longa é a jornada — mas cada órbita ao redor do sol vale a pena" — Crónicas da Galáxia',
 ];
 
 function formatDate(iso) {
@@ -2225,7 +2818,40 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 updateClock();
-document.getElementById('jedi-quote').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+// ── FRASES JEDI — exibição com atribuição ──
+let _ultimaQuoteIdx = -1;
+
+function exibirQuote(idx) {
+  const raw = quotes[idx];
+  const elFrase  = document.getElementById('jedi-quote');
+  const elAutor  = document.getElementById('jedi-quote-autor');
+  if (!elFrase) return;
+
+  // Separa frase da atribuição: formato '"Frase" — Personagem'
+  const match = raw.match(/^(.*?)\s*—\s*([^"]+)$/);
+  if (match) {
+    elFrase.textContent = match[1].trim();
+    elAutor.textContent = '— ' + match[2].trim();
+  } else {
+    elFrase.textContent = raw;
+    if (elAutor) elAutor.textContent = '';
+  }
+}
+
+function quoteAleatoria() {
+  let idx;
+  do { idx = Math.floor(Math.random() * quotes.length); }
+  while (idx === _ultimaQuoteIdx && quotes.length > 1);
+  _ultimaQuoteIdx = idx;
+  return idx;
+}
+
+function proximaQuote() {
+  exibirQuote(quoteAleatoria());
+}
+
+// Exibe frase inicial
+exibirQuote(quoteAleatoria());
 
 // ── TABS ──
 let activeFilter = { mamadas:'todos', duvidas:'pendentes', agenda:'proximos' };
@@ -2304,6 +2930,9 @@ function executarDelete() {
     }
     if (vacStatus[vacId]) { delete vacStatus[vacId]; saveVacinas(vacStatus); }
     saveExtras(vacExtras); renderVacinas();
+  } else if (tipo === 'medicacao') {
+    medicacoes = medicacoes.filter(m => m.id !== id);
+    saveMedicacao(medicacoes); renderMedicacao();
   }
   fecharModal();
   showToast('💨 Registro apagado das crônicas pela Força');
@@ -2602,19 +3231,31 @@ function initAgendaForm() {
 initAgendaForm();
 
 function salvarEvento() {
-  const titulo = document.getElementById('a-titulo').value.trim();
-  const data = document.getElementById('a-data').value;
-  const hora = document.getElementById('a-hora').value;
-  const local = document.getElementById('a-local').value.trim();
-  const tipo = document.getElementById('a-tipo').value;
+  const titulo    = document.getElementById('a-titulo').value.trim();
+  const data      = document.getElementById('a-data').value;
+  const hora      = document.getElementById('a-hora').value;
+  const local     = document.getElementById('a-local').value.trim();
+  const tipo      = document.getElementById('a-tipo').value;
+  // Captura profissional se preenchido
+  const profSel   = document.getElementById('a-profissional')?.value;
+  const profOutro = document.getElementById('a-profissional-outro')?.value.trim();
+  let profissional = '';
+  if (profSel && profSel !== '' && profSel !== 'outro_prof' && PROFISSIONAIS[profSel]) {
+    profissional = PROFISSIONAIS[profSel].nome + ' — ' + PROFISSIONAIS[profSel].especialidade;
+  } else if (profSel === 'outro_prof' && profOutro) {
+    profissional = profOutro;
+  }
+
   if (!titulo || !data) { alert('Defina o nome e o ciclo galáctico da missão!'); return; }
 
-  db.eventos.push({ id: Date.now(), titulo, data, hora, local, tipo });
+  db.eventos.push({ id: Date.now(), titulo, data, hora, local, tipo, profissional });
   db.eventos.sort((a,b) => (a.data+a.hora) > (b.data+b.hora) ? 1 : -1);
   saveData(db);
   document.getElementById('a-titulo').value = '';
   document.getElementById('a-hora').value = '';
   document.getElementById('a-local').value = '';
+  if (document.getElementById('a-profissional')) document.getElementById('a-profissional').value = '';
+  if (document.getElementById('prof-card')) document.getElementById('prof-card').style.display = 'none';
   renderAgenda();
   renderDashboard();
   showToast('🗺️ Missão registrada nas crônicas!');
@@ -2644,7 +3285,23 @@ function renderAgenda() {
     return;
   }
 
-  el.innerHTML = list.map(e => `
+  // Botão exportar lote — só aparece se há eventos futuros
+  const futuros = db.eventos.filter(e => e.data >= hoje);
+  const btnExportar = futuros.length > 0 ? `
+    <button onclick="exportarAgendaICS()" style="
+      width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px;margin-bottom:12px;
+      background:linear-gradient(135deg,rgba(0,60,130,0.5),rgba(0,30,80,0.6));
+      border:1px solid rgba(0,180,255,0.3);border-radius:10px;
+      color:var(--blue-neon);font-family:'Orbitron',monospace;
+      font-size:0.65rem;letter-spacing:0.06em;cursor:pointer;
+      transition:all 0.2s;
+    ">
+      📅 Exportar ${futuros.length} missão${futuros.length > 1 ? 'ões' : ''} para o Calendário
+    </button>
+  ` : '';
+
+  el.innerHTML = btnExportar + list.map(e => `
     <div class="evento-item ${e.data < hoje ? 'passado' : ''}">
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
@@ -2652,9 +3309,23 @@ function renderAgenda() {
           <span class="feed-title">${e.titulo}</span>
         </div>
         <div class="evento-date">${formatDate(e.data)}${e.hora ? ' · ' + e.hora : ''}</div>
-        ${e.local ? `<div style="font-size:0.8rem;color:#7ab3d4;margin-top:3px">📍 ${e.local}</div>` : ''}
+        ${e.local       ? `<div style="font-size:0.78rem;color:var(--text-dim);margin-top:3px">📍 ${e.local}</div>` : ''}
+        ${e.profissional ? `<div style="font-size:0.72rem;color:rgba(0,212,255,0.6);margin-top:3px">👩‍⚕️ ${e.profissional}</div>` : ''}
       </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        ${e.data >= hoje ? `
+          <button onclick="adicionarEventoCalendario(${e.id})" style="
+            background:rgba(0,80,180,0.3);border:1px solid rgba(0,180,255,0.3);
+            color:var(--blue-neon);border-radius:8px;padding:6px 10px;
+            font-size:0.68rem;font-family:'Orbitron',monospace;
+            cursor:pointer;white-space:nowrap;letter-spacing:0.04em;
+            display:flex;align-items:center;gap:5px;
+          " title="Adicionar ao Calendário Apple">
+            📅 Calendário
+          </button>
+        ` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteEvento(${e.id})">🗑</button>
+      </div>
     </div>
   `).join('');
 }
@@ -2905,30 +3576,209 @@ const VACINAS_CALENDARIO = [
   },
 ];
 
-const VAC_KEY    = 'arthur_vacinas_v1';
-const VAC_EX_KEY = 'arthur_vacinas_extras_v1';
+const VAC_KEY    = 'arthur_vacinas_offline';
+const VAC_EX_KEY = 'arthur_vacinas_extras_offline';
 
-function loadVacinas()  { try { return JSON.parse(localStorage.getItem(VAC_KEY))    || {}; } catch(e) { return {}; } }
-function saveVacinas(d) { try { localStorage.setItem(VAC_KEY, JSON.stringify(d)); }    catch(e) {} }
-function loadExtras()   { try { return JSON.parse(localStorage.getItem(VAC_EX_KEY)) || {}; } catch(e) { return {}; } }
-function saveExtras(d)  { try { localStorage.setItem(VAC_EX_KEY, JSON.stringify(d)); } catch(e) {} }
+async function loadVacinasDB()  {
+  try {
+    const snap = await VACINHAS_REF.get();
+    if (snap.exists) { const d = snap.data().status || {}; localStorage.setItem(VAC_KEY, JSON.stringify(d)); return d; }
+  } catch(e) {}
+  try { return JSON.parse(localStorage.getItem(VAC_KEY)) || {}; } catch(e) { return {}; }
+}
+async function saveVacinas(d) {
+  localStorage.setItem(VAC_KEY, JSON.stringify(d));
+  try { await VACINHAS_REF.set({ status: d }); } catch(e) {}
+}
+async function loadExtrasDB() {
+  try {
+    const snap = await EXTRAS_REF.get();
+    if (snap.exists) { const d = snap.data().extras || {}; localStorage.setItem(VAC_EX_KEY, JSON.stringify(d)); return d; }
+  } catch(e) {}
+  try { return JSON.parse(localStorage.getItem(VAC_EX_KEY)) || {}; } catch(e) { return {}; }
+}
+async function saveExtras(d) {
+  localStorage.setItem(VAC_EX_KEY, JSON.stringify(d));
+  try { await EXTRAS_REF.set({ extras: d }); } catch(e) {}
+}
 
-let vacStatus = loadVacinas();
-let vacExtras  = loadExtras(); // { grupoIdx: [ { id, nome, doenca, obs, fonte } ] }
+// Inicializa com dados locais, depois carrega do Firebase
+let vacStatus = {};
+let vacExtras  = {};
+try { vacStatus = JSON.parse(localStorage.getItem(VAC_KEY))    || {}; } catch(e) {}
+try { vacExtras  = JSON.parse(localStorage.getItem(VAC_EX_KEY)) || {}; } catch(e) {}
 
-// ── MODAL NOVA VACINA ──
+// Carrega do Firebase em background e atualiza se necessário
+loadVacinasDB().then(d => { vacStatus = d; renderVacinas(); });
+loadExtrasDB().then(d  => { vacExtras  = d; renderVacinas(); });
+
+// Sync em tempo real para vacinas
+VACINHAS_REF.onSnapshot(snap => {
+  if (!snap.exists) return;
+  const novo = snap.data().status || {};
+  if (JSON.stringify(vacStatus) !== JSON.stringify(novo)) {
+    vacStatus = novo;
+    localStorage.setItem(VAC_KEY, JSON.stringify(novo));
+    renderVacinas();
+  }
+}, () => {});
+
+EXTRAS_REF.onSnapshot(snap => {
+  if (!snap.exists) return;
+  const novo = snap.data().extras || {};
+  if (JSON.stringify(vacExtras) !== JSON.stringify(novo)) {
+    vacExtras = novo;
+    localStorage.setItem(VAC_EX_KEY, JSON.stringify(novo));
+    renderVacinas();
+  }
+}, () => {});
+
+// ── VACINAS OPCIONAIS — SBP · SBIm (não obrigatórias pelo PNI) ──
+const VACINAS_OPCIONAIS = [
+  // ── RECÉM-NASCIDO (0–28 dias) ──
+  {
+    faixa: '🌌 Recém-Nascido (0–28 dias)',
+    vacinas: [
+      { nome: 'Vitamina K (injeção ao nascer)', doenca: 'Prevenção de hemorragias neonatais', obs: 'Administrada na maternidade. Não é vacina, mas frequentemente incluída no protocolo neonatal.', fonte: 'SBP' },
+    ]
+  },
+  // ── PRIMEIROS MESES (1–6 meses) ──
+  {
+    faixa: '🌱 Primeiros Meses (1–6 meses)',
+    vacinas: [
+      { nome: 'Pneumocócica 13V (Prevenar 13) — 1ª dose', doenca: 'Pneumonia, meningite e otite (13 sorotipos)', obs: 'O PNI oferece a 10V; a 13V amplia a proteção para 3 sorotipos adicionais. Recomendada pela SBP.', fonte: 'SBP · SBIm' },
+      { nome: 'Pneumocócica 15V (Vaxneuvance) — 1ª dose', doenca: 'Pneumonia e infecções pneumocócicas (15 sorotipos)', obs: 'Versão mais recente. Consultar disponibilidade com o Curandeiro Jedi.', fonte: 'SBP · SBIm' },
+      { nome: 'Pneumocócica 20V — 1ª dose', doenca: 'Pneumonia e infecções pneumocócicas (20 sorotipos)', obs: 'Cobertura mais ampla disponível. Verificar indicação e disponibilidade.', fonte: 'SBIm' },
+      { nome: 'Hexavalente (Infanrix Hexa) — 1ª dose', doenca: 'Difteria, Tétano, Coqueluche, Hepatite B, Hib e Polio inativada', obs: 'Substitui a Penta + VIP em dose única. Acelaular — menor risco de febre.', fonte: 'SBP · SBIm' },
+      { nome: 'Meningocócica B (Bexsero) — 1ª dose', doenca: 'Meningite meningocócica sorogrupo B', obs: 'Não disponível no SUS. Esquema: 2, 4 e 12 meses. Altamente recomendada pela SBP.', fonte: 'SBP · SBIm' },
+      { nome: 'Meningocócica ACWY (Menveo/Nimenrix) — 1ª dose', doenca: 'Meningite meningocócica A, C, W e Y', obs: 'O PNI oferece apenas a C. A ACWY amplia a proteção. Recomendada a partir de 2 meses.', fonte: 'SBP · SBIm' },
+    ]
+  },
+  // ── 6–12 MESES ──
+  {
+    faixa: '🌿 6–12 Meses',
+    vacinas: [
+      { nome: 'Pneumocócica 13V (Prevenar 13) — 3ª dose / reforço', doenca: 'Pneumonia, meningite e otite (13 sorotipos)', obs: 'Completar esquema iniciado anteriormente.', fonte: 'SBP · SBIm' },
+      { nome: 'Meningocócica B (Bexsero) — 2ª/3ª dose', doenca: 'Meningite meningocócica sorogrupo B', obs: 'Continuação do esquema iniciado aos 2 meses.', fonte: 'SBP · SBIm' },
+      { nome: 'Influenza / Gripe — dose de reforço (6–8m)', doenca: 'Gripe (influenza)', obs: 'Primeira vez: 2 doses com 30 dias de intervalo. Reforço anual a partir da 2ª temporada.', fonte: 'PNI · SBP' },
+      { nome: 'Rotavírus Pentavalente (RotaTeq) — 3ª dose', doenca: 'Gastroenterite por rotavírus (5 tipos)', obs: 'O PNI oferece a monovalente (2 doses). A pentavalente amplia a cobertura. Até 8m 0d.', fonte: 'SBP · SBIm' },
+    ]
+  },
+  // ── 12–18 MESES ──
+  {
+    faixa: '⭐ 12–18 Meses',
+    vacinas: [
+      { nome: 'Meningocócica B (Bexsero) — reforço 12 meses', doenca: 'Meningite meningocócica sorogrupo B', obs: 'Dose de reforço do esquema primário.', fonte: 'SBP · SBIm' },
+      { nome: 'Meningocócica ACWY — reforço', doenca: 'Meningite meningocócica A, C, W e Y', obs: 'Reforço do esquema iniciado nos primeiros meses.', fonte: 'SBP · SBIm' },
+      { nome: 'Varicela (2ª dose antecipada)', doenca: 'Varicela (catapora)', obs: 'SBP recomenda 2 doses: 12 e 15 meses. PNI oferece como Tetraviral aos 15m.', fonte: 'SBP' },
+      { nome: 'Hepatite A (2ª dose)', doenca: 'Hepatite A', obs: 'Completar esquema iniciado aos 12 meses.', fonte: 'PNI · SBP' },
+    ]
+  },
+  // ── 2–4 ANOS ──
+  {
+    faixa: '🚀 2–4 Anos',
+    vacinas: [
+      { nome: 'Influenza / Gripe — dose anual', doenca: 'Gripe (influenza)', obs: 'Ritual anual recomendado pela SBP para todas as crianças até 8 anos.', fonte: 'PNI · SBP' },
+      { nome: 'Pneumocócica 13V — reforço (2–5 anos)', doenca: 'Pneumonia e meningite pneumocócica', obs: 'Para crianças não vacinadas ou com esquema incompleto na infância.', fonte: 'SBP · SBIm' },
+      { nome: 'Meningocócica ACWY — reforço pré-escolar', doenca: 'Meningite meningocócica A, C, W e Y', obs: 'Reforço recomendado antes da entrada escolar.', fonte: 'SBP · SBIm' },
+    ]
+  },
+  // ── 5–10 ANOS ──
+  {
+    faixa: '🎓 5–10 Anos',
+    vacinas: [
+      { nome: 'Influenza / Gripe — dose anual', doenca: 'Gripe (influenza)', obs: 'Recomendada anualmente pela SBP para grupos de risco e crianças em geral.', fonte: 'PNI · SBP' },
+      { nome: 'Meningocócica B — reforço escolar', doenca: 'Meningite meningocócica sorogrupo B', obs: 'SBIm recomenda reforço na idade escolar para crianças vacinadas na infância.', fonte: 'SBIm' },
+      { nome: 'Varicela — 2ª dose (se não recebida)', doenca: 'Varicela (catapora)', obs: 'Indicada para crianças que receberam apenas 1 dose.', fonte: 'SBP' },
+      { nome: 'Hepatite A — dose adicional', doenca: 'Hepatite A', obs: 'Para crianças não vacinadas anteriormente.', fonte: 'PNI · SBP' },
+    ]
+  },
+  // ── ESPECIAIS / QUALQUER IDADE ──
+  {
+    faixa: '✨ Especiais (qualquer faixa etária)',
+    vacinas: [
+      { nome: 'COVID-19 — reforço bivalente', doenca: 'COVID-19 (variantes)', obs: 'Reforços bivalentes indicados conforme calendário atualizado do MS e SBP.', fonte: 'PNI · SBP' },
+      { nome: 'Raiva (pré-exposição)', doenca: 'Raiva', obs: 'Indicada em situações de risco de exposição. Avaliar com o Curandeiro Jedi.', fonte: 'PNI' },
+      { nome: 'Tifóide (Typhim Vi)', doenca: 'Febre tifoide', obs: 'Recomendada para viagens a regiões endêmicas. A partir de 2 anos.', fonte: 'SBP · SBIm' },
+      { nome: 'Hepatite B — dose adicional', doenca: 'Hepatite B', obs: 'Para crianças com esquema incompleto ou sem resposta imunológica.', fonte: 'PNI · SBP' },
+      { nome: 'Meningocócica B — esquema atrasado', doenca: 'Meningite meningocócica sorogrupo B', obs: 'Esquema de recuperação para crianças não vacinadas na infância.', fonte: 'SBP · SBIm' },
+      { nome: 'Influenza — dose semestral (imunodeprimidos)', doenca: 'Gripe (influenza)', obs: 'Para crianças imunodeprimidas: 2 doses por ano.', fonte: 'SBP' },
+    ]
+  },
+];
+
+// ── MODAL NOVA VACINA — ATUALIZADO ──
 let _novaVacGrupoIdx = null;
 
 function abrirModalNovaVacina(grupoIdx) {
   _novaVacGrupoIdx = grupoIdx;
   const g = VACINAS_CALENDARIO[grupoIdx];
   document.getElementById('modal-nova-vac-grupo').textContent = g.icone + ' ' + g.grupo;
-  document.getElementById('nv-nome').value   = '';
-  document.getElementById('nv-doenca').value = '';
-  document.getElementById('nv-obs').value    = '';
-  document.getElementById('nv-fonte').value  = 'PNI · SBP';
+
+  // Renderiza lista de sugestões
+  renderSugestoesVacinas();
+
+  // Mostra passo 1
+  document.getElementById('nv-step-1').style.display = 'block';
+  document.getElementById('nv-step-2').style.display = 'none';
   document.getElementById('modal-nova-vacina').style.display = 'flex';
-  setTimeout(() => document.getElementById('nv-nome').focus(), 100);
+}
+
+function renderSugestoesVacinas() {
+  const lista = document.getElementById('nv-sugestoes-lista');
+  if (!lista) return;
+
+  lista.innerHTML = VACINAS_OPCIONAIS.map(faixa => `
+    <div style="margin-bottom:10px">
+      <div style="
+        font-family:'Orbitron',monospace;font-size:0.6rem;
+        color:var(--gold);letter-spacing:0.08em;
+        padding:6px 10px;background:rgba(180,130,0,0.1);
+        border-radius:6px;margin-bottom:4px;
+        border-left:2px solid var(--gold);
+      ">${faixa.faixa}</div>
+      ${faixa.vacinas.map(v => `
+        <div onclick="abrirFormNovaVacina(${JSON.stringify(v).replace(/"/g,'&quot;')})"
+          style="
+            display:flex;align-items:flex-start;gap:10px;
+            padding:10px 12px;margin-bottom:4px;
+            background:rgba(0,20,50,0.6);
+            border:1px solid rgba(0,180,255,0.15);
+            border-radius:8px;cursor:pointer;
+            transition:border-color 0.15s, background 0.15s;
+          "
+          onmousedown="this.style.background='rgba(0,50,120,0.5)'"
+          ontouchstart="this.style.background='rgba(0,50,120,0.5)'"
+          onmouseup="this.style.background='rgba(0,20,50,0.6)'"
+          ontouchend="this.style.background='rgba(0,20,50,0.6)'">
+          <span style="font-size:1.1rem;flex-shrink:0;margin-top:1px">🛡️</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--white);line-height:1.3">${v.nome}</div>
+            <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;line-height:1.3">${v.doenca}</div>
+            ${v.obs ? `<div style="font-size:0.62rem;color:rgba(255,200,0,0.6);margin-top:3px;line-height:1.3">⚠ ${v.obs}</div>` : ''}
+            <div style="font-size:0.6rem;color:rgba(0,180,255,0.5);margin-top:3px">📡 ${v.fonte}</div>
+          </div>
+          <span style="color:var(--blue-neon);font-size:1rem;flex-shrink:0;margin-top:2px">＋</span>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function abrirFormNovaVacina(vacina) {
+  // Preenche o form (ou limpa se for personalizado)
+  document.getElementById('nv-nome').value   = vacina ? vacina.nome   : '';
+  document.getElementById('nv-doenca').value = vacina ? vacina.doenca : '';
+  document.getElementById('nv-obs').value    = vacina ? vacina.obs    : '';
+  document.getElementById('nv-fonte').value  = vacina ? vacina.fonte  : 'SBP · SBIm';
+
+  document.getElementById('nv-step-1').style.display = 'none';
+  document.getElementById('nv-step-2').style.display = 'block';
+}
+
+function voltarNvStep1() {
+  document.getElementById('nv-step-2').style.display = 'none';
+  document.getElementById('nv-step-1').style.display = 'block';
 }
 
 function fecharModalNovaVacina() {
@@ -2940,7 +3790,7 @@ function salvarNovaVacina() {
   const nome   = document.getElementById('nv-nome').value.trim();
   const doenca = document.getElementById('nv-doenca').value.trim();
   const obs    = document.getElementById('nv-obs').value.trim();
-  const fonte  = document.getElementById('nv-fonte').value.trim() || 'PNI · SBP';
+  const fonte  = document.getElementById('nv-fonte').value.trim() || 'SBP · SBIm';
   if (!nome) { alert('⚠️ Defina o nome da vacina antes de gravar!'); return; }
   const idx = String(_novaVacGrupoIdx);
   if (!vacExtras[idx]) vacExtras[idx] = [];
@@ -3070,6 +3920,590 @@ function renderVacinas() {
   }).join('');
 }
 
+// ── PROFISSIONAIS PRÉ-DEFINIDOS ──
+const PROFISSIONAIS = {
+  isabella_mazzoni: {
+    nome: 'Dra. Isabella Mazzoni',
+    especialidade: 'Pediatra · Neonatologista',
+    crm: 'CRM 167072/SP · RQE 99350',
+    contato: '(11) 97721-0348',
+    instagram: '@draisabellamazzoni · IPE Pediatria',
+    emoji: '👩‍⚕️'
+  },
+  lilian_sarli: {
+    nome: 'Lilian Sarli',
+    especialidade: 'Fisioterapeuta · Osteopata Pediátrica',
+    crm: 'CREFITO · PUC-Campinas · Mestra UNICAMP',
+    contato: '@dra.liliansarli',
+    instagram: 'Fisioterapia Pélvica · Osteopatia Pediátrica',
+    emoji: '🧘'
+  }
+};
+
+function toggleProfissional(tipo) {
+  const campo = document.getElementById('campo-profissional');
+  campo.style.display = (tipo === 'consulta' || tipo === 'retorno') ? 'block' : 'none';
+  if (tipo !== 'consulta' && tipo !== 'retorno') {
+    document.getElementById('prof-card').style.display = 'none';
+  }
+}
+
+function selecionarProfissional(val) {
+  const outro = document.getElementById('a-profissional-outro');
+  const card  = document.getElementById('prof-card');
+  if (val === 'outro_prof') {
+    outro.style.display = 'block';
+    card.style.display  = 'none';
+  } else if (PROFISSIONAIS[val]) {
+    outro.style.display = 'none';
+    const p = PROFISSIONAIS[val];
+    card.style.display = 'block';
+    card.innerHTML = `
+      <div style="font-size:1.1rem;margin-bottom:4px">${p.emoji} <strong style="color:var(--white)">${p.nome}</strong></div>
+      <div>🩺 ${p.especialidade}</div>
+      <div>📋 ${p.crm}</div>
+      <div>📱 ${p.contato}</div>
+      <div>🌐 ${p.instagram}</div>
+    `;
+    // Preenche o título automaticamente
+    const titulo = document.getElementById('a-titulo');
+    if (!titulo.value) titulo.value = `Audiência · ${p.nome}`;
+  } else {
+    outro.style.display = 'none';
+    card.style.display  = 'none';
+  }
+}
+
+// Inicializa campo profissional
+document.addEventListener('DOMContentLoaded', () => toggleProfissional('consulta'));
+toggleProfissional('consulta');
+
+// ── SUBMÓDULO MISSÕES / MEDICAÇÃO ──
+function showSubTabMissoes(id) {
+  document.querySelectorAll('#tab-agenda .subpanel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#tab-agenda .sub-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('subpanel-' + id).classList.add('active');
+  document.getElementById('stab-' + id).classList.add('active');
+  if (id === 'medicacao') renderMedicacao();
+}
+
+// ── MEDICAMENTOS — LISTA LOCAL (200+ medicamentos infantis brasileiros) ──
+const MEDICAMENTOS_DB = [
+  // Antitérmicos / Analgésicos
+  { nome: 'Dipirona Sódica (Novalgina Gotas)', generico: 'Dipirona Sódica', cat: '🌡️ Antitérmico' },
+  { nome: 'Novalgina Gotas', generico: 'Dipirona Sódica', cat: '🌡️ Antitérmico' },
+  { nome: 'Paracetamol (Tylenol Bebê)', generico: 'Paracetamol', cat: '🌡️ Antitérmico' },
+  { nome: 'Tylenol Bebê Gotas', generico: 'Paracetamol', cat: '🌡️ Antitérmico' },
+  { nome: 'Ibuprofeno (Alivium)', generico: 'Ibuprofeno', cat: '🌡️ Anti-inflamatório' },
+  { nome: 'Alivium Bebê Gotas', generico: 'Ibuprofeno', cat: '🌡️ Anti-inflamatório' },
+  { nome: 'Ibuprofeno (Advil Bebê)', generico: 'Ibuprofeno', cat: '🌡️ Anti-inflamatório' },
+  { nome: 'Advil Bebê', generico: 'Ibuprofeno', cat: '🌡️ Anti-inflamatório' },
+  // Antibióticos
+  { nome: 'Amoxicilina (Amoxil)', generico: 'Amoxicilina', cat: '💊 Antibiótico' },
+  { nome: 'Amoxil Pediátrico', generico: 'Amoxicilina', cat: '💊 Antibiótico' },
+  { nome: 'Amoxicilina + Clavulanato (Clavulin)', generico: 'Amoxicilina + Clavulanato', cat: '💊 Antibiótico' },
+  { nome: 'Clavulin BD', generico: 'Amoxicilina + Clavulanato', cat: '💊 Antibiótico' },
+  { nome: 'Azitromicina (Zitromax)', generico: 'Azitromicina', cat: '💊 Antibiótico' },
+  { nome: 'Zitromax Pediátrico', generico: 'Azitromicina', cat: '💊 Antibiótico' },
+  { nome: 'Cefalexina (Keflex)', generico: 'Cefalexina', cat: '💊 Antibiótico' },
+  { nome: 'Keflex Pediátrico', generico: 'Cefalexina', cat: '💊 Antibiótico' },
+  { nome: 'Sulfametoxazol + Trimetoprim (Bactrim)', generico: 'Sulfametoxazol + Trimetoprim', cat: '💊 Antibiótico' },
+  { nome: 'Bactrim Suspensão', generico: 'Sulfametoxazol + Trimetoprim', cat: '💊 Antibiótico' },
+  // Vitaminas e Suplementos
+  { nome: 'Vitamina D3 (D-Tabs)', generico: 'Colecalciferol', cat: '🌟 Vitamina' },
+  { nome: 'D-Tabs Gotas', generico: 'Colecalciferol', cat: '🌟 Vitamina' },
+  { nome: 'Vitamina D (Addera D3)', generico: 'Colecalciferol', cat: '🌟 Vitamina' },
+  { nome: 'Addera D3 Gotas', generico: 'Colecalciferol', cat: '🌟 Vitamina' },
+  { nome: 'Polivitamínico (Apetil)', generico: 'Polivitamínico', cat: '🌟 Vitamina' },
+  { nome: 'Apetil Gotas', generico: 'Polivitamínico', cat: '🌟 Vitamina' },
+  { nome: 'Ferro (Noripurum)', generico: 'Ferro (Hidróxido Polimaltosado)', cat: '🌟 Suplemento' },
+  { nome: 'Noripurum Gotas', generico: 'Ferro (Hidróxido Polimaltosado)', cat: '🌟 Suplemento' },
+  { nome: 'Ferro (Fer-In-Sol)', generico: 'Sulfato Ferroso', cat: '🌟 Suplemento' },
+  { nome: 'Ácido Fólico', generico: 'Ácido Fólico', cat: '🌟 Suplemento' },
+  { nome: 'Vitamina C', generico: 'Ácido Ascórbico', cat: '🌟 Vitamina' },
+  // Gastro / Cólicas
+  { nome: 'Simeticona (Luftal Bebê)', generico: 'Simeticona', cat: '🍼 Gastro' },
+  { nome: 'Luftal Bebê Gotas', generico: 'Simeticona', cat: '🍼 Gastro' },
+  { nome: 'Dimeticona (Dimecon)', generico: 'Dimeticona', cat: '🍼 Gastro' },
+  { nome: 'Omeprazol (Losec)', generico: 'Omeprazol', cat: '🍼 Gastro' },
+  { nome: 'Domperidona (Motilium)', generico: 'Domperidona', cat: '🍼 Gastro' },
+  { nome: 'Motilium Suspensão', generico: 'Domperidona', cat: '🍼 Gastro' },
+  { nome: 'Ranitidina', generico: 'Ranitidina', cat: '🍼 Gastro' },
+  { nome: 'Ondansetrona (Vonau)', generico: 'Ondansetrona', cat: '🍼 Gastro' },
+  { nome: 'Soro de Reidratação Oral (Pedialyte)', generico: 'Soro de Reidratação Oral', cat: '🍼 Gastro' },
+  { nome: 'Pedialyte', generico: 'Soro de Reidratação Oral', cat: '🍼 Gastro' },
+  // Antialérgicos
+  { nome: 'Loratadina (Loratamed)', generico: 'Loratadina', cat: '🌸 Antialérgico' },
+  { nome: 'Loratamed Pediátrico', generico: 'Loratadina', cat: '🌸 Antialérgico' },
+  { nome: 'Cetirizina (Zyrtec)', generico: 'Cetirizina', cat: '🌸 Antialérgico' },
+  { nome: 'Zyrtec Gotas', generico: 'Cetirizina', cat: '🌸 Antialérgico' },
+  { nome: 'Hidroxizina (Hixizine)', generico: 'Hidroxizina', cat: '🌸 Antialérgico' },
+  { nome: 'Dexclorfeniramina (Polaramine)', generico: 'Dexclorfeniramina', cat: '🌸 Antialérgico' },
+  // Respiratório
+  { nome: 'Salbutamol (Aerolin)', generico: 'Salbutamol', cat: '🫁 Respiratório' },
+  { nome: 'Aerolin Spray', generico: 'Salbutamol', cat: '🫁 Respiratório' },
+  { nome: 'Budesonida (Pulmicort)', generico: 'Budesonida', cat: '🫁 Respiratório' },
+  { nome: 'Pulmicort Nebulização', generico: 'Budesonida', cat: '🫁 Respiratório' },
+  { nome: 'Brometo de Ipratrópio (Atrovent)', generico: 'Brometo de Ipratrópio', cat: '🫁 Respiratório' },
+  { nome: 'Prednisolona (Predsim)', generico: 'Prednisolona', cat: '🫁 Respiratório' },
+  { nome: 'Montelucaste (Singulair)', generico: 'Montelucaste', cat: '🫁 Respiratório' },
+  // Otorrinolaringologia
+  { nome: 'Soro Fisiológico Nasal', generico: 'Cloreto de Sódio 0,9%', cat: '👃 ORL' },
+  { nome: 'Solução Salina Nasal', generico: 'Cloreto de Sódio', cat: '👃 ORL' },
+  { nome: 'Rinosoro', generico: 'Solução Salina Hipertônica', cat: '👃 ORL' },
+  // Dermatológico
+  { nome: 'Nistatina (Micostatin)', generico: 'Nistatina', cat: '🧴 Dermatológico' },
+  { nome: 'Micostatin Suspensão', generico: 'Nistatina', cat: '🧴 Dermatológico' },
+  { nome: 'Cetoconazol Creme', generico: 'Cetoconazol', cat: '🧴 Dermatológico' },
+  { nome: 'Hidrocortisona Creme', generico: 'Hidrocortisona', cat: '🧴 Dermatológico' },
+  // Probióticos
+  { nome: 'Probiótico (Floratil)', generico: 'Saccharomyces boulardii', cat: '🦠 Probiótico' },
+  { nome: 'Floratil', generico: 'Saccharomyces boulardii', cat: '🦠 Probiótico' },
+  { nome: 'Probiótico (Lactipan)', generico: 'Lactobacillus', cat: '🦠 Probiótico' },
+];
+
+function buscarMedicamento(termo) {
+  const sug = document.getElementById('med-sugestoes');
+  if (!termo || termo.length < 2) { sug.style.display = 'none'; return; }
+  const t = termo.toLowerCase();
+  const resultados = MEDICAMENTOS_DB.filter(m =>
+    m.nome.toLowerCase().includes(t) || m.generico.toLowerCase().includes(t)
+  ).slice(0, 8);
+  if (!resultados.length) { sug.style.display = 'none'; return; }
+  sug.style.display = 'block';
+  sug.innerHTML = resultados.map(m => `
+    <div onclick="selecionarMedicamento('${m.nome.replace(/'/g,"\\'")}','${m.generico.replace(/'/g,"\\'")}','${m.cat}')"
+      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,180,255,0.1);transition:background 0.15s"
+      onmouseover="this.style.background='rgba(0,80,160,0.3)'"
+      onmouseout="this.style.background='none'">
+      <div style="font-size:0.85rem;color:var(--white);font-weight:700">${m.nome}</div>
+      <div style="font-size:0.68rem;color:var(--text-dim)">${m.cat} · ${m.generico}</div>
+    </div>
+  `).join('');
+}
+
+function selecionarMedicamento(nome, generico, cat) {
+  document.getElementById('med-nome').value    = nome;
+  document.getElementById('med-generico').value = generico;
+  document.getElementById('med-sugestoes').style.display = 'none';
+}
+
+// Fechar sugestões ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('#med-nome') && !e.target.closest('#med-sugestoes')) {
+    const s = document.getElementById('med-sugestoes');
+    if (s) s.style.display = 'none';
+  }
+});
+
+// ── CRUD MEDICAÇÃO ──
+const MED_REF = firestore.collection('diario').doc('arthur_medicacao');
+let medicacoes = [];
+
+async function loadMedicacao() {
+  try {
+    const snap = await MED_REF.get();
+    if (snap.exists) return snap.data().lista || [];
+  } catch(e) {}
+  try { return JSON.parse(localStorage.getItem('arthur_medicacao_offline')) || []; } catch(e) { return []; }
+}
+
+async function saveMedicacao(lista) {
+  localStorage.setItem('arthur_medicacao_offline', JSON.stringify(lista));
+  try { await MED_REF.set({ lista }); } catch(e) {}
+}
+
+// Sync tempo real medicação
+MED_REF.onSnapshot(snap => {
+  if (!snap.exists) return;
+  const novo = snap.data().lista || [];
+  if (JSON.stringify(medicacoes) !== JSON.stringify(novo)) {
+    medicacoes = novo;
+    renderMedicacao();
+  }
+}, () => {});
+
+loadMedicacao().then(d => { medicacoes = d; });
+
+function initMedForm() {
+  const hoje = todayISO();
+  document.getElementById('med-inicio').value = hoje;
+}
+
+function salvarMedicacao() {
+  const nome     = document.getElementById('med-nome').value.trim();
+  const generico = document.getElementById('med-generico').value.trim();
+  const dose     = document.getElementById('med-dose').value.trim();
+  const freq     = document.getElementById('med-freq').value;
+  const inicio   = document.getElementById('med-inicio').value;
+  const fim      = document.getElementById('med-fim').value;
+  const indicado = document.getElementById('med-indicado').value;
+  const obs      = document.getElementById('med-obs').value.trim();
+
+  if (!nome) { alert('⚠️ Informe o nome da poção antes de registrar!'); return; }
+
+  medicacoes.unshift({
+    id: Date.now(), nome, generico, dose, freq, inicio, fim,
+    indicado, obs, autor: usuarioAtual
+  });
+  saveMedicacao(medicacoes);
+
+  // Limpar form
+  document.getElementById('med-nome').value    = '';
+  document.getElementById('med-generico').value = '';
+  document.getElementById('med-dose').value    = '';
+  document.getElementById('med-obs').value     = '';
+  document.getElementById('med-fim').value     = '';
+
+  renderMedicacao();
+  showToast('⚗️ Elixir ativado nas crônicas da Força!');
+}
+
+function deleteMedicacao(id) {
+  confirmarDelete('medicacao', id, 'Remover este elixir das crônicas? A ação é irreversível como o lado sombrio.');
+}
+
+const FREQ_LABEL = {
+  se_necessario:'Se necessário', '4h':'A cada 4h', '6h':'A cada 6h',
+  '8h':'A cada 8h', '12h':'A cada 12h', '24h':'1x ao dia', outro:'Outra'
+};
+
+function renderMedicacao() {
+  const el = document.getElementById('lista-medicacao');
+  if (!el) return;
+  if (!medicacoes.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💊</div><p>Nenhum elixir registrado nas crônicas</p></div>`;
+    return;
+  }
+  el.innerHTML = medicacoes.map(m => `
+    <div class="card" style="margin-bottom:8px;padding:14px 16px;position:relative">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div style="font-weight:700;color:var(--white);font-size:0.95rem">⚗️ ${m.nome}</div>
+          ${m.generico ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:1px">Princípio ativo: ${m.generico}</div>` : ''}
+        </div>
+        <button onclick="deleteMedicacao(${m.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:1rem;padding:2px 6px">🗑</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem">
+        ${m.dose     ? `<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--blue-neon)">💉 ${m.dose}</span>` : ''}
+        ${m.freq     ? `<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">⏱ ${FREQ_LABEL[m.freq]||m.freq}</span>` : ''}
+        ${m.inicio   ? `<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">📅 ${formatDate(m.inicio)}${m.fim?' → '+formatDate(m.fim):''}</span>` : ''}
+        ${m.indicado ? `<span style="background:rgba(0,100,200,0.2);border:1px solid rgba(0,180,255,0.2);border-radius:6px;padding:2px 8px;color:var(--text-dim)">👩‍⚕️ ${m.indicado}</span>` : ''}
+      </div>
+      ${m.obs ? `<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;font-style:italic">📝 ${m.obs}</div>` : ''}
+      ${m.autor ? `<div class="autor-tag">✍️ ${nomeAutor(m.autor)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── iCALENDAR — INTEGRAÇÃO COM CALENDÁRIO APPLE ──
+
+const TIPO_LABEL = {
+  consulta: 'Audiência com Curandeiro Jedi',
+  vacina:   'Ritual de Proteção — Vacina',
+  exame:    'Análise pela Força — Exame',
+  retorno:  'Retorno ao Templo Jedi',
+  outro:    'Missão do Padawan Arthur',
+};
+
+function formatarDataICS(dataISO, horaHHMM) {
+  // Retorna string no formato iCal: YYYYMMDDTHHMMSS (local) ou YYYYMMDD (all-day)
+  if (!dataISO) return null;
+  const [y, m, d] = dataISO.split('-');
+  if (!horaHHMM) return `${y}${m}${d}`;
+  const [h, min] = horaHHMM.split(':');
+  return `${y}${m}${d}T${h}${min}00`;
+}
+
+function gerarUID() {
+  return Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '@padawan.arthur';
+}
+
+function sanitizarTexto(t) {
+  // Escapa caracteres especiais do iCal e remove emojis problemáticos
+  return (t || '').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+}
+
+function gerarBlocoVEVENT(e) {
+  const dtstart = formatarDataICS(e.data, e.hora);
+  // Duração padrão: 1 hora para consultas, 30min para outros
+  let dtend;
+  if (e.hora) {
+    const [h, min] = e.hora.split(':').map(Number);
+    const durMin   = (e.tipo === 'consulta' || e.tipo === 'retorno') ? 60 : 30;
+    const endMin   = (h * 60 + min + durMin);
+    const eh = String(Math.floor(endMin / 60) % 24).padStart(2,'0');
+    const em = String(endMin % 60).padStart(2,'0');
+    const [y,mo,d] = e.data.split('-');
+    dtend = `${y}${mo}${d}T${eh}${em}00`;
+  } else {
+    const d = new Date(e.data + 'T12:00:00');
+    d.setDate(d.getDate() + 1);
+    dtend = d.toISOString().split('T')[0].replace(/-/g,'');
+  }
+
+  const titulo    = sanitizarTexto(TIPO_LABEL[e.tipo] || e.titulo) + ' — ' + sanitizarTexto(e.titulo);
+  const descricao = [
+    '🛸 Padawan Arthur — Crônicas da Ordem Jedi',
+    e.profissional ? `👩‍⚕️ ${e.profissional}` : '',
+    e.tipo ? `📋 Tipo: ${TIPO_LABEL[e.tipo] || e.tipo}` : '',
+  ].filter(Boolean).join('\\n');
+
+  const propriedadeDt    = e.hora ? 'DTSTART' : 'DTSTART;VALUE=DATE';
+  const propriedadeDtEnd = e.hora ? 'DTEND'   : 'DTEND;VALUE=DATE';
+
+  const alarmeMin        = (e.tipo === 'consulta' || e.tipo === 'retorno' || e.tipo === 'vacina') ? -1440 : -60;
+  const alarmeDescricao  = `Lembrete: ${sanitizarTexto(e.titulo)} — Padawan Arthur`;
+
+  // ── Guardiões — sempre incluídos como convidados ──
+  const GUARDIOES_EMAILS = [
+    { nome: 'João Campos',  email: 'joaoacampos@icloud.com' },
+    { nome: 'Nadyne',       email: 'nadcrep@icloud.com'     },
+  ];
+
+  // ORGANIZER: quem está gerando o invite (o app)
+  // ATTENDEE: ambos os guardiões sempre, independente de quem enviou
+  const organizer = `ORGANIZER;CN=Padawan Arthur:mailto:joaoacampos@icloud.com`;
+  const attendees = GUARDIOES_EMAILS.map(g =>
+    `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;` +
+    `RSVP=TRUE;CN=${g.nome}:mailto:${g.email}`
+  );
+
+  return [
+    'BEGIN:VEVENT',
+    `UID:${gerarUID()}`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').split('.')[0]}Z`,
+    `${propriedadeDt}:${dtstart}`,
+    `${propriedadeDtEnd}:${dtend}`,
+    `SUMMARY:${titulo}`,
+    `DESCRIPTION:${descricao}`,
+    e.local ? `LOCATION:${sanitizarTexto(e.local)}` : '',
+    'STATUS:CONFIRMED',
+    'TRANSP:OPAQUE',
+    organizer,
+    ...attendees,
+    // Alarme
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${alarmeDescricao}`,
+    `TRIGGER:${alarmeMin < 0 ? '-' : ''}PT${Math.abs(alarmeMin)}M`,
+    'END:VALARM',
+    'END:VEVENT',
+  ].filter(l => l !== '').join('\r\n');
+}
+
+function gerarICS(eventos, nomeArquivo) {
+  const linhas = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Padawan Arthur//Crônicas da Ordem Jedi//PT',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Missões do Padawan Arthur',
+    'X-WR-TIMEZONE:America/Sao_Paulo',
+    'X-APPLE-CALENDAR-COLOR:#0099e6',
+    ...eventos.map(gerarBlocoVEVENT),
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  // Cria blob e link de download
+  const blob = new Blob([linhas], { type: 'text/calendar;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = nomeArquivo;
+  // No iOS Safari, tenta abrir direto (webcal não funciona com blob)
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+// ── Opção A: Evento único ──
+function adicionarEventoCalendario(id) {
+  const e = db.eventos.find(ev => ev.id === id);
+  if (!e) return;
+  const nome = e.titulo.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase().slice(0, 30);
+  gerarICS([e], `missao-${nome}.ics`);
+  showToast('📅 Arquivo .ics gerado — confirme no Calendário!');
+}
+
+// ── Opção B: Exportar todas as missões futuras ──
+function exportarAgendaICS() {
+  const hoje   = todayISO();
+  const futuros = db.eventos.filter(e => e.data >= hoje);
+  if (!futuros.length) {
+    showToast('⚠️ Nenhuma missão futura para exportar');
+    return;
+  }
+  gerarICS(futuros, 'missoes-padawan-arthur.ics');
+  showToast(`📅 ${futuros.length} missão(ões) exportada(s) para o Calendário!`);
+}
+// Fotos são salvas como base64 no localStorage (Firebase tem limite de 1MB por doc)
+const FOTO_ARTHUR_KEY   = 'arthur_foto_arthur';
+const FOTO_GUARDIOES_KEY = 'arthur_fotos_guardioes';
+
+function loadFotos() {
+  try { return JSON.parse(localStorage.getItem(FOTO_GUARDIOES_KEY)) || {}; } catch(e) { return {}; }
+}
+let fotosGuardioes = loadFotos();
+
+function redimensionarImagem(file, maxSize, callback) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      const max = maxSize || 400;
+      if (w > h) { if (w > max) { h = h*(max/w); w = max; } }
+      else        { if (h > max) { w = w*(max/h); h = max; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── FOTO DO ARTHUR ──
+let _arthurFotoPendente = null;
+
+function abrirFotoArthur() {
+  const atual = localStorage.getItem(FOTO_ARTHUR_KEY);
+  const prev  = document.getElementById('arthur-preview-img');
+  const emoji = document.getElementById('arthur-preview-emoji');
+  const rmBtn = document.getElementById('arthur-remove-btn');
+  if (atual) {
+    prev.src = atual; prev.style.display = 'block';
+    emoji.style.display = 'none';
+    rmBtn.style.display = 'block';
+  } else {
+    prev.style.display = 'none';
+    emoji.style.display = 'block';
+    rmBtn.style.display = 'none';
+  }
+  _arthurFotoPendente = atual || null;
+  document.getElementById('modal-foto-arthur').style.display = 'flex';
+}
+
+function previewFotoArthur(input) {
+  if (!input.files[0]) return;
+  redimensionarImagem(input.files[0], 400, b64 => {
+    _arthurFotoPendente = b64;
+    const prev  = document.getElementById('arthur-preview-img');
+    const emoji = document.getElementById('arthur-preview-emoji');
+    prev.src = b64; prev.style.display = 'block';
+    emoji.style.display = 'none';
+    document.getElementById('arthur-remove-btn').style.display = 'block';
+  });
+}
+
+function removerFotoArthur() {
+  _arthurFotoPendente = null;
+  document.getElementById('arthur-preview-img').style.display = 'none';
+  document.getElementById('arthur-preview-emoji').style.display = 'block';
+  document.getElementById('arthur-remove-btn').style.display = 'none';
+}
+
+function salvarFotoArthur() {
+  if (_arthurFotoPendente) {
+    localStorage.setItem(FOTO_ARTHUR_KEY, _arthurFotoPendente);
+  } else {
+    localStorage.removeItem(FOTO_ARTHUR_KEY);
+  }
+  atualizarFotoArthurHeader();
+  fecharFotoArthur();
+  showToast('🛸 Foto do Padawan atualizada!');
+}
+
+function fecharFotoArthur() {
+  document.getElementById('modal-foto-arthur').style.display = 'none';
+  document.getElementById('input-foto-arthur').value = '';
+  _arthurFotoPendente = null;
+}
+
+function atualizarFotoArthurHeader() {
+  const foto  = localStorage.getItem(FOTO_ARTHUR_KEY);
+  const img   = document.getElementById('arthur-photo-img');
+  const emoji = document.getElementById('arthur-photo-emoji');
+  if (foto) {
+    img.src = foto; img.style.display = 'block';
+    emoji.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    emoji.style.display = 'block';
+  }
+}
+
+// ── FOTO DO GUARDIÃO ──
+let _guardiaoFotoPendente = null;
+
+function abrirTrocaFotoGuardiao() {
+  document.getElementById('menu-guardiao').style.display = 'none';
+  requestAnimationFrame(() => {
+    const atual = fotosGuardioes[usuarioAtual] || null;
+    const prev  = document.getElementById('guardiao-preview-img');
+    const emoji = document.getElementById('guardiao-preview-emoji');
+    const rmBtn = document.getElementById('guardiao-remove-btn');
+    if (atual) {
+      prev.src = atual; prev.style.display = 'block';
+      emoji.style.display = 'none';
+      rmBtn.style.display = 'block';
+    } else {
+      prev.style.display = 'none';
+      emoji.textContent  = GUARDIOES[usuarioAtual]?.emoji || '👤';
+      emoji.style.display = 'block';
+      rmBtn.style.display = 'none';
+    }
+    _guardiaoFotoPendente = atual;
+    const modal = document.getElementById('modal-foto-guardiao');
+    modal.style.display = 'flex';
+    modal.style.zIndex  = '99000';
+  });
+}
+
+function previewFotoGuardiao(input) {
+  if (!input.files[0]) return;
+  redimensionarImagem(input.files[0], 300, b64 => {
+    _guardiaoFotoPendente = b64;
+    const prev  = document.getElementById('guardiao-preview-img');
+    const emoji = document.getElementById('guardiao-preview-emoji');
+    prev.src = b64; prev.style.display = 'block';
+    emoji.style.display = 'none';
+    document.getElementById('guardiao-remove-btn').style.display = 'block';
+  });
+}
+
+function removerFotoGuardiao() {
+  _guardiaoFotoPendente = null;
+  document.getElementById('guardiao-preview-img').style.display = 'none';
+  const emoji = document.getElementById('guardiao-preview-emoji');
+  emoji.textContent = GUARDIOES[usuarioAtual]?.emoji || '👤';
+  emoji.style.display = 'block';
+  document.getElementById('guardiao-remove-btn').style.display = 'none';
+}
+
+function salvarFotoGuardiao() {
+  if (_guardiaoFotoPendente) {
+    fotosGuardioes[usuarioAtual] = _guardiaoFotoPendente;
+  } else {
+    delete fotosGuardioes[usuarioAtual];
+  }
+  localStorage.setItem(FOTO_GUARDIOES_KEY, JSON.stringify(fotosGuardioes));
+  atualizarBadge();
+  fecharFotoGuardiao();
+  showToast('📷 Foto do Guardião atualizada!');
+}
+
+function fecharFotoGuardiao() {
+  document.getElementById('modal-foto-guardiao').style.display = 'none';
+  document.getElementById('input-foto-guardiao').value = '';
+  _guardiaoFotoPendente = null;
+}
+
+// ── INIT FOTOS ──
+atualizarFotoArthurHeader();
+
 // ── INIT ──
 function renderAll() {
   renderMamadas();
@@ -3078,13 +4512,381 @@ function renderAll() {
   renderDashboard();
   renderMesversario();
   renderVacinas();
+  renderMedicacao();
 }
 
-// Aguarda dados carregarem antes de renderizar
-loadData().then(d => {
-  db = d;
-  if (usuarioAtual) renderAll();
-});
+initMedForm();
 </script>
+
+<!-- ══════════════════════════════════════════════
+     MODAL GLOSSÁRIO GALÁCTICO
+     z-index: 999999 — mais alto de todo o app
+     position: fixed diretamente no body
+     NUNCA dentro de header, nav ou qualquer container
+     ══════════════════════════════════════════════ -->
+<div id="modal-glossario" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  background:rgba(2,11,24,0.97);
+  flex-direction:column;
+  overflow:hidden;
+">
+
+  <!-- HEADER DO GLOSSÁRIO -->
+  <div style="
+    background:linear-gradient(180deg,rgba(0,20,50,0.98) 0%,rgba(2,11,24,0.95) 100%);
+    border-bottom:1px solid rgba(0,180,255,0.2);
+    padding:env(safe-area-inset-top,0) 0 0;
+    flex-shrink:0;
+  ">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+      <div style="font-size:1.4rem">📖</div>
+      <div style="flex:1">
+        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#e8f4fd;letter-spacing:0.08em">GLOSSÁRIO GALÁCTICO</div>
+        <div style="font-size:0.65rem;color:#7ab3d4;margin-top:1px">Termos Jedi · Equivalentes do Mundo Comum</div>
+      </div>
+      <button onclick="fecharGlossario()" style="
+        background:rgba(0,50,100,0.5);
+        border:1px solid rgba(0,180,255,0.25);
+        border-radius:8px;
+        color:#7ab3d4;
+        font-size:1.1rem;
+        width:36px;height:36px;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        flex-shrink:0;
+      ">✕</button>
+    </div>
+
+    <!-- BUSCA -->
+    <div style="padding:0 16px 14px;position:relative">
+      <span style="position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5">🔍</span>
+      <input
+        type="text"
+        id="gloss-busca"
+        placeholder="Buscar termo Jedi ou palavra comum..."
+        oninput="filtrarGlossario()"
+        style="
+          width:100%;
+          background:rgba(0,20,50,0.8);
+          border:1px solid rgba(0,180,255,0.25);
+          border-radius:10px;
+          color:#e8f4fd;
+          font-size:16px;
+          font-family:'Exo 2',sans-serif;
+          padding:10px 14px 10px 42px;
+          outline:none;
+          -webkit-appearance:none;
+        "
+      >
+    </div>
+
+    <!-- FILTROS -->
+    <div id="gloss-filtros" style="
+      display:flex;gap:6px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding:0 16px 12px;
+      -webkit-overflow-scrolling:touch;
+    ">
+      <button class="gf-btn gf-ativo" onclick="setGlossFiltro('todos',this)">Todos</button>
+      <button class="gf-btn" onclick="setGlossFiltro('nav',this)">🌌 Navegação</button>
+      <button class="gf-btn" onclick="setGlossFiltro('form',this)">📝 Formulários</button>
+      <button class="gf-btn" onclick="setGlossFiltro('acao',this)">⚡ Ações</button>
+      <button class="gf-btn" onclick="setGlossFiltro('status',this)">📊 Status</button>
+      <button class="gf-btn" onclick="setGlossFiltro('pessoa',this)">👤 Pessoas</button>
+      <button class="gf-btn" onclick="setGlossFiltro('sistema',this)">⚙️ Sistema</button>
+    </div>
+
+    <!-- CONTADOR -->
+    <div id="gloss-contador" style="
+      font-size:0.62rem;
+      color:#7ab3d4;
+      font-family:'Orbitron',monospace;
+      letter-spacing:0.06em;
+      padding:0 16px 10px;
+      text-align:right;
+    "></div>
+  </div>
+
+  <!-- LISTA SCROLLÁVEL -->
+  <div id="gloss-lista" style="
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:12px 16px calc(16px + env(safe-area-inset-bottom,0));
+  "></div>
+</div>
+
+<style>
+  /* Modal glossário visível como flex */
+  #modal-glossario.aberto { display:flex !important; }
+
+  /* Filtros do glossário */
+  .gf-btn {
+    flex-shrink:0;
+    padding:5px 12px;
+    border-radius:20px;
+    border:1px solid rgba(0,180,255,0.2);
+    background:transparent;
+    color:#7ab3d4;
+    font-size:0.68rem;
+    font-family:'Exo 2',sans-serif;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.15s;
+    min-height:32px;
+    touch-action:manipulation;
+  }
+  .gf-btn.gf-ativo {
+    background:rgba(0,180,255,0.15);
+    border-color:#00d4ff;
+    color:#00d4ff;
+  }
+
+  /* Item do glossário */
+  .gi {
+    background:rgba(6,15,34,0.9);
+    border:1px solid rgba(0,180,255,0.14);
+    border-radius:10px;
+    padding:11px 14px;
+    margin-bottom:7px;
+    display:grid;
+    grid-template-columns:1fr 24px 1fr;
+    align-items:center;
+    gap:8px;
+  }
+  .gi-jedi {
+    font-weight:700;
+    color:#00d4ff;
+    font-size:0.85rem;
+    line-height:1.3;
+    word-break:break-word;
+  }
+  .gi-seta { color:rgba(0,180,255,0.3); text-align:center; font-size:0.9rem; }
+  .gi-comum { font-size:0.82rem; color:#e8f4fd; line-height:1.3; word-break:break-word; }
+  .gi-obs   { font-size:0.68rem; color:#7ab3d4; margin-top:2px; font-style:italic; }
+  .gi-cat   {
+    display:inline-block;
+    font-size:0.55rem;
+    padding:1px 6px;
+    border-radius:6px;
+    font-family:'Orbitron',monospace;
+    letter-spacing:0.04em;
+    margin-bottom:3px;
+  }
+  .gc-nav    { background:rgba(0,180,255,0.12); color:#00d4ff; border:1px solid rgba(0,180,255,0.2); }
+  .gc-form   { background:rgba(180,130,0,0.12); color:#ffe066; border:1px solid rgba(180,130,0,0.2); }
+  .gc-acao   { background:rgba(57,255,20,0.08); color:#7fff60; border:1px solid rgba(57,255,20,0.15); }
+  .gc-status { background:rgba(185,127,255,0.1); color:#b97fff; border:1px solid rgba(185,127,255,0.2); }
+  .gc-pessoa { background:rgba(255,110,180,0.1); color:#ff9ed5; border:1px solid rgba(255,110,180,0.2); }
+  .gc-sistema{ background:rgba(0,50,100,0.4); color:#7ab3d4; border:1px solid rgba(0,180,255,0.12); }
+
+  .gi-secao {
+    font-family:'Orbitron',monospace;
+    font-size:0.62rem;
+    color:#ffe066;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding:8px 0 6px;
+    border-bottom:1px solid rgba(255,220,0,0.12);
+    margin-bottom:8px;
+    margin-top:4px;
+  }
+  .gi-secao:first-child { margin-top:0; }
+
+  @media (max-width:480px) {
+    .gi { grid-template-columns:1fr; gap:4px; }
+    .gi-seta { display:none; }
+    .gi-comum::before { content:'↳ '; color:#7ab3d4; }
+  }
+</style>
+
+<script>
+// ── GLOSSÁRIO — DADOS ──
+const GLOSS_DADOS = [
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🌌 Holocron',                  comum:'Dashboard / Início',                     obs:'Tela principal com resumo do dia' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🍼 Nutrição',                  comum:'Alimentação / Amamentação',               obs:'Aba de registro de mamadas' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📜 Missivas',                  comum:'Dúvidas para o pediatra',                 obs:'Perguntas e respostas do médico' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🗺️ Missões',                   comum:'Agenda / Compromissos',                   obs:'Consultas, exames e vacinas agendadas' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🌙 Órbitas',                   comum:'Mesversário / Meses de vida',             obs:'Marcos e conquistas por mês' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🛡️ Escudos',                   comum:'Vacinas / Carteira de vacinação',         obs:'Checklist do calendário vacinal' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'⚗️ Elixires',                  comum:'Medicação / Remédios',                    obs:'Registro de medicamentos administrados' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📚 Holocron do Saber',         comum:'Base de conhecimento / Repositório',     obs:'Respostas do pediatra organizadas por tema' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📜 Missivas ao Mestre',        comum:'Perguntas pendentes ao pediatra',         obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Galáctico',             comum:'Data',                                    obs:'Campo de data em qualquer formulário' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Hora-Padrão',                 comum:'Hora / Horário',                          obs:'Campo de hora em qualquer formulário' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🤱 Fonte Natural',            comum:'Peito / Aleitamento materno',             obs:'Tipo de mamada' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🥛 Fórmula Alquímica',        comum:'Fórmula infantil / Leite em pó',          obs:'Tipo de mamada' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'✨ Combinação da Força',      comum:'Misto / Peito + fórmula',                obs:'Tipo de mamada combinado' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Recarga de Energia',          comum:'Mamada / Alimentação',                    obs:'Registro de uma mamada' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Dosagem da Força',            comum:'Dose do remédio',                         obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Essência Alquímica',          comum:'Princípio ativo / Substância ativa',      obs:'Nome genérico do medicamento' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ritmo de Administração',      comum:'Frequência / De quanto em quanto tempo',  obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Inicial',               comum:'Data de início',                          obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Final',                 comum:'Data de fim / Término',                   obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Nome do Elixir',              comum:'Nome do remédio',                         obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Prescrito pelo Curandeiro',   comum:'Indicado por / Médico responsável',       obs:'' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🏠 Iniciativa dos Guardiões', comum:'Automedicação',                           obs:'Remédio dado sem prescrição médica' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Coordenadas / Observações',   comum:'Local / Endereço',                        obs:'Campo de localização na agenda' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Órbita Galáctica',            comum:'Mês de vida',                             obs:'Ex: 1ª Órbita = 1 mês de vida' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'✨ 1ª Volta ao Sol',          comum:'Aniversário de 1 ano',                    obs:'12ª órbita — grande celebração' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Domínio da Força',            comum:'Categoria / Assunto',                     obs:'Classificação das dúvidas' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Classe da Missão',            comum:'Tipo de compromisso',                     obs:'Consulta, exame, vacina etc.' },
+  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Detalhes para as Crônicas',   comum:'Observações / Descrição',                 obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Registrar Recarga',        comum:'Registrar mamada',                        obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🚀 Registrar Missão',        comum:'Salvar compromisso / Agendar',            obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚗️ Ativar Elixir',           comum:'Registrar medicação',                     obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🛡️ Gravar Escudo',           comum:'Adicionar vacina',                        obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'💫 Enviar Missiva',          comum:'Enviar dúvida para o pediatra',           obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'💾 Gravar no Holocron',      comum:'Salvar resposta do médico',               obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🌙 Gravar nas Crônicas',     comum:'Salvar marco do mesversário',             obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Criar Guardião',          comum:'Criar novo usuário / perfil',             obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Destruir',                comum:'Excluir / Apagar definitivamente',        obs:'Confirmação de exclusão' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Recuar para a Luz',          comum:'Cancelar',                                obs:'Cancela a exclusão' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Abortar',                    comum:'Fechar / Cancelar',                       obs:'Fecha modal sem salvar' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📅 Calendário',              comum:'Adicionar ao Calendário Apple',           obs:'Exporta evento como .ics' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🔮 Próximas',                comum:'Próximos compromissos',                   obs:'Filtro de agenda' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📜 Concluídas',              comum:'Compromissos passados',                   obs:'Filtro de agenda' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'✅ Iluminadas',              comum:'Dúvidas respondidas',                     obs:'Filtro de missivas' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚡ Recarga registrada nas crônicas!', comum:'Mamada salva!',                 obs:'Confirmação' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'🗺️ Missão registrada nas crônicas!', comum:'Compromisso salvo!',             obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚗️ Elixir ativado nas crônicas da Força!', comum:'Medicação registrada!',   obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'🛡️ Novo escudo gravado nas crônicas!', comum:'Vacina adicionada!',          obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⏳ Aguardando Resposta',     comum:'Sem resposta ainda',                      obs:'Status de dúvida pendente' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'CONFIRMAR DESTRUIÇÃO',       comum:'Confirmar exclusão',                      obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'SABEDORIA DO CURANDEIRO',    comum:'Resposta do pediatra',                    obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚡ Força sincronizada com a nuvem', comum:'Dados salvos online / Conectado', obs:'' },
+  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚠️ Sem conexão — dados locais temporários', comum:'Sem internet',           obs:'App salva localmente e sincroniza depois' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Guardião(ã) da Força',       comum:'Responsável / Pai ou Mãe',               obs:'Perfil de usuário no app' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Pai do Padawan',             comum:'Pai',                                     obs:'João' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Mãe do Padawan',             comum:'Mãe',                                     obs:'Nadyne' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Curandeiro(a) Jedi',         comum:'Médico(a) / Pediatra',                   obs:'' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Padawan Arthur',             comum:'Arthur / O bebê',                         obs:'' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Código da Força',            comum:'Senha / PIN de acesso',                  obs:'PIN de 6 dígitos' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Emblema do Guardião',        comum:'Emoji do perfil / Avatar',               obs:'' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🏥 Audiência com Curandeiro', comum:'Consulta médica',                       obs:'Tipo de missão' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'💉 Ritual de Proteção',      comum:'Vacina / Vacinação',                     obs:'Tipo de missão' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🔬 Análise pela Força',      comum:'Exame médico / Laboratorial',            obs:'Tipo de missão' },
+  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🔄 Retorno ao Templo',       comum:'Retorno médico',                          obs:'Tipo de missão' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Crônicas da Ordem Jedi',     comum:'Histórico / Registros do app',            obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Escudos de Proteção',        comum:'Vacinas / Imunização',                   obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Rituais concluídos',         comum:'Vacinas tomadas',                         obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Escudos ativados',           comum:'Vacinas aplicadas / Progresso vacinal',  obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Chegada à Galáxia',          comum:'Ao nascer / Vacinas do nascimento',       obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Ciclo Lunar X — X Meses',    comum:'Vacinas de X meses de vida',             obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'⭐ Marco Jedi',              comum:'Marco de desenvolvimento',               obs:'Categoria do mesversário' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'🎁 Tributo da Galáxia',      comum:'Presente / Lembrança',                   obs:'Categoria do mesversário' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'📸 Arquivo Holográfico',     comum:'Foto / Registro fotográfico',            obs:'Categoria do mesversário' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'💬 Crônica Livre',           comum:'Nota livre / Observação',                obs:'Categoria do mesversário' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'🔄 Se necessário pela Força', comum:'Se necessário / SOS',                   obs:'Frequência de medicação' },
+  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Ritual concluído em',        comum:'Vacinado em / Data de aplicação',        obs:'' },
+];
+
+// ── GLOSSÁRIO — FUNÇÕES ──
+let _glossFiltro = 'todos';
+
+function abrirGlossario() {
+  fecharMenuGuardiao();
+  // Limpa busca
+  const inp = document.getElementById('gloss-busca');
+  if (inp) inp.value = '';
+  _glossFiltro = 'todos';
+  // Reseta botões filtro
+  document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('gf-ativo'));
+  const primBtn = document.querySelector('.gf-btn');
+  if (primBtn) primBtn.classList.add('gf-ativo');
+
+  renderGlossario();
+
+  // Abre o modal com z-index máximo garantido
+  const modal = document.getElementById('modal-glossario');
+  modal.style.zIndex = '999999';
+  modal.classList.add('aberto');
+
+  // Foca a busca após animação
+  setTimeout(() => { if (inp) inp.focus(); }, 200);
+}
+
+function fecharGlossario() {
+  const modal = document.getElementById('modal-glossario');
+  modal.classList.remove('aberto');
+}
+
+function setGlossFiltro(cat, btn) {
+  _glossFiltro = cat;
+  document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('gf-ativo'));
+  btn.classList.add('gf-ativo');
+  renderGlossario();
+}
+
+function filtrarGlossario() {
+  renderGlossario();
+}
+
+function renderGlossario() {
+  const busca   = (document.getElementById('gloss-busca')?.value || '').toLowerCase().trim();
+  const lista   = document.getElementById('gloss-lista');
+  const contador = document.getElementById('gloss-contador');
+  if (!lista) return;
+
+  // Filtra itens
+  const filtrados = GLOSS_DADOS.filter(item => {
+    const matchCat  = _glossFiltro === 'todos' || item.cat === _glossFiltro;
+    const matchBusca = !busca ||
+      item.jedi.toLowerCase().includes(busca) ||
+      item.comum.toLowerCase().includes(busca) ||
+      (item.obs||'').toLowerCase().includes(busca);
+    return matchCat && matchBusca;
+  });
+
+  if (contador) {
+    contador.textContent = busca
+      ? `${filtrados.length} resultado${filtrados.length !== 1 ? 's' : ''}`
+      : `${filtrados.length} termo${filtrados.length !== 1 ? 's' : ''}`;
+  }
+
+  if (!filtrados.length) {
+    lista.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;color:#7ab3d4">
+        <div style="font-size:2.5rem;margin-bottom:10px;opacity:0.4">🔭</div>
+        <p style="font-size:0.85rem">Nenhum termo encontrado nas crônicas</p>
+      </div>`;
+    return;
+  }
+
+  // Agrupa por seção
+  const secoes = {};
+  filtrados.forEach(item => {
+    if (!secoes[item.sec]) secoes[item.sec] = [];
+    secoes[item.sec].push(item);
+  });
+
+  lista.innerHTML = Object.entries(secoes).map(([sec, itens]) => `
+    <div class="gi-secao">${sec}</div>
+    ${itens.map(item => `
+      <div class="gi">
+        <div>
+          <span class="gi-cat gc-${item.cat}">${GLOSS_CAT_LABEL[item.cat]}</span><br>
+          <span class="gi-jedi">${item.jedi}</span>
+        </div>
+        <div class="gi-seta">→</div>
+        <div>
+          <span class="gi-comum">${item.comum}</span>
+          ${item.obs ? `<div class="gi-obs">${item.obs}</div>` : ''}
+        </div>
+      </div>
+    `).join('')}
+  `).join('');
+}
+
+const GLOSS_CAT_LABEL = {
+  nav:'Navegação', form:'Formulário', acao:'Ação',
+  status:'Status', pessoa:'Pessoas', sistema:'Sistema'
+};
+</script>
+
 </body>
 </html>
