@@ -17,9 +17,9 @@
 <!-- PERFORMANCE: Preload fontes críticas — carregam em paralelo, não bloqueiam renderização -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap"></noscript>
 
 <!-- Firebase SDK — síncrono para garantia de inicialização -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1538,10 +1538,11 @@
   }
 
   .today-date {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    color: var(--blue-neon);
-    letter-spacing: 0.1em;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 0.72rem;
+    color: rgba(0,180,255,0.6);
+    letter-spacing: 0.08em;
+    margin-top: 3px;
   }
 
   .jedi-quote {
@@ -1576,10 +1577,13 @@
 
   /* HORA DISPLAY */
   #relogio {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 1.55rem;
+    font-weight: 400;
     color: var(--blue-neon);
-    text-shadow: 0 0 8px var(--blue-neon);
+    text-shadow: 0 0 12px rgba(0,180,255,0.6);
+    letter-spacing: 0.04em;
+    line-height: 1;
   }
 
   /* ── FILTER BUTTONS — touch friendly ── */
@@ -1835,16 +1839,13 @@
     <span class="nav-icon">🌌</span>Holocron
   </button>
   <button onclick="showTab('mamadas')">
-    <span class="nav-icon">🍼</span>Nutrição
-  </button>
-  <button onclick="showTab('duvidas')">
-    <span class="nav-icon">📜</span>Missivas
+    <span class="nav-icon">🍼</span>Fonte de Energia
   </button>
   <button onclick="showTab('agenda')">
-    <span class="nav-icon">🗺️</span>Missões
+    <span class="nav-icon">🩺</span>Ordem da Cura
   </button>
   <button onclick="showTab('mesversario')">
-    <span class="nav-icon">🌙</span>Órbitas
+    <span class="nav-icon">📈</span>Jornada
   </button>
   <button onclick="showTab('vacinas')">
     <span class="nav-icon">🛡️</span>Escudos
@@ -1881,7 +1882,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-agenda">0</div>
-        <div class="stat-label">missões da Ordem</div>
+        <div class="stat-label">audiências da Ordem</div>
       </div>
     </div>
 
@@ -1898,7 +1899,7 @@
     <div class="section-title">⚡ Últimas Recargas de Energia</div>
     <div id="feed-recente"></div>
 
-    <div class="section-title">🗺️ Próximas Missões</div>
+    <div class="section-title">🗺️ Próximas Audiências</div>
     <div id="feed-agenda"></div>
   </div>
 
@@ -1950,73 +1951,22 @@
     <div id="lista-mamadas"></div>
   </div>
 
-  <!-- MISSIVAS -->
-  <div id="tab-duvidas" class="tab-panel">
-
-    <!-- SUB-ABAS -->
-    <div class="sub-tabs">
-      <button class="sub-tab active" id="stab-perguntas" onclick="showSubTab('perguntas')">📜 Missivas ao Mestre</button>
-      <button class="sub-tab" id="stab-repositorio" onclick="showSubTab('repositorio')">📚 Holocron do Saber</button>
-    </div>
-
-    <!-- PAINEL PERGUNTAS -->
-    <div id="subpanel-perguntas" class="subpanel active">
-      <div class="card">
-        <div class="section-title">📜 Nova Missiva ao Curandeiro Jedi</div>
-        <div class="form-group">
-          <label>Questão a ser iluminada pela Força</label>
-          <textarea id="d-texto" placeholder="Ex: A dose de energia diária está alinhada com os ensinamentos da Ordem?"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Domínio da Força</label>
-          <select id="d-cat">
-            <option value="alimentacao">🍼 Nutrição e Energia</option>
-            <option value="sono">😴 Ciclos de Repouso</option>
-            <option value="desenvolvimento">📈 Crescimento do Padawan</option>
-            <option value="saude">🏥 Cura e Saúde</option>
-            <option value="vacinas">💉 Escudos de Proteção</option>
-            <option value="comportamento">🧠 Conduta e Comportamento</option>
-            <option value="outro">💬 Outros Segredos</option>
-          </select>
-        </div>
-        <button class="btn btn-gold btn-full" onclick="salvarDuvida()">💫 Enviar Missiva</button>
-      </div>
-
-      <div class="filter-bar">
-        <button class="filter-btn active" id="fd-pendentes" onclick="filtrarDuvidas('pendentes', this)">⏳ Aguardando Resposta</button>
-        <button class="filter-btn" id="fd-respondidas" onclick="filtrarDuvidas('respondidas', this)">✅ Iluminadas</button>
-        <button class="filter-btn" id="fd-todas" onclick="filtrarDuvidas('todas', this)">📋 Todas as Missivas</button>
-      </div>
-
-      <div id="lista-duvidas"></div>
-    </div>
-
-    <!-- PAINEL REPOSITÓRIO -->
-    <div id="subpanel-repositorio" class="subpanel">
-      <div class="repo-search-bar">
-        <input type="text" id="repo-busca" placeholder="🔍  Buscar nos arquivos do Holocron..." oninput="renderRepositorio()">
-      </div>
-      <div id="lista-repositorio"></div>
-    </div>
-
-  </div>
-
-  <!-- MISSÕES -->
   <div id="tab-agenda" class="tab-panel">
 
     <!-- SUB-ABAS MISSÕES -->
     <div class="sub-tabs">
-      <button class="sub-tab active" id="stab-missoes" onclick="showSubTabMissoes('missoes')">🗺️ Missões</button>
-      <button class="sub-tab" id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">⚗️ Elixires</button>
+      <button class="sub-tab active" id="stab-missoes"   onclick="showSubTabMissoes('missoes')">🗺️ Audiências</button>
+      <button class="sub-tab"        id="stab-missivas"  onclick="showSubTabMissoes('missivas')">📜 Missivas</button>
+      <button class="sub-tab"        id="stab-medicacao" onclick="showSubTabMissoes('medicacao')">⚗️ Elixires</button>
     </div>
 
     <!-- PAINEL MISSÕES -->
     <div id="subpanel-missoes" class="subpanel active">
       <div class="card">
-        <div class="section-title">🗺️ Nova Missão do Padawan</div>
+        <div class="section-title">🗺️ Nova Audiência do Padawan</div>
         <div class="form-group">
-          <label>Nome da Missão</label>
-          <input type="text" id="a-titulo" placeholder="ex: Audiência com a Curandeira Jedi Dra. Isabella">
+          <label>Nome da Audiência</label>
+          <input type="text" id="a-titulo" placeholder="ex: Consulta com a Curandeira Jedi Dra. Isabella">
         </div>
         <div class="row-2">
           <div class="form-group">
@@ -2060,17 +2010,70 @@
           <label>Coordenadas / Observações</label>
           <input type="text" id="a-local" placeholder="ex: Templo da Cura — Setor Médico, Quadrante 100">
         </div>
-        <button class="btn btn-primary btn-full" onclick="salvarEvento()">🚀 Registrar Missão</button>
+        <button class="btn btn-primary btn-full" onclick="salvarEvento()">🚀 Registrar Audiência</button>
       </div>
 
       <div class="filter-bar">
-        <button class="filter-btn active" onclick="filtrarAgenda('proximos', this)">🔮 Próximas</button>
+        <button class="filter-btn active" onclick="filtrarAgenda('proximos', this)">🔮 Próximas Audiências</button>
         <button class="filter-btn" onclick="filtrarAgenda('todos', this)">📋 Todas</button>
         <button class="filter-btn" onclick="filtrarAgenda('passados', this)">📜 Concluídas</button>
       </div>
 
       <div id="lista-agenda"></div>
     </div>
+
+    <!-- PAINEL MISSIVAS (movido de tab-duvidas) -->
+    <div id="subpanel-missivas" class="subpanel">
+
+      <!-- Sub-sub-abas: Perguntas / Holocron -->
+      <div style="display:flex;gap:0;background:rgba(0,15,40,0.4);border-radius:10px;padding:3px;margin-bottom:10px">
+        <button class="sub-tab active" id="stab-perguntas" onclick="showMissivas('perguntas')"
+          style="flex:1;border-radius:8px;font-size:0.68rem">📜 Missivas</button>
+        <button class="sub-tab" id="stab-repositorio" onclick="showMissivas('repositorio')"
+          style="flex:1;border-radius:8px;font-size:0.68rem">📚 Holocron do Saber</button>
+      </div>
+
+      <!-- Painel Perguntas -->
+      <div id="subpanel-perguntas" class="subpanel active">
+        <div class="card">
+          <div class="section-title">📜 Nova Missiva ao Curandeiro Jedi</div>
+          <div class="form-group">
+            <label>Questão a ser iluminada pela Força</label>
+            <textarea id="d-texto" placeholder="Ex: A dose de energia diária está alinhada com os ensinamentos da Ordem?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Domínio da Força</label>
+            <select id="d-cat">
+              <option value="alimentacao">🍼 Nutrição e Energia</option>
+              <option value="sono">😴 Ciclos de Repouso</option>
+              <option value="desenvolvimento">📈 Crescimento do Padawan</option>
+              <option value="saude">🏥 Cura e Saúde</option>
+              <option value="vacinas">💉 Escudos de Proteção</option>
+              <option value="comportamento">🧠 Conduta e Comportamento</option>
+              <option value="outro">💬 Outros Segredos</option>
+            </select>
+          </div>
+          <button class="btn btn-gold btn-full" onclick="salvarDuvida()">💫 Enviar Missiva</button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-btn active" id="fd-pendentes"   onclick="filtrarDuvidas('pendentes', this)">⏳ Aguardando Resposta</button>
+          <button class="filter-btn"        id="fd-respondidas" onclick="filtrarDuvidas('respondidas', this)">✅ Iluminadas</button>
+          <button class="filter-btn"        id="fd-todas"       onclick="filtrarDuvidas('todas', this)">📋 Todas as Missivas</button>
+        </div>
+        <div id="lista-duvidas"></div>
+      </div>
+
+      <!-- Painel Repositório -->
+      <div id="subpanel-repositorio" class="subpanel">
+        <div class="repo-search-bar">
+          <input type="text" id="repo-busca" placeholder="🔍  Buscar nos arquivos do Holocron..." oninput="renderRepositorio()">
+        </div>
+        <div id="lista-repositorio"></div>
+      </div>
+
+    </div>
+
 
     <!-- PAINEL MEDICAÇÃO -->
     <div id="subpanel-medicacao" class="subpanel">
@@ -3729,10 +3732,18 @@ let activeFilter = { mamadas:'todos', duvidas:'pendentes', agenda:'proximos' };
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  const tabs = ['dashboard','mamadas','duvidas','agenda','mesversario','vacinas'];
-  document.querySelectorAll('nav button')[tabs.indexOf(id)].classList.add('active');
+  // tab-duvidas foi fundida em tab-agenda — redirecionar
+  const realId = id === 'duvidas' ? 'agenda' : id;
+  const tabEl = document.getElementById('tab-' + realId);
+  if (tabEl) tabEl.classList.add('active');
+  // Ativar botão nav correspondente
+  const tabs = ['dashboard','mamadas','agenda','mesversario','vacinas'];
+  const navBtns = document.querySelectorAll('nav button');
+  const idx = tabs.indexOf(realId);
+  if (idx >= 0 && navBtns[idx]) navBtns[idx].classList.add('active');
   renderAll();
+  // Se veio de duvidas, abrir sub-aba Missivas automaticamente
+  if (id === 'duvidas') setTimeout(() => showSubTabMissoes('missivas'), 50);
 }
 
 // ── MAMADAS ──
@@ -3903,12 +3914,22 @@ function renderMamadas() {
 }
 
 // ── SUB-ABAS DÚVIDAS ──
-function showSubTab(id) {
-  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.subpanel').forEach(p => p.classList.remove('active'));
-  document.getElementById('stab-' + id).classList.add('active');
-  document.getElementById('subpanel-' + id).classList.add('active');
+// showMissivas — controla sub-sub-abas dentro do painel Missivas
+function showMissivas(id) {
+  const container = document.getElementById('subpanel-missivas');
+  if (!container) return;
+  container.querySelectorAll('.subpanel').forEach(p => p.classList.remove('active'));
+  container.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('subpanel-' + id);
+  const btn   = document.getElementById('stab-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn)   btn.classList.add('active');
   if (id === 'repositorio') renderRepositorio();
+}
+
+// Manter compatibilidade: chamadas legadas de showSubTab redirecionam
+function showSubTab(id) {
+  showMissivas(id);
 }
 
 // ── DÚVIDAS ──
@@ -4133,7 +4154,7 @@ function salvarEvento() {
     profissional = profOutro;
   }
 
-  if (!titulo || !data) { alert('Defina o nome e o ciclo galáctico da missão!'); return; }
+  if (!titulo || !data) { alert('Defina o nome e o ciclo galáctico da audiência!'); return; }
 
   db.eventos.push({ id: Date.now(), titulo, data, hora, local, tipo, profissional });
   db.eventos.sort((a,b) => (a.data+a.hora) > (b.data+b.hora) ? 1 : -1);
@@ -4145,11 +4166,11 @@ function salvarEvento() {
   if (document.getElementById('prof-card')) document.getElementById('prof-card').style.display = 'none';
   renderAgenda();
   renderDashboard();
-  showToast('🗺️ Missão registrada nas crônicas!');
+  showToast('🗺️ Audiência registrada nas crônicas!');
 }
 
 function deleteEvento(id) {
-  confirmarDelete('evento', id, 'Remover esta missão das crônicas? A ação é irreversível como o lado sombrio.');
+  confirmarDelete('evento', id, 'Remover esta audiência das crônicas? A ação é irreversível como o lado sombrio.');
 }
 
 function filtrarAgenda(f, btn) {
@@ -4168,7 +4189,7 @@ function renderAgenda() {
 
   const el = document.getElementById('lista-agenda');
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><p>${f === 'proximos' ? 'A Ordem aguarda — nenhuma missão registrada' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma missão registrada'}</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><p>${f === 'proximos' ? 'A Ordem aguarda — nenhuma audiência registrada' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma audiência registrada'}</p></div>`;
     return;
   }
 
@@ -4251,7 +4272,7 @@ function renderDashboard() {
   const proximos = db.eventos.filter(e => e.data >= hoje).slice(0, 3);
   const fa = document.getElementById('feed-agenda');
   if (!proximos.length) {
-    fa.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🗺️</div><p>A Ordem aguarda — nenhuma missão registrada</p></div>`;
+    fa.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🗺️</div><p>A Ordem aguarda — nenhuma audiência registrada</p></div>`;
   } else {
     fa.innerHTML = proximos.map(e => `
       <div class="evento-item" style="margin-bottom:6px">
@@ -5198,11 +5219,26 @@ toggleProfissional('consulta');
 
 // ── SUBMÓDULO MISSÕES / MEDICAÇÃO ──
 function showSubTabMissoes(id) {
-  document.querySelectorAll('#tab-agenda .subpanel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('#tab-agenda .sub-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('subpanel-' + id).classList.add('active');
-  document.getElementById('stab-' + id).classList.add('active');
+  // Remove active apenas nos subpanels diretos de tab-agenda (não os aninhados em missivas)
+  const tabAgenda = document.getElementById('tab-agenda');
+  if (!tabAgenda) return;
+  // Remover active apenas dos subpanels filhos diretos de tab-agenda
+  tabAgenda.querySelectorAll(':scope > .subpanel, :scope > .sub-tabs + .subpanel').forEach(p => p.classList.remove('active'));
+  // Subpanels no nível superior (missoes, missivas, medicacao)
+  ['subpanel-missoes','subpanel-missivas','subpanel-medicacao'].forEach(pid => {
+    const el = document.getElementById(pid);
+    if (el) el.classList.remove('active');
+  });
+  ['stab-missoes','stab-missivas','stab-medicacao'].forEach(bid => {
+    const el = document.getElementById(bid);
+    if (el) el.classList.remove('active');
+  });
+  const panel = document.getElementById('subpanel-' + id);
+  const btn   = document.getElementById('stab-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn)   btn.classList.add('active');
   if (id === 'medicacao') renderMedicacao();
+  if (id === 'missivas')  { renderDuvidas(); }
 }
 
 // ── MEDICAMENTOS — LISTA LOCAL (200+ medicamentos infantis brasileiros) ──
@@ -5525,7 +5561,7 @@ function gerarICS(eventos, nomeArquivo) {
     'PRODID:-//Padawan Arthur//Crônicas da Ordem Jedi//PT',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Missões do Padawan Arthur',
+    'X-WR-CALNAME:Audiencias do Padawan Arthur',
     'X-WR-TIMEZONE:America/Sao_Paulo',
     'X-APPLE-CALENDAR-COLOR:#0099e6',
     ...eventos.map(gerarBlocoVEVENT),
@@ -5557,11 +5593,11 @@ function exportarAgendaICS() {
   const hoje   = todayISO();
   const futuros = db.eventos.filter(e => e.data >= hoje);
   if (!futuros.length) {
-    showToast('⚠️ Nenhuma missão futura para exportar');
+    showToast('⚠️ Nenhuma audiência futura para exportar');
     return;
   }
   gerarICS(futuros, 'missoes-padawan-arthur.ics');
-  showToast(`📅 ${futuros.length} missão(ões) exportada(s) para o Calendário!`);
+  showToast(`📅 ${futuros.length} audiência(s) exportada(s) para o Calendário!`);
 }
 
 // ── SISTEMA DE NOVIDADES — banner ao fazer login ──
@@ -6768,7 +6804,7 @@ const GLOSS_DADOS = [
   { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Classe da Missão',            comum:'Tipo de compromisso',                     obs:'Consulta, exame, vacina etc.' },
   { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Detalhes para as Crônicas',   comum:'Observações / Descrição',                 obs:'' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Registrar Recarga',        comum:'Registrar mamada',                        obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🚀 Registrar Missão',        comum:'Salvar compromisso / Agendar',            obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🚀 Registrar Audiência',        comum:'Salvar compromisso / Agendar',            obs:'' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚗️ Ativar Elixir',           comum:'Registrar medicação',                     obs:'' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🛡️ Gravar Escudo',           comum:'Adicionar vacina',                        obs:'' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'💫 Enviar Missiva',          comum:'Enviar dúvida para o pediatra',           obs:'' },
@@ -6779,7 +6815,7 @@ const GLOSS_DADOS = [
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Recuar para a Luz',          comum:'Cancelar',                                obs:'Cancela a exclusão' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Abortar',                    comum:'Fechar / Cancelar',                       obs:'Fecha modal sem salvar' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📅 Calendário',              comum:'Adicionar ao Calendário Apple',           obs:'Exporta evento como .ics' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🔮 Próximas',                comum:'Próximos compromissos',                   obs:'Filtro de agenda' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🔮 Próximas Audiências',                comum:'Próximos compromissos',                   obs:'Filtro de agenda' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📜 Concluídas',              comum:'Compromissos passados',                   obs:'Filtro de agenda' },
   { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'✅ Iluminadas',              comum:'Dúvidas respondidas',                     obs:'Filtro de missivas' },
   { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚡ Recarga registrada nas crônicas!', comum:'Mamada salva!',                 obs:'Confirmação' },
@@ -6828,6 +6864,13 @@ const GLOSS_DADOS = [
   { cat:'status', sec:'📊 Status e Mensagens',     jedi:'📏 Medidas gravadas nas crônicas do Padawan!', comum:'Registro de crescimento salvo!', obs:'' },
   // ── RELATÓRIO ──
   { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📋 Relatório do Ciclo Galáctico', comum:'Relatório diário de nutrição',   obs:'Pop-up com resumo das mamadas do dia' },
+  // ── REESTRUTURAÇÃO v3 ──
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🍼 Fonte de Energia',             comum:'Aba Nutrição / Alimentação',     obs:'Preparada para sólidos (v2)' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🩺 Ordem da Cura',                comum:'Aba Saúde (agenda + missivas + elixires)', obs:'Antigo "Missões"' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📈 Jornada do Padawan',           comum:'Aba Evolução (marcos + crescimento)', obs:'Antigo "Órbitas" — receberá sono e fraldas no v2' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🗺️ Audiências',                  comum:'Sub-aba Agenda / Consultas',     obs:'Antigo "Missões" dentro de Ordem da Cura' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'Audiências da Ordem',             comum:'Contador de consultas futuras no dashboard', obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'🚀 Registrar Audiência',          comum:'Salvar consulta / compromisso',  obs:'' },
   { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📋 Copiar Relatório',            comum:'Copiar resumo para área de transferência', obs:'Cole no WhatsApp, notas etc.' },
   { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Ciclo atual',                    comum:'Dia de hoje (00:00 a 23:59)',     obs:'Período usado para contar as mamadas do dia' },
   { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Recargas neste ciclo',           comum:'Mamadas hoje',                   obs:'Contador no dashboard' },
