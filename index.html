@@ -1069,6 +1069,87 @@
   /* ── GUARDIAN COM FACE ID ATIVO ── */
   .guardian-biometria-badge { font-size:0.75rem; opacity:0.7; margin-left:4px; }
 
+  /* ── RELATÓRIO DIÁRIO ── */
+  .btn-relatorio-diario {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(0,40,90,0.6), rgba(0,25,60,0.7));
+    border: 1px solid rgba(0,180,255,0.25);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-relatorio-diario:hover, .btn-relatorio-diario:active {
+    background: linear-gradient(135deg, rgba(0,60,130,0.6), rgba(0,40,90,0.7));
+    border-color: var(--blue-neon);
+    box-shadow: 0 0 14px rgba(0,180,255,0.15);
+  }
+
+  /* ── RELATÓRIO — conteúdo ── */
+  .rel-section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin: 12px 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,200,80,0.2);
+    text-transform: uppercase;
+  }
+  .rel-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,180,255,0.07);
+    font-size: 0.82rem;
+  }
+  .rel-stat-row:last-child { border-bottom: none; }
+  .rel-stat-label { color: var(--text-dim); }
+  .rel-stat-value { color: var(--white); font-family: 'Orbitron', monospace; font-size: 0.78rem; }
+  .rel-stat-value.destaque { color: var(--blue-neon); font-size: 0.9rem; }
+  .rel-mamada-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,180,255,0.07);
+    font-size: 0.8rem;
+  }
+  .rel-mamada-item:last-child { border-bottom: none; }
+  .rel-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+  .rel-total-box {
+    background: rgba(0,60,130,0.3);
+    border: 1px solid rgba(0,180,255,0.25);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 10px 0;
+    text-align: center;
+  }
+  .rel-total-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    color: var(--blue-neon);
+    text-shadow: 0 0 10px rgba(0,180,255,0.5);
+  }
+  .rel-total-label {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
   /* ── ÓRBITAS SUB-ABAS ── */
   .orbitas-subtabs {
     display:flex; gap:8px; margin-bottom:14px;
@@ -1788,21 +1869,31 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-value" id="stat-mamadas">0</div>
-        <div class="stat-label">recargas hoje</div>
+        <div class="stat-label">recargas neste ciclo</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-ml">0</div>
-        <div class="stat-label">ml de energia</div>
+        <div class="stat-label">ml de energia vital</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-duvidas">0</div>
-        <div class="stat-label">missivas pendentes</div>
+        <div class="stat-label">missivas ao Curandeiro</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-agenda">0</div>
-        <div class="stat-label">missões à frente</div>
+        <div class="stat-label">missões da Ordem</div>
       </div>
     </div>
+
+    <!-- Botão Relatório Diário -->
+    <button class="btn-relatorio-diario" onclick="abrirRelatorio()">
+      <span style="font-size:1.1rem">📋</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--white)">RELATÓRIO DO CICLO</div>
+        <div style="font-size:0.65rem;color:var(--text-dim);margin-top:1px">Resumo de nutrição diária</div>
+      </div>
+      <span style="margin-left:auto;color:var(--blue-neon);font-size:0.9rem">›</span>
+    </button>
 
     <div class="section-title">⚡ Últimas Recargas de Energia</div>
     <div id="feed-recente"></div>
@@ -2048,8 +2139,8 @@
         </div>
 
         <div class="form-group">
-          <label>Observações</label>
-          <input type="text" id="med-obs" placeholder="ex: aplicar após recarga de energia...">
+          <label>Crônica da Ordem</label>
+          <input type="text" id="med-obs" placeholder="ex: administrar após recarga de energia da Força...">
         </div>
 
         <button class="btn btn-primary btn-full" onclick="salvarMedicacao()">⚗️ Ativar Elixir</button>
@@ -2163,11 +2254,11 @@
             <input type="number" id="cresc-pc" placeholder="ex: 35.0" step="0.1" min="0" max="60">
           </div>
           <div class="form-group">
-            <label>Obs. da Consulta</label>
-            <input type="text" id="cresc-obs" placeholder="ex: Desenvolvimento ótimo">
+            <label>Observações da Audiência</label>
+            <input type="text" id="cresc-obs" placeholder="ex: Padawan respondendo bem aos ensinamentos da Força">
           </div>
         </div>
-        <button class="btn btn-primary btn-full" onclick="salvarCrescimento()">📏 Gravar Medidas nas Crônicas</button>
+        <button class="btn btn-primary btn-full" onclick="salvarCrescimento()">📏 Registrar Medidas nas Crônicas da Força</button>
       </div>
 
       <!-- Gráfico -->
@@ -2278,6 +2369,36 @@
   </div>
 </div>
 
+<!-- MODAL RELATÓRIO DIÁRIO -->
+<div id="modal-relatorio" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:400px;text-align:left;border-color:rgba(0,212,255,0.3);max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="font-size:1.8rem">📋</div>
+      <div style="flex:1">
+        <div class="modal-title" style="text-align:left;margin-bottom:2px;font-size:0.85rem">RELATÓRIO DO CICLO GALÁCTICO</div>
+        <div id="rel-data-titulo" style="font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em"></div>
+      </div>
+      <button onclick="fecharRelatorio()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+
+    <!-- Seletor de data -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <button onclick="relNavDia(-1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem">‹</button>
+      <input type="date" id="rel-data-input" onchange="renderRelatorio()" style="flex:1;text-align:center;font-family:'Orbitron',monospace;font-size:0.75rem;background:rgba(0,20,50,0.6);border:1px solid rgba(0,180,255,0.25);border-radius:8px;color:var(--white);padding:7px">
+      <button onclick="relNavDia(+1)" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--blue-neon);padding:6px 12px;cursor:pointer;font-size:1rem">›</button>
+    </div>
+
+    <!-- Conteúdo do relatório -->
+    <div id="rel-conteudo"></div>
+
+    <!-- Botões -->
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="copiarRelatorio()">📋 Copiar Relatório</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);font-size:0.68rem" onclick="fecharRelatorio()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL NOVA VACINA AVULSA -->
 <div id="modal-nova-vacina" class="modal-overlay" style="display:none">
   <div class="modal-box" style="max-width:380px;text-align:left;border-color:rgba(0,212,255,0.35)">
@@ -2308,7 +2429,7 @@
         <input type="text" id="nv-doenca" placeholder="ex: Gripe (influenza)">
       </div>
       <div class="form-group" style="margin-bottom:10px">
-        <label>Observações da Ordem</label>
+        <label>⚠️ Observações da Ordem Jedi</label>
         <input type="text" id="nv-obs" placeholder="ex: Recomendada pela SBP">
       </div>
       <div class="form-group" style="margin-bottom:14px">
@@ -3466,8 +3587,12 @@ function formatDate(iso) {
 }
 
 function todayISO() {
+  // Usa data LOCAL (00:00 a 23:59 do dispositivo) — nunca UTC
   const now = new Date();
-  return now.toISOString().split('T')[0];
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function nowTime() {
@@ -4014,7 +4139,7 @@ function renderAgenda() {
 
   const el = document.getElementById('lista-agenda');
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><p>${f === 'proximos' ? 'Nenhuma missão aguarda o Padawan' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma missão registrada'}</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><p>${f === 'proximos' ? 'A Ordem aguarda — nenhuma missão registrada' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma missão registrada'}</p></div>`;
     return;
   }
 
@@ -4082,7 +4207,7 @@ function renderDashboard() {
   const recentes = ordenarMamadas(db.mamadas).slice(0, 3);
   const fr = document.getElementById('feed-recente');
   if (!recentes.length) {
-    fr.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🍼</div><p>Nenhuma recarga registrada ainda</p></div>`;
+    fr.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🍼</div><p>Nenhuma recarga registrada nas crônicas</p></div>`;
   } else {
     fr.innerHTML = recentes.map(m => `
       <div class="feed-item ${m.tipo}" style="margin-bottom:6px">
@@ -4097,7 +4222,7 @@ function renderDashboard() {
   const proximos = db.eventos.filter(e => e.data >= hoje).slice(0, 3);
   const fa = document.getElementById('feed-agenda');
   if (!proximos.length) {
-    fa.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🗺️</div><p>Nenhuma missão aguarda o Padawan</p></div>`;
+    fa.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🗺️</div><p>A Ordem aguarda — nenhuma missão registrada</p></div>`;
   } else {
     fa.innerHTML = proximos.map(e => `
       <div class="evento-item" style="margin-bottom:6px">
@@ -4169,7 +4294,7 @@ function renderMesversario() {
   const el = document.getElementById('lista-mesversario');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🌙</div><p>Nenhuma órbita gravada nas crônicas ainda</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🌙</div><p>Nenhuma órbita gravada nas crônicas da Força</p></div>`;
     return;
   }
 
@@ -4273,7 +4398,10 @@ function initCrescForm() {
   const inp = document.getElementById('cresc-data');
   if (inp && !inp.value) {
     const hoje = new Date();
-    inp.value = hoje.toISOString().split('T')[0];
+    const cy = hoje.getFullYear();
+    const cm = String(hoje.getMonth()+1).padStart(2,'0');
+    const cd = String(hoje.getDate()).padStart(2,'0');
+    inp.value = `${cy}-${cm}-${cd}`;
   }
   // Sugerir mês atual do Arthur
   const nasc = new Date('2026-03-12');
@@ -4330,7 +4458,7 @@ function renderCrescimento() {
   const el = document.getElementById('lista-crescimento');
   if (!el) return;
   if (!crescData.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida gravada ainda — registre a primeira consulta</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida registrada — aguarde a primeira Audiência com a Curandeira Jedi</p></div>`;
     return;
   }
   const nomeMes = m => m === 0 ? '🌌 Nascimento' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
@@ -5867,6 +5995,178 @@ function fecharFotoGuardiao() {
 atualizarFotoArthurHeader();
 
 // ── INIT ──
+// ── RELATÓRIO DIÁRIO ──
+let _relDataAtual = null;
+
+function abrirRelatorio() {
+  _relDataAtual = todayISO();
+  document.getElementById('rel-data-input').value = _relDataAtual;
+  renderRelatorio();
+  document.getElementById('modal-relatorio').style.display = 'flex';
+}
+
+function fecharRelatorio() {
+  document.getElementById('modal-relatorio').style.display = 'none';
+}
+
+function relNavDia(delta) {
+  const inp = document.getElementById('rel-data-input');
+  if (!inp.value) inp.value = todayISO();
+  const d = new Date(inp.value + 'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  inp.value = `${y}-${m}-${day}`;
+  renderRelatorio();
+}
+
+function renderRelatorio() {
+  const inp = document.getElementById('rel-data-input');
+  const dataISO = inp?.value || todayISO();
+
+  // Título da data
+  const dtObj = new Date(dataISO + 'T12:00:00');
+  const titulo = document.getElementById('rel-data-titulo');
+  if (titulo) {
+    const opts = { weekday:'long', day:'2-digit', month:'long', year:'numeric' };
+    titulo.textContent = dtObj.toLocaleDateString('pt-BR', opts).replace(/^./, s => s.toUpperCase());
+  }
+
+  // Filtrar mamadas do dia (00:00–23:59 local)
+  const mamadasDia = (db.mamadas || []).filter(m => m.data === dataISO);
+  const ordenadas  = ordenarMamadas(mamadasDia); // mais recentes primeiro
+
+  // Calcular totais
+  const totalMamadas = mamadasDia.length;
+  const totalMl      = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
+  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + (m.ml||0), 0);
+  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + (m.ml||0), 0);
+  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (m.ml||0), 0);
+  const nPeito       = mamadasDia.filter(m => m.tipo === 'peito').length;
+  const nFormula     = mamadasDia.filter(m => m.tipo === 'formula').length;
+  const nMisto       = mamadasDia.filter(m => m.tipo === 'misto').length;
+
+  // Intervalo médio entre mamadas
+  let intervaloMedio = '—';
+  if (ordenadas.length >= 2) {
+    const parseTime = str => {
+      const [hh, mm] = str.split(':').map(Number);
+      return hh * 60 + mm;
+    };
+    const tempos = ordenadas.map(m => parseTime(m.hora)).filter(t => !isNaN(t));
+    if (tempos.length >= 2) {
+      const sorted = [...tempos].sort((a,b) => a - b);
+      let totalInt = 0;
+      for (let i = 1; i < sorted.length; i++) totalInt += sorted[i] - sorted[i-1];
+      const mediaMin = Math.round(totalInt / (sorted.length - 1));
+      const h = Math.floor(mediaMin / 60);
+      const m2 = mediaMin % 60;
+      intervaloMedio = h > 0 ? `${h}h ${m2}min` : `${m2}min`;
+    }
+  }
+
+  // Primeira e última mamada
+  const horariosOrdenados = mamadasDia
+    .map(m => m.hora)
+    .filter(Boolean)
+    .sort();
+  const primeiraHora = horariosOrdenados[0] || '—';
+  const ultimaHora   = horariosOrdenados[horariosOrdenados.length - 1] || '—';
+
+  const nomeTipo = t => t === 'peito' ? '🤱 Fonte Natural' : t === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação';
+  const ehHoje = dataISO === todayISO();
+
+  const el = document.getElementById('rel-conteudo');
+  if (!el) return;
+
+  if (!totalMamadas) {
+    el.innerHTML = `
+      <div class="rel-empty">
+        <div style="font-size:2rem;margin-bottom:8px">🍼</div>
+        <div>Nenhuma recarga registrada neste ciclo galáctico</div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <!-- Totalizador principal -->
+    <div class="rel-total-box">
+      <div class="rel-total-num">${totalMamadas}</div>
+      <div class="rel-total-label">RECARGAS DE ENERGIA${ehHoje ? ' — CICLO ATUAL' : ''}</div>
+      ${totalMl > 0 ? `<div style="margin-top:6px;font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--gold)">${totalMl} ml total</div>` : ''}
+    </div>
+
+    <!-- Por tipo -->
+    <div class="rel-section-title">⚡ Distribuição por Fonte</div>
+    ${nPeito   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${nPeito}× ${mlPeito > 0 ? '· ' + mlPeito + ' ml' : ''}</span></div>` : ''}
+    ${nFormula > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula Alquímica</span><span class="rel-stat-value">${nFormula}× ${mlFormula > 0 ? '· ' + mlFormula + ' ml' : ''}</span></div>` : ''}
+    ${nMisto   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">✨ Combinação da Força</span><span class="rel-stat-value">${nMisto}× ${mlMisto > 0 ? '· ' + mlMisto + ' ml' : ''}</span></div>` : ''}
+
+    <!-- Horários -->
+    <div class="rel-section-title">⏱️ Cronologia das Recargas</div>
+    <div class="rel-stat-row"><span class="rel-stat-label">🌅 Primeira recarga</span><span class="rel-stat-value">${primeiraHora}</span></div>
+    <div class="rel-stat-row"><span class="rel-stat-label">🌙 Última recarga</span><span class="rel-stat-value">${ultimaHora}</span></div>
+    <div class="rel-stat-row"><span class="rel-stat-label">⏳ Intervalo médio</span><span class="rel-stat-value">${intervaloMedio}</span></div>
+
+    <!-- Registro detalhado -->
+    <div class="rel-section-title">📜 Crônica Detalhada</div>
+    ${ordenadas.map(m => `
+      <div class="rel-mamada-item">
+        <span style="color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.7rem;min-width:44px">${m.hora || '—'}</span>
+        <span class="badge badge-${m.tipo}" style="font-size:0.65rem;padding:2px 6px">${nomeTipo(m.tipo)}</span>
+        ${m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.72rem">${m.ml}ml</span>` : ''}
+        ${m.obs ? `<span style="color:var(--text-dim);font-size:0.68rem;flex:1;text-align:right;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${m.obs}</span>` : ''}
+      </div>
+    `).join('')}
+  `;
+}
+
+function copiarRelatorio() {
+  const inp = document.getElementById('rel-data-input');
+  const dataISO = inp?.value || todayISO();
+  const dtObj = new Date(dataISO + 'T12:00:00');
+  const dataFmt = dtObj.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+
+  const mamadasDia = (db.mamadas || []).filter(m => m.data === dataISO);
+  const ordenadas  = ordenarMamadas(mamadasDia);
+  const totalMl    = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
+  const nPeito     = mamadasDia.filter(m => m.tipo === 'peito').length;
+  const nFormula   = mamadasDia.filter(m => m.tipo === 'formula').length;
+  const nMisto     = mamadasDia.filter(m => m.tipo === 'misto').length;
+  const nomeTipo   = t => t === 'peito' ? 'Fonte Natural' : t === 'formula' ? 'Fórmula Alquímica' : 'Combinação';
+
+  let texto = `📋 RELATÓRIO DO PADAWAN ARTHUR\n`;
+  texto += `${dataFmt.replace(/^./, s => s.toUpperCase())}\n`;
+  texto += `${'─'.repeat(32)}\n\n`;
+  texto += `⚡ RECARGAS DE ENERGIA: ${mamadasDia.length}\n`;
+  if (totalMl > 0) texto += `💧 Total de energia vital: ${totalMl} ml\n`;
+  texto += `\n`;
+  if (nPeito   > 0) texto += `🤱 Fonte Natural: ${nPeito}×\n`;
+  if (nFormula > 0) texto += `🥛 Fórmula Alquímica: ${nFormula}×\n`;
+  if (nMisto   > 0) texto += `✨ Combinação da Força: ${nMisto}×\n`;
+  texto += `\n📜 CRÔNICA DETALHADA:\n`;
+
+  ordenadas.forEach(m => {
+    texto += `  ${m.hora || '--:--'} · ${nomeTipo(m.tipo)}`;
+    if (m.ml) texto += ` · ${m.ml}ml`;
+    if (m.obs) texto += ` — ${m.obs}`;
+    texto += '\n';
+  });
+
+  texto += `\n⚔️ Arquivos da Ordem Jedi · Padawan Arthur`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto)
+      .then(() => showToast('📋 Relatório copiado para a área de transferência!'))
+      .catch(() => {
+        prompt('Copie o relatório abaixo:', texto);
+      });
+  } else {
+    prompt('Copie o relatório abaixo:', texto);
+  }
+}
+
 function renderAll() {
   renderMamadas();
   renderDuvidas();
@@ -6153,11 +6453,25 @@ const GLOSS_DADOS = [
   { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'📐 Comprimento',              comum:'Comprimento / Altura em cm',              obs:'Medida de crescimento' },
   { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'🔵 Perímetro Cefálico',       comum:'Circunferência da cabeça em cm',          obs:'Sigla: PC' },
   { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Obs. da Consulta',            comum:'Observações da pediatra na consulta',     obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📏 Gravar Medidas nas Crônicas', comum:'Salvar registro de crescimento',       obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📏 Registrar Medidas nas Crônicas da Força', comum:'Salvar registro de crescimento',       obs:'' },
   { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Curvas OMS',                  comum:'Referência mundial de crescimento saudável (OMS)', obs:'Organização Mundial da Saúde' },
   { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P3 / P50 / P97',              comum:'Percentis de crescimento (P3=abaixo da média, P50=mediana, P97=acima da média)', obs:'P50 = metade das crianças' },
   { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P15 / P85',                   comum:'Faixa de crescimento normal / Zona verde', obs:'Entre P15 e P85 é considerado crescimento adequado' },
   { cat:'status', sec:'📊 Status e Mensagens',     jedi:'📏 Medidas gravadas nas crônicas do Padawan!', comum:'Registro de crescimento salvo!', obs:'' },
+  // ── RELATÓRIO ──
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📋 Relatório do Ciclo Galáctico', comum:'Relatório diário de nutrição',   obs:'Pop-up com resumo das mamadas do dia' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📋 Copiar Relatório',            comum:'Copiar resumo para área de transferência', obs:'Cole no WhatsApp, notas etc.' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Ciclo atual',                    comum:'Dia de hoje (00:00 a 23:59)',     obs:'Período usado para contar as mamadas do dia' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Recargas neste ciclo',           comum:'Mamadas hoje',                   obs:'Contador no dashboard' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'ml de energia vital',            comum:'Total de ml de leite hoje',      obs:'Contador no dashboard' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Missivas ao Curandeiro',         comum:'Dúvidas pendentes',              obs:'Contador no dashboard' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Missões da Ordem',               comum:'Compromissos futuros',           obs:'Contador no dashboard' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Observações da Audiência',       comum:'Obs. da consulta médica',        obs:'Campo na aba crescimento' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Sabedoria da Audiência',         comum:'Resposta / observação do médico na consulta', obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Crônica Detalhada',              comum:'Lista completa de mamadas do dia', obs:'No relatório diário' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Distribuição por Fonte',         comum:'Quantas mamadas por tipo',       obs:'No relatório diário' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Cronologia das Recargas',        comum:'Horários das mamadas do dia',    obs:'No relatório diário' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Crônica da Ordem',               comum:'Observações / campo de texto livre', obs:'Label genérico de observações' },
 ];
 
 // ── GLOSSÁRIO — FUNÇÕES ──
