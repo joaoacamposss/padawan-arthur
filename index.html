@@ -13,11 +13,66 @@
 <meta http-equiv="Content-Security-Policy" content="default-src * 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src *; font-src * data:; img-src * data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';">
 <link rel="manifest" id="pwa-manifest">
 <link rel="apple-touch-icon" id="pwa-icon">
-<!-- Firebase SDK -->
+
+<!-- PERFORMANCE: Preload fontes críticas — carregam em paralelo, não bloqueiam renderização -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"></noscript>
+
+<!-- Firebase SDK — síncrono para garantia de inicialização -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- SPLASH: CSS crítico inline — renderiza instantaneamente sem esperar fontes ou Firebase -->
+<style>
+  body { background: #020b18; margin: 0; }
+  #splash {
+    position: fixed; inset: 0; z-index: 9999999;
+    background: #020b18;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  #splash.fadeout { opacity: 0; pointer-events: none; }
+  #splash-nave { font-size: 3rem; animation: splash-pulse 1.5s ease-in-out infinite; }
+  #splash-title {
+    font-family: 'Orbitron', 'Arial Black', sans-serif;
+    font-size: 1.4rem; font-weight: 900;
+    color: #e8f4fd; letter-spacing: 0.1em;
+    margin-top: 16px;
+    text-shadow: 0 0 20px #00d4ff;
+  }
+  #splash-sub {
+    font-family: 'Orbitron', 'Arial', sans-serif;
+    font-size: 0.6rem; color: #ffe066;
+    letter-spacing: 0.25em; margin-top: 6px; opacity: 0.8;
+  }
+  #splash-bar-wrap {
+    width: 120px; height: 2px;
+    background: rgba(0,180,255,0.15);
+    border-radius: 2px; margin-top: 28px; overflow: hidden;
+  }
+  #splash-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff, #ffe066);
+    border-radius: 2px;
+    animation: splash-load 2s ease-out forwards;
+    box-shadow: 0 0 8px #00d4ff;
+  }
+  @keyframes splash-pulse {
+    0%,100% { filter: drop-shadow(0 0 8px #00d4ff); transform: scale(1); }
+    50%      { filter: drop-shadow(0 0 20px #00d4ff); transform: scale(1.08); }
+  }
+  @keyframes splash-load {
+    0%   { width: 0%; }
+    60%  { width: 70%; }
+    100% { width: 100%; }
+  }
+</style>
 <style>
   :root {
     --blue-deep: #020b18;
@@ -917,7 +972,106 @@
   }
   .btn-del-vac-extra:hover { background: rgba(200,30,30,0.35); color: #ff6b6b; }
 
-  .btn-novo-guardiao {
+  /* ── FACE ID / BIOMETRIA ── */
+  .btn-faceid {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(0,60,120,0.5), rgba(0,30,70,0.6));
+    border: 1px solid rgba(0,180,255,0.4);
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    box-shadow: 0 0 14px rgba(0,180,255,0.1);
+  }
+  .btn-faceid:active {
+    transform: scale(0.97);
+    box-shadow: 0 0 20px rgba(0,180,255,0.3);
+  }
+  .btn-faceid .faceid-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 6px var(--blue-neon));
+  }
+
+  .lembrar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0 4px;
+    cursor: pointer;
+  }
+  .lembrar-toggle {
+    width: 36px; height: 20px;
+    background: rgba(0,50,100,0.4);
+    border-radius: 10px;
+    border: 1px solid rgba(0,180,255,0.3);
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .lembrar-toggle.on {
+    background: rgba(0,120,220,0.5);
+    border-color: var(--blue-neon);
+    box-shadow: 0 0 8px rgba(0,180,255,0.3);
+  }
+  .lembrar-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: rgba(0,180,255,0.5);
+    transition: transform 0.2s, background 0.2s;
+  }
+  .lembrar-toggle.on::after {
+    transform: translateX(16px);
+    background: var(--blue-neon);
+    box-shadow: 0 0 6px var(--blue-neon);
+  }
+  .lembrar-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 0.07em;
+  }
+
+  .biometria-banner {
+    background: linear-gradient(135deg, rgba(0,40,90,0.7), rgba(0,20,50,0.8));
+    border: 1px solid rgba(0,180,255,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 14px;
+    text-align: center;
+  }
+  .biometria-banner-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--blue-neon);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .biometria-banner-sub {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── GUARDIAN COM FACE ID ATIVO ── */
+  .guardian-biometria-badge {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-left: 4px;
+  }
     width: 100%;
     padding: 11px;
     background: transparent;
@@ -1381,7 +1535,15 @@
 </head>
 <body>
 
-<div id="stars"></div>
+<!-- SPLASH SCREEN — aparece imediatamente, some quando o app estiver pronto -->
+<div id="splash">
+  <div id="splash-nave">🛸</div>
+  <div id="splash-title">PADAWAN ARTHUR</div>
+  <div id="splash-sub">ARQUIVOS DA ORDEM JEDI</div>
+  <div id="splash-bar-wrap"><div id="splash-bar"></div></div>
+</div>
+
+<!-- Firebase init — feito por iniciarApp() no DOMContentLoaded -->
 <div class="nebula"></div>
 
 <!-- ── TELA DE LOGIN ── -->
@@ -1433,6 +1595,15 @@
         toque nos pontos para abrir o teclado
       </div>
       <div class="pin-error" id="pin-error"></div>
+      <!-- Botão Face ID — aparece se disponível e registrado -->
+      <div id="faceid-btn-wrap" style="display:none">
+        <button class="btn-faceid" onclick="autenticarFaceID()">
+          <span class="faceid-icon">🔐</span>
+          <span>Entrar com Face ID</span>
+        </button>
+        <div style="text-align:center;font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em;margin-bottom:12px;opacity:0.6">— ou digite o código —</div>
+      </div>
+
       <div class="pin-keypad">
         <button class="pin-key" onclick="pinDigito('1')">1</button>
         <button class="pin-key" onclick="pinDigito('2')">2</button>
@@ -1446,6 +1617,12 @@
         <button class="pin-key pin-key-back" onclick="voltarLogin()">↩</button>
         <button class="pin-key" onclick="pinDigito('0')">0</button>
         <button class="pin-key pin-key-del" onclick="pinApagar()">⌫</button>
+      </div>
+
+      <!-- Toggle lembrar dispositivo -->
+      <div class="lembrar-wrap" onclick="toggleLembrarDispositivo()" id="lembrar-wrap">
+        <div class="lembrar-toggle" id="lembrar-toggle"></div>
+        <span class="lembrar-label">LEMBRAR ESTE DISPOSITIVO</span>
       </div>
     </div>
 
@@ -1517,6 +1694,10 @@
     </button>
     <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">☁️</span> Sincronizar dados locais
+    </button>
+    <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
+    <button id="menu-btn-faceid" onclick="menuToggleFaceID()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">🔐</span> <span id="menu-faceid-label">Ativar Face ID</span>
     </button>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
     <button onclick="sairSessao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
@@ -2186,19 +2367,26 @@
 
 <script>
 // ── STARFIELD ──
-const starsEl = document.getElementById('stars');
-for (let i = 0; i < 120; i++) {
-  const s = document.createElement('div');
-  s.className = 'star';
-  const sz = Math.random() * 2.5 + 0.5;
-  s.style.cssText = `
-    width:${sz}px; height:${sz}px;
-    top:${Math.random()*100}%; left:${Math.random()*100}%;
-    --dur:${2+Math.random()*4}s;
-    animation-delay:${Math.random()*4}s;
-  `;
-  starsEl.appendChild(s);
-}
+(function() {
+  // As estrelas são injetadas no body diretamente (não depende de div#stars)
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      top:${Math.random()*100}%; left:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;
+      animation-delay:${Math.random()*4}s;
+      position:fixed; border-radius:50%;
+      background:#fff; opacity:${0.3+Math.random()*0.7};
+      pointer-events:none; z-index:0;
+    `;
+    frag.appendChild(s);
+  }
+  document.body.appendChild(frag);
+}());
 
 // ── DETECÇÃO CAPACITOR / APP NATIVO ──
 const IS_CAPACITOR = window.Capacitor !== undefined;
@@ -2403,8 +2591,7 @@ function voltarLogin() {
   renderListaGuardioes();
 }
 
-// Renderiza lista ao carregar
-renderListaGuardioes();
+// Renderiza lista ao carregar (feito pelo iniciarApp via firebase-ready)
 
 let usuarioAtual = null;
 let _guardiaoPendente = null;
@@ -2445,7 +2632,194 @@ async function decriptar(b64) {
   } catch(e) { return null; }
 }
 
-// ── PIN KEYPAD ──
+// ── BIOMETRIA (WebAuthn / Face ID) ──
+const BIOMETRIA_KEY     = 'arthur_biometria_v1';   // { guardiao_id: credentialId_b64 }
+const LEMBRAR_KEY       = 'arthur_lembrar_v1';     // { guardiao_id: true }
+const AUTOLOGIN_KEY     = 'arthur_autologin_v1';   // guardiao_id logado lembrado
+
+let _lembrarAtivado = false;
+
+function loadBiometria()  { try { return JSON.parse(localStorage.getItem(BIOMETRIA_KEY))  || {}; } catch(e) { return {}; } }
+function saveBiometria(d) { try { localStorage.setItem(BIOMETRIA_KEY, JSON.stringify(d)); } catch(e) {} }
+function loadLembrar()    { try { return JSON.parse(localStorage.getItem(LEMBRAR_KEY))    || {}; } catch(e) { return {}; } }
+function saveLembrar(d)   { try { localStorage.setItem(LEMBRAR_KEY,   JSON.stringify(d)); } catch(e) {} }
+
+let biometriaData = loadBiometria();
+let lembrarData   = loadLembrar();
+
+// Verifica se WebAuthn está disponível (iOS Safari 14+ suporta)
+function webAuthnDisponivel() {
+  return !!(window.PublicKeyCredential && navigator.credentials);
+}
+
+// Verifica se este dispositivo tem Face ID registrado para o guardião
+function temFaceID(guardiao_id) {
+  return webAuthnDisponivel() && !!biometriaData[guardiao_id];
+}
+
+// Registra Face ID para o guardião atual após login bem-sucedido
+async function registrarFaceID(guardiao_id) {
+  if (!webAuthnDisponivel()) return false;
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId    = new TextEncoder().encode(guardiao_id);
+    const cred = await navigator.credentials.create({
+      publicKey: {
+        challenge,
+        rp: { name: 'Padawan Arthur', id: location.hostname || 'localhost' },
+        user: { id: userId, name: guardiao_id, displayName: GUARDIOES[guardiao_id]?.nome || guardiao_id },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7  },  // ES256
+          { type: 'public-key', alg: -257 }  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',  // usa biometria do dispositivo (Face ID / Touch ID)
+          userVerification: 'required'
+        },
+        timeout: 60000,
+        attestation: 'none'
+      }
+    });
+    if (cred) {
+      // Salva credentialId em base64
+      const idB64 = btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+      biometriaData[guardiao_id] = idB64;
+      saveBiometria(biometriaData);
+      return true;
+    }
+  } catch(e) {
+    console.log('Face ID registro cancelado:', e.message);
+  }
+  return false;
+}
+
+// Autentica com Face ID
+async function autenticarFaceID() {
+  const id = _guardiaoPendente;
+  if (!id || !biometriaData[id]) return;
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes = Uint8Array.from(atob(biometriaData[id]), c => c.charCodeAt(0));
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        allowCredentials: [{ type: 'public-key', id: credIdBytes }],
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+    if (assertion) {
+      // Face ID confirmado!
+      if (_lembrarAtivado) {
+        lembrarData[id] = true;
+        saveLembrar(lembrarData);
+        localStorage.setItem(AUTOLOGIN_KEY, id);
+      }
+      fazerLogin(id);
+    }
+  } catch(e) {
+    console.log('Face ID autenticação cancelada:', e.message);
+    document.getElementById('pin-error').textContent = 'Face ID cancelado — use o código';
+    setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 2000);
+  }
+}
+
+// Toggle lembrar dispositivo
+function toggleLembrarDispositivo() {
+  _lembrarAtivado = !_lembrarAtivado;
+  document.getElementById('lembrar-toggle').className = 'lembrar-toggle' + (_lembrarAtivado ? ' on' : '');
+}
+
+// Mostra/oculta botão Face ID ao escolher guardião
+function atualizarBotaoFaceID(guardiao_id) {
+  const wrap = document.getElementById('faceid-btn-wrap');
+  if (wrap) wrap.style.display = temFaceID(guardiao_id) ? 'block' : 'none';
+  // Restaura estado do toggle "lembrar"
+  _lembrarAtivado = !!(lembrarData[guardiao_id]);
+  const toggle = document.getElementById('lembrar-toggle');
+  if (toggle) toggle.className = 'lembrar-toggle' + (_lembrarAtivado ? ' on' : '');
+}
+
+// Verifica auto-login ao abrir o app
+function verificarAutoLogin() {
+  try {
+    const id = localStorage.getItem(AUTOLOGIN_KEY);
+    if (id && lembrarData[id] && GUARDIOES[id]) {
+      _guardiaoPendente = id;
+      if (temFaceID(id)) {
+        // Mostra tela de login com Face ID e dispara automaticamente
+        mostrarTelaFaceIDAutomatico(id);
+      } else {
+        // Sem Face ID mas lembrado: entra direto
+        fazerLogin(id);
+      }
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// Mostra tela de Face ID automático (entrada direta ao abrir app)
+function mostrarTelaFaceIDAutomatico(id) {
+  const g = GUARDIOES[id];
+  document.getElementById('login-step-1').style.display = 'none';
+  document.getElementById('login-step-2').style.display = 'block';
+  document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Verificando identidade...`;
+  atualizarBotaoFaceID(id);
+  // Dispara Face ID automaticamente após 300ms
+  setTimeout(autenticarFaceID, 300);
+}
+
+// Banner pós-login: oferecer ativar Face ID (se ainda não registrado)
+function mostrarBannerFaceID(guardiao_id) {
+  if (!webAuthnDisponivel()) return;
+  if (biometriaData[guardiao_id]) return; // já registrado, não exibir
+  // Mostra no app, não na tela de login
+  const banner = document.createElement('div');
+  banner.id = 'banner-faceid';
+  banner.className = 'biometria-banner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:8500;animation:fadeIn 0.3s ease';
+  banner.innerHTML = `
+    <div class="biometria-banner-title">🔐 ATIVAR FACE ID</div>
+    <div class="biometria-banner-sub">Entre mais rápido no próximo acesso sem digitar o código</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-primary" style="font-size:0.68rem;padding:8px 16px" onclick="ativarFaceIDAgora('${guardiao_id}')">⚡ Ativar agora</button>
+      <button class="btn" style="font-size:0.68rem;padding:8px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim)" onclick="dispensarBannerFaceID()">Agora não</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function ativarFaceIDAgora(guardiao_id) {
+  dispensarBannerFaceID();
+  showToast('🔐 Aguardando Face ID…');
+  const ok = await registrarFaceID(guardiao_id);
+  if (ok) {
+    showToast('✅ Face ID ativado! Próximo acesso será automático.');
+    lembrarData[guardiao_id] = true;
+    saveLembrar(lembrarData);
+    localStorage.setItem(AUTOLOGIN_KEY, guardiao_id);
+  } else {
+    showToast('⚠️ Face ID não registrado. Tente novamente.');
+  }
+}
+
+function dispensarBannerFaceID() {
+  const b = document.getElementById('banner-faceid');
+  if (b) b.remove();
+}
+
+// Desativar Face ID / esquecimento do dispositivo (no menu do guardião)
+function desativarBiometria(guardiao_id) {
+  delete biometriaData[guardiao_id];
+  saveBiometria(biometriaData);
+  delete lembrarData[guardiao_id];
+  saveLembrar(lembrarData);
+  localStorage.removeItem(AUTOLOGIN_KEY);
+  showToast('🔓 Face ID e sessão lembrada removidos.');
+}
+
+
 
 // Foca o input oculto para abrir teclado nativo
 function focarPinOculto() {
@@ -2474,6 +2848,7 @@ function escolherGuardiao(id) {
   const g = GUARDIOES[id];
   document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Digite o Código da Força`;
   atualizarPinDisplay();
+  atualizarBotaoFaceID(id);
   // Foca automaticamente para abrir teclado
   setTimeout(focarPinOculto, 150);
 }
@@ -2529,6 +2904,12 @@ function verificarSenha() {
 
 function fazerLogin(id) {
   usuarioAtual = id;
+  // Salvar sessão lembrada se ativado
+  if (_lembrarAtivado) {
+    lembrarData[id] = true;
+    saveLembrar(lembrarData);
+    localStorage.setItem(AUTOLOGIN_KEY, id);
+  }
   document.getElementById('tela-login').style.display = 'none';
   atualizarBadge();
   iniciarAutoLock();
@@ -2537,8 +2918,9 @@ function fazerLogin(id) {
     db = d;
     renderAll();
     iniciarSyncTempoReal();
-    // Verifica novidades de outros guardiões após 1s (deixa a tela carregar primeiro)
     setTimeout(() => verificarNovidades(id), 1000);
+    // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
+    setTimeout(() => mostrarBannerFaceID(id), 2000);
   });
   // Sync guardiões em tempo real
   GUARDIOES_REF.onSnapshot(snap => {
@@ -2554,16 +2936,26 @@ function fazerLogin(id) {
 }
 
 function sairSessao() {
+  const id = usuarioAtual;
   usuarioAtual = null;
   _pinAtual = '';
   _guardiaoPendente = null;
   if (_autoLockTimer) clearTimeout(_autoLockTimer);
   try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
+  // Se lembrado: mantém autologin. Se saiu manualmente: remove sessão mas mantém biometria registrada
+  // Usuário pode desativar Face ID pelo menu do guardião
   document.getElementById('login-step-1').style.display = 'block';
   document.getElementById('login-step-2').style.display = 'none';
   atualizarPinDisplay();
   document.getElementById('pin-error').textContent = '';
   document.getElementById('tela-login').style.display = 'flex';
+  // Se tinha lembrar ativo, vai direto pro Face ID
+  if (id && lembrarData[id]) {
+    setTimeout(() => {
+      _guardiaoPendente = id;
+      mostrarTelaFaceIDAutomatico(id);
+    }, 200);
+  }
 }
 
 function atualizarBadge() {
@@ -2592,10 +2984,38 @@ function nomeAutor(id) {
 // ── MENU GUARDIÃO ──
 function abrirMenuGuardiao(e) {
   e.stopPropagation();
+  // Atualiza label Face ID conforme estado atual
+  const temFace = temFaceID(usuarioAtual);
+  const labelEl = document.getElementById('menu-faceid-label');
+  if (labelEl) labelEl.textContent = temFace ? 'Desativar Face ID' : 'Ativar Face ID';
   document.getElementById('menu-guardiao').style.display = 'block';
 }
 function fecharMenuGuardiao() {
   document.getElementById('menu-guardiao').style.display = 'none';
+}
+
+async function menuToggleFaceID() {
+  fecharMenuGuardiao();
+  const id = usuarioAtual;
+  if (!id) return;
+  if (temFaceID(id)) {
+    // Desativar
+    if (confirm(`Desativar Face ID e "Lembrar dispositivo" para ${GUARDIOES[id]?.nome}?`)) {
+      desativarBiometria(id);
+    }
+  } else {
+    // Ativar
+    showToast('🔐 Aguardando Face ID…');
+    const ok = await registrarFaceID(id);
+    if (ok) {
+      lembrarData[id] = true;
+      saveLembrar(lembrarData);
+      localStorage.setItem(AUTOLOGIN_KEY, id);
+      showToast('✅ Face ID ativado! Próximo acesso será automático.');
+    } else {
+      showToast('⚠️ Face ID não registrado. Tente novamente.');
+    }
+  }
 }
 
 // ── TROCAR EMOJI DO PERFIL ──
@@ -2653,40 +3073,71 @@ function iniciarAutoLock() {
   resetAutoLock();
 }
 
-// Sempre mostra tela de login ao abrir — sessão só lembra QUEM é o guardião
-// mas ainda exige o PIN para entrar
-(function() {
-  try {
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved && GUARDIOES[saved]) {
-      // Pré-seleciona o guardião mas ainda exige PIN
-      _guardiaoPendente = saved;
-      document.getElementById('login-step-1').style.display = 'none';
-      document.getElementById('login-step-2').style.display = 'block';
-      const g = GUARDIOES[saved];
-      document.getElementById('login-nome-label').textContent = `${g.emoji} ${g.nome} · Digite o Código da Força`;
-      atualizarPinDisplay();
-    }
-  } catch(e) {}
-})();
-
-
 // ── FIREBASE ──
-const firebaseConfig = {
-  apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
-  authDomain:        "padawan-arthur.firebaseapp.com",
-  projectId:         "padawan-arthur",
-  storageBucket:     "padawan-arthur.firebasestorage.app",
-  messagingSenderId: "38758983138",
-  appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
-};
+// ── FIREBASE INIT — SDKs síncronos, disponíveis imediatamente ──
+let DOC_REF, VACINHAS_REF, EXTRAS_REF, GUARDIOES_REF, MED_REF;
 
-firebase.initializeApp(firebaseConfig);
-const firestore = firebase.firestore();
-const DOC_REF   = firestore.collection('diario').doc('arthur');
-const VACINHAS_REF = firestore.collection('diario').doc('arthur_vacinas');
-const EXTRAS_REF   = firestore.collection('diario').doc('arthur_vacinas_extras');
-const GUARDIOES_REF = firestore.collection('diario').doc('arthur_guardioes');
+function initFirebaseRefs() {
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+      authDomain:        "padawan-arthur.firebaseapp.com",
+      projectId:         "padawan-arthur",
+      storageBucket:     "padawan-arthur.firebasestorage.app",
+      messagingSenderId: "38758983138",
+      appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+    });
+  }
+  const fs   = firebase.firestore();
+  DOC_REF        = fs.collection('diario').doc('arthur');
+  VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
+  EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
+  GUARDIOES_REF  = fs.collection('diario').doc('arthur_guardioes');
+  MED_REF        = fs.collection('diario').doc('arthur_medicacao');
+}
+
+function removerSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.classList.add('fadeout');
+  setTimeout(() => { splash.style.display = 'none'; }, 420);
+}
+
+function iniciarApp() {
+  initFirebaseRefs();
+
+  loadGuardioes();
+  loadFotos();
+  loadVacinasOuter();
+  loadMedicacaoOuter();
+
+  // 1. Tenta auto-login (Face ID ou "lembrar dispositivo")
+  if (verificarAutoLogin()) {
+    setTimeout(removerSplash, 600);
+    return;
+  }
+
+  // 2. Verifica sessão de navegador: pré-seleciona guardião mas exige PIN
+  const sessao = sessionStorage.getItem(SESSION_KEY);
+  if (sessao && GUARDIOES[sessao]) {
+    _guardiaoPendente = sessao;
+    document.getElementById('login-step-1').style.display = 'none';
+    document.getElementById('login-step-2').style.display = 'block';
+    const g = GUARDIOES[sessao];
+    document.getElementById('login-nome-label').textContent =
+      `${g.emoji} ${g.nome} · Digite o Código da Força`;
+    atualizarPinDisplay();
+    atualizarBotaoFaceID(sessao);
+    setTimeout(focarPinOculto, 200);
+  } else {
+    renderListaGuardioes();
+  }
+
+  setTimeout(removerSplash, 600);
+}
+
+// Inicia quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', iniciarApp);
 
 // Indicador online/offline
 function mostrarStatusConexao(online) {
@@ -2781,13 +3232,7 @@ function iniciarSyncTempoReal() {
 
 // Carregamento async dos dados
 let db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
-loadData().then(d => {
-  db = d;
-  if (usuarioAtual) {
-    renderAll();
-    iniciarSyncTempoReal();
-  }
-});
+// db é populado pelo fazerLogin() após iniciarApp() estar pronto
 
 // ── DETECÇÃO iOS PARA BANNER DE INSTALAÇÃO ──
 (function() {
@@ -2998,18 +3443,28 @@ function initMamadaForm() {
 }
 initMamadaForm();
 
+// Ordena mamadas: mais recente primeiro (data DESC, hora DESC)
+function ordenarMamadas(arr) {
+  return [...arr].sort((a, b) => {
+    const da = (a.data || '0000-00-00') + 'T' + (a.hora || '00:00');
+    const db_ = (b.data || '0000-00-00') + 'T' + (b.hora || '00:00');
+    return da < db_ ? 1 : da > db_ ? -1 : 0;
+  });
+}
+
 function salvarMamada() {
   const data = document.getElementById('m-data').value;
   const hora = document.getElementById('m-hora').value;
   const tipo = document.getElementById('m-tipo').value;
-  const ml = document.getElementById('m-ml').value;
-  const obs = document.getElementById('m-obs').value;
+  const ml   = document.getElementById('m-ml').value;
+  const obs  = document.getElementById('m-obs').value;
 
   if (!data || !hora) { alert('⚠️ Defina o ciclo galáctico e a hora-padrão antes de registrar!'); return; }
 
-  db.mamadas.unshift({ id: Date.now(), data, hora, tipo, ml: ml ? parseInt(ml) : null, obs, autor: usuarioAtual });
+  db.mamadas.push({ id: Date.now(), data, hora, tipo, ml: ml ? parseInt(ml) : null, obs, autor: usuarioAtual });
+  db.mamadas = ordenarMamadas(db.mamadas); // mantém sempre ordenado
   saveData(db);
-  document.getElementById('m-ml').value = ''; // reseta select
+  document.getElementById('m-ml').value  = '';
   document.getElementById('m-obs').value = '';
   document.getElementById('m-hora').value = nowTime();
   renderMamadas();
@@ -3113,7 +3568,8 @@ function filtrarMamadas(f, btn) {
 
 function renderMamadas() {
   const f = activeFilter.mamadas;
-  let list = [...db.mamadas];
+  // SEMPRE ordena: mais recente primeiro
+  let list = ordenarMamadas(db.mamadas);
   if (f !== 'todos') list = list.filter(m => m.tipo === f);
 
   const el = document.getElementById('lista-mamadas');
@@ -3471,8 +3927,8 @@ function renderDashboard() {
   document.getElementById('stat-duvidas').textContent = duvidaPend;
   document.getElementById('stat-agenda').textContent = proxEv;
 
-  // Feed recente
-  const recentes = db.mamadas.slice(0, 3);
+  // Feed recente — 3 mamadas mais recentes (ordenadas)
+  const recentes = ordenarMamadas(db.mamadas).slice(0, 3);
   const fr = document.getElementById('feed-recente');
   if (!recentes.length) {
     fr.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🍼</div><p>Nenhuma recarga registrada ainda</p></div>`;
@@ -3728,36 +4184,42 @@ async function saveExtras(d) {
   try { await EXTRAS_REF.set({ extras: d }); } catch(e) {}
 }
 
-// Inicializa com dados locais, depois carrega do Firebase
+// Inicializa com dados locais (imediato, sem Firebase)
 let vacStatus = {};
 let vacExtras  = {};
 try { vacStatus = JSON.parse(localStorage.getItem(VAC_KEY))    || {}; } catch(e) {}
 try { vacExtras  = JSON.parse(localStorage.getItem(VAC_EX_KEY)) || {}; } catch(e) {}
 
-// Carrega do Firebase em background e atualiza se necessário
-loadVacinasDB().then(d => { vacStatus = d; renderVacinas(); });
-loadExtrasDB().then(d  => { vacExtras  = d; renderVacinas(); });
+// Chamado pelo iniciarApp após Firebase estar pronto
+function loadVacinasOuter() {
+  loadVacinasDB().then(d => { vacStatus = d; renderVacinas(); });
+  loadExtrasDB().then(d  => { vacExtras  = d; renderVacinas(); });
 
-// Sync em tempo real para vacinas
-VACINHAS_REF.onSnapshot(snap => {
-  if (!snap.exists) return;
-  const novo = snap.data().status || {};
-  if (JSON.stringify(vacStatus) !== JSON.stringify(novo)) {
-    vacStatus = novo;
-    localStorage.setItem(VAC_KEY, JSON.stringify(novo));
-    renderVacinas();
+  // Sync em tempo real para vacinas
+  if (VACINHAS_REF) {
+    VACINHAS_REF.onSnapshot(snap => {
+      if (!snap.exists) return;
+      const novo = snap.data().status || {};
+      if (JSON.stringify(vacStatus) !== JSON.stringify(novo)) {
+        vacStatus = novo;
+        localStorage.setItem(VAC_KEY, JSON.stringify(novo));
+        renderVacinas();
+      }
+    }, () => {});
   }
-}, () => {});
 
-EXTRAS_REF.onSnapshot(snap => {
-  if (!snap.exists) return;
-  const novo = snap.data().extras || {};
-  if (JSON.stringify(vacExtras) !== JSON.stringify(novo)) {
-    vacExtras = novo;
-    localStorage.setItem(VAC_EX_KEY, JSON.stringify(novo));
-    renderVacinas();
+  if (EXTRAS_REF) {
+    EXTRAS_REF.onSnapshot(snap => {
+      if (!snap.exists) return;
+      const novo = snap.data().extras || {};
+      if (JSON.stringify(vacExtras) !== JSON.stringify(novo)) {
+        vacExtras = novo;
+        localStorage.setItem(VAC_EX_KEY, JSON.stringify(novo));
+        renderVacinas();
+      }
+    }, () => {});
   }
-}, () => {});
+}
 
 // ── VACINAS OPCIONAIS — SBP · SBIm (não obrigatórias pelo PNI) ──
 const VACINAS_OPCIONAIS = [
@@ -4223,33 +4685,41 @@ document.addEventListener('click', e => {
 });
 
 // ── CRUD MEDICAÇÃO ──
-const MED_REF = firestore.collection('diario').doc('arthur_medicacao');
+// MED_REF é definido em initFirebaseRefs() — aguarda firebase-ready
 let medicacoes = [];
 
 async function loadMedicacao() {
   try {
-    const snap = await MED_REF.get();
-    if (snap.exists) return snap.data().lista || [];
+    if (MED_REF) {
+      const snap = await MED_REF.get();
+      if (snap.exists) return snap.data().lista || [];
+    }
   } catch(e) {}
   try { return JSON.parse(localStorage.getItem('arthur_medicacao_offline')) || []; } catch(e) { return []; }
 }
 
-async function saveMedicacao(lista) {
-  localStorage.setItem('arthur_medicacao_offline', JSON.stringify(lista));
-  try { await MED_REF.set({ lista }); } catch(e) {}
+// Chamada pelo iniciarApp após Firebase estar pronto
+function loadMedicacaoOuter() {
+  loadMedicacao().then(d => {
+    medicacoes = d;
+    // Inicia sync tempo real de medicação
+    if (MED_REF) {
+      MED_REF.onSnapshot(snap => {
+        if (!snap.exists) return;
+        const novo = snap.data().lista || [];
+        if (JSON.stringify(medicacoes) !== JSON.stringify(novo)) {
+          medicacoes = novo;
+          renderMedicacao();
+        }
+      }, () => {});
+    }
+  });
 }
 
-// Sync tempo real medicação
-MED_REF.onSnapshot(snap => {
-  if (!snap.exists) return;
-  const novo = snap.data().lista || [];
-  if (JSON.stringify(medicacoes) !== JSON.stringify(novo)) {
-    medicacoes = novo;
-    renderMedicacao();
-  }
-}, () => {});
-
-loadMedicacao().then(d => { medicacoes = d; });
+async function saveMedicacao(lista) {
+  localStorage.setItem('arthur_medicacao_offline', JSON.stringify(lista));
+  try { if (MED_REF) await MED_REF.set({ lista }); } catch(e) {}
+}
 
 function initMedForm() {
   const hoje = todayISO();
