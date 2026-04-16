@@ -1067,27 +1067,68 @@
   }
 
   /* ── GUARDIAN COM FACE ID ATIVO ── */
-  .guardian-biometria-badge {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    margin-left: 4px;
+  .guardian-biometria-badge { font-size:0.75rem; opacity:0.7; margin-left:4px; }
+
+  /* ── ÓRBITAS SUB-ABAS ── */
+  .orbitas-subtabs {
+    display:flex; gap:8px; margin-bottom:14px;
+    background:rgba(0,20,50,0.5); border:1px solid rgba(0,180,255,0.15);
+    border-radius:12px; padding:5px;
   }
-    width: 100%;
-    padding: 11px;
-    background: transparent;
-    border: 1px dashed rgba(0,180,255,0.3);
-    border-radius: 10px;
-    color: var(--text-dim);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: all 0.2s;
+  .orbitas-stab {
+    flex:1; padding:9px 6px; border-radius:8px; border:none;
+    background:transparent; color:var(--text-dim);
+    font-family:'Orbitron',monospace; font-size:0.62rem; letter-spacing:0.07em;
+    cursor:pointer; transition:all 0.2s; -webkit-tap-highlight-color:transparent;
+  }
+  .orbitas-stab.active {
+    background:linear-gradient(135deg,rgba(0,80,180,0.5),rgba(0,50,120,0.6));
+    color:var(--white); box-shadow:0 0 10px rgba(0,180,255,0.2);
+    border:1px solid rgba(0,180,255,0.3);
+  }
+
+  /* ── CRESCIMENTO ── */
+  .cresc-metric-tabs { display:flex; gap:6px; justify-content:center; }
+  .cresc-mtab {
+    padding:7px 12px; border-radius:20px; border:1px solid rgba(0,180,255,0.2);
+    background:transparent; color:var(--text-dim); font-size:0.65rem;
+    font-family:'Orbitron',monospace; cursor:pointer; transition:all 0.2s;
+    letter-spacing:0.05em; -webkit-tap-highlight-color:transparent;
+  }
+  .cresc-mtab.active {
+    background:rgba(0,120,220,0.25); color:var(--blue-neon);
+    border-color:var(--blue-neon); box-shadow:0 0 8px rgba(0,180,255,0.2);
+  }
+  .cresc-item {
+    background:rgba(0,20,50,0.5); border:1px solid rgba(0,180,255,0.15);
+    border-radius:10px; padding:12px 14px; margin-bottom:8px;
+    display:flex; align-items:flex-start; gap:10px;
+  }
+  .cresc-item-mes {
+    font-family:'Orbitron',monospace; font-size:0.6rem; color:var(--gold);
+    letter-spacing:0.07em; white-space:nowrap; min-width:60px; padding-top:2px;
+  }
+  .cresc-item-body { flex:1; }
+  .cresc-item-data { font-size:0.68rem; color:var(--text-dim); margin-bottom:6px; }
+  .cresc-item-medidas { display:flex; gap:8px; flex-wrap:wrap; }
+  .cresc-badge {
+    background:rgba(0,60,130,0.4); border:1px solid rgba(0,180,255,0.2);
+    border-radius:6px; padding:3px 8px; font-size:0.72rem;
+    color:var(--blue-neon); font-family:'Orbitron',monospace;
+  }
+  .cresc-item-obs { font-size:0.72rem; color:var(--text-dim); margin-top:5px; font-style:italic; }
+  .cresc-leg-item { display:flex; align-items:center; gap:5px; color:var(--text-dim); }
+  .cresc-leg-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+  .btn-novo-guardiao {
+    width:100%; padding:11px; background:transparent;
+    border:1px dashed rgba(0,180,255,0.3); border-radius:10px;
+    color:var(--text-dim); font-family:'Orbitron',monospace;
+    font-size:0.65rem; letter-spacing:0.08em; cursor:pointer; transition:all 0.2s;
   }
   .btn-novo-guardiao:hover {
-    border-color: var(--blue-neon);
-    color: var(--blue-neon);
-    background: rgba(0,180,255,0.05);
+    border-color:var(--blue-neon); color:var(--blue-neon);
+    background:rgba(0,180,255,0.05);
   }
 
   .emoji-grid {
@@ -2020,52 +2061,131 @@
 
   </div>
 
-  <!-- ÓRBITAS DO PADAWAN (MESVERSÁRIO) -->
+  <!-- ÓRBITAS DO PADAWAN (MESVERSÁRIO + CRESCIMENTO) -->
   <div id="tab-mesversario" class="tab-panel">
-    <div class="card">
-      <div class="section-title">🌙 Nova Órbita Completada</div>
-      <div class="form-group">
-        <label>Marco / Conquista / Memória</label>
-        <input type="text" id="mv-titulo" placeholder="ex: Primeiro sorriso registrado nos arquivos">
-      </div>
-      <div class="row-2">
-        <div class="form-group">
-          <label>Órbita Galáctica</label>
-          <select id="mv-mes">
-            <option value="1">1ª Órbita</option>
-            <option value="2">2ª Órbita</option>
-            <option value="3">3ª Órbita</option>
-            <option value="4">4ª Órbita</option>
-            <option value="5">5ª Órbita</option>
-            <option value="6">6ª Órbita</option>
-            <option value="7">7ª Órbita</option>
-            <option value="8">8ª Órbita</option>
-            <option value="9">9ª Órbita</option>
-            <option value="10">10ª Órbita</option>
-            <option value="11">11ª Órbita</option>
-            <option value="12">✨ 1ª Volta ao Sol</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Classificação na Ordem</label>
-          <select id="mv-cat">
-            <option value="marco">⭐ Marco Jedi</option>
-            <option value="presente">🎁 Tributo da Galáxia</option>
-            <option value="memoria">📸 Arquivo Holográfico</option>
-            <option value="saude">🏥 Relatório Médico</option>
-            <option value="outro">💬 Crônica Livre</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Detalhes para as Crônicas</label>
-        <input type="text" id="mv-obs" placeholder="ex: O Padawan virou sozinho pela primeira vez!">
-      </div>
-      <button class="btn btn-gold btn-full" onclick="salvarMesversario()">🌙 Gravar nas Crônicas</button>
+    <!-- Sub-abas -->
+    <div class="orbitas-subtabs">
+      <button class="orbitas-stab active" id="ostab-marcos" onclick="showOrbitasTab('marcos',this)">🌙 Marcos</button>
+      <button class="orbitas-stab" id="ostab-crescimento" onclick="showOrbitasTab('crescimento',this)">📏 Crescimento</button>
     </div>
 
-    <div class="filter-bar" id="mv-filtros"></div>
-    <div id="lista-mesversario"></div>
+    <!-- SUB-ABA: MARCOS -->
+    <div id="orbitas-panel-marcos" class="orbitas-panel">
+      <div class="card">
+        <div class="section-title">🌙 Nova Órbita Completada</div>
+        <div class="form-group">
+          <label>Marco / Conquista / Memória</label>
+          <input type="text" id="mv-titulo" placeholder="ex: Primeiro sorriso registrado nos arquivos">
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Órbita Galáctica</label>
+            <select id="mv-mes">
+              <option value="1">1ª Órbita</option>
+              <option value="2">2ª Órbita</option>
+              <option value="3">3ª Órbita</option>
+              <option value="4">4ª Órbita</option>
+              <option value="5">5ª Órbita</option>
+              <option value="6">6ª Órbita</option>
+              <option value="7">7ª Órbita</option>
+              <option value="8">8ª Órbita</option>
+              <option value="9">9ª Órbita</option>
+              <option value="10">10ª Órbita</option>
+              <option value="11">11ª Órbita</option>
+              <option value="12">✨ 1ª Volta ao Sol</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Classificação na Ordem</label>
+            <select id="mv-cat">
+              <option value="marco">⭐ Marco Jedi</option>
+              <option value="presente">🎁 Tributo da Galáxia</option>
+              <option value="memoria">📸 Arquivo Holográfico</option>
+              <option value="saude">🏥 Relatório Médico</option>
+              <option value="outro">💬 Crônica Livre</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Detalhes para as Crônicas</label>
+          <input type="text" id="mv-obs" placeholder="ex: O Padawan virou sozinho pela primeira vez!">
+        </div>
+        <button class="btn btn-gold btn-full" onclick="salvarMesversario()">🌙 Gravar nas Crônicas</button>
+      </div>
+      <div class="filter-bar" id="mv-filtros"></div>
+      <div id="lista-mesversario"></div>
+    </div>
+
+    <!-- SUB-ABA: CRESCIMENTO -->
+    <div id="orbitas-panel-crescimento" class="orbitas-panel" style="display:none">
+      <div class="card">
+        <div class="section-title">📏 Registro de Crescimento</div>
+        <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5;margin-bottom:12px">
+          Registre os dados das consultas com a Curandeira Jedi. Os pontos são plotados sobre as curvas de referência da OMS.
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Ciclo Galáctico</label>
+            <input type="date" id="cresc-data">
+          </div>
+          <div class="form-group">
+            <label>Órbita (meses)</label>
+            <select id="cresc-mes">
+              <option value="0">Nascimento</option>
+              <option value="1">1ª Órbita</option>
+              <option value="2">2ª Órbita</option>
+              <option value="3">3ª Órbita</option>
+              <option value="4">4ª Órbita</option>
+              <option value="5">5ª Órbita</option>
+              <option value="6">6ª Órbita</option>
+              <option value="7">7ª Órbita</option>
+              <option value="8">8ª Órbita</option>
+              <option value="9">9ª Órbita</option>
+              <option value="10">10ª Órbita</option>
+              <option value="11">11ª Órbita</option>
+              <option value="12">✨ 1ª Volta ao Sol</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>⚖️ Peso (kg)</label>
+            <input type="number" id="cresc-peso" placeholder="ex: 4.350" step="0.001" min="0" max="30">
+          </div>
+          <div class="form-group">
+            <label>📐 Comprimento (cm)</label>
+            <input type="number" id="cresc-altura" placeholder="ex: 52.5" step="0.1" min="0" max="120">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>🔵 Perímetro Cefálico (cm)</label>
+            <input type="number" id="cresc-pc" placeholder="ex: 35.0" step="0.1" min="0" max="60">
+          </div>
+          <div class="form-group">
+            <label>Obs. da Consulta</label>
+            <input type="text" id="cresc-obs" placeholder="ex: Desenvolvimento ótimo">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="salvarCrescimento()">📏 Gravar Medidas nas Crônicas</button>
+      </div>
+
+      <!-- Gráfico -->
+      <div class="card" style="padding:14px 12px">
+        <div class="cresc-metric-tabs">
+          <button class="cresc-mtab active" id="cmtab-peso"   onclick="setCrescMetrica('peso',this)">⚖️ Peso</button>
+          <button class="cresc-mtab"        id="cmtab-altura" onclick="setCrescMetrica('altura',this)">📐 Comprimento</button>
+          <button class="cresc-mtab"        id="cmtab-pc"     onclick="setCrescMetrica('pc',this)">🔵 P. Cefálico</button>
+        </div>
+        <div style="position:relative;width:100%;margin-top:10px">
+          <canvas id="cresc-chart" style="width:100%;max-height:280px;display:block"></canvas>
+        </div>
+        <div id="cresc-legenda" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:0.65rem;font-family:'Orbitron',monospace"></div>
+      </div>
+
+      <!-- Lista de registros -->
+      <div id="lista-crescimento"></div>
+    </div>
   </div>
 
   <!-- ESCUDOS DO PADAWAN (VACINAS) -->
@@ -2932,6 +3052,20 @@ function fazerLogin(id) {
     // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
     setTimeout(() => mostrarBannerFaceID(id), 2000);
   });
+  // Sync crescimento do Firebase
+  try {
+    EXTRAS_REF.get().then(snap => {
+      if (snap.exists) {
+        const d = snap.data();
+        if (d.crescimento && Array.isArray(d.crescimento)) {
+          crescData = d.crescimento;
+          saveCrescimentoLocal(crescData);
+          renderCrescimento();
+        }
+      }
+    }).catch(() => {});
+  } catch(e) {}
+
   // Sync guardiões em tempo real
   GUARDIOES_REF.onSnapshot(snap => {
     if (!snap.exists) return;
@@ -3120,6 +3254,7 @@ function iniciarApp() {
   loadFotos();
   loadVacinasOuter();
   loadMedicacaoOuter();
+  crescData = loadCrescimento();
 
   // 1. Tenta auto-login (Face ID ou "lembrar dispositivo")
   if (verificarAutoLogin()) {
@@ -3521,6 +3656,12 @@ function executarDelete() {
     }
     if (vacStatus[vacId]) { delete vacStatus[vacId]; saveVacinas(vacStatus); }
     saveExtras(vacExtras); renderVacinas();
+  } else if (tipo === 'crescimento') {
+    crescData = crescData.filter(x => x.id !== id);
+    saveCrescimentoLocal(crescData);
+    try { EXTRAS_REF && EXTRAS_REF.set({ crescimento: crescData }); } catch(e) {}
+    renderCrescimento();
+    renderGraficoCrescimento();
   } else if (tipo === 'medicacao') {
     medicacoes = medicacoes.filter(m => m.id !== id);
     saveMedicacao(medicacoes); renderMedicacao();
@@ -4059,6 +4200,318 @@ function renderMesversario() {
 function setMvFiltro(val, btn) {
   mvFiltroMes = val;
   renderMesversario();
+}
+
+// ── MÓDULO CRESCIMENTO ──
+const CRESC_KEY = 'arthur_crescimento_v1';
+let crescData = [];
+let _crescMetrica = 'peso';
+
+function loadCrescimento() {
+  try { return JSON.parse(localStorage.getItem(CRESC_KEY)) || []; } catch(e) { return []; }
+}
+function saveCrescimentoLocal(d) {
+  try { localStorage.setItem(CRESC_KEY, JSON.stringify(d)); } catch(e) {}
+}
+
+// Curvas OMS peso (kg) — meninos — P3, P15, P50, P85, P97
+const OMS_PESO = {
+  p3:  [2.5,3.4,4.3,5.0,5.6,6.1,6.4,6.7,7.0,7.2,7.5,7.7,7.8],
+  p15: [2.9,3.9,4.9,5.7,6.2,6.7,7.1,7.4,7.7,7.9,8.2,8.4,8.6],
+  p50: [3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6],
+  p85: [3.9,5.1,6.3,7.2,7.8,8.4,8.8,9.2,9.6,9.9,10.2,10.5,10.8],
+  p97: [4.4,5.8,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8],
+};
+// Curvas OMS comprimento (cm) — meninos
+const OMS_ALTURA = {
+  p3:  [46.1,50.8,54.4,57.3,59.7,61.7,63.3,64.8,66.2,67.5,68.7,69.9,71.0],
+  p15: [47.5,52.4,56.2,59.1,61.5,63.6,65.3,66.9,68.3,69.6,70.9,72.1,73.2],
+  p50: [49.9,54.7,58.4,61.4,63.9,65.9,67.6,69.2,70.6,72.0,73.3,74.5,75.7],
+  p85: [51.8,56.9,60.8,63.8,66.3,68.4,70.3,71.9,73.4,74.8,76.2,77.5,78.7],
+  p97: [53.4,58.6,62.6,65.7,68.3,70.4,72.2,73.9,75.5,76.9,78.3,79.7,81.0],
+};
+// Curvas OMS perímetro cefálico (cm) — meninos
+const OMS_PC = {
+  p3:  [32.1,35.1,37.0,38.6,39.9,40.9,41.7,42.4,43.1,43.6,44.1,44.6,45.0],
+  p15: [33.0,36.0,38.0,39.5,40.8,41.9,42.7,43.4,44.1,44.7,45.2,45.6,46.0],
+  p50: [34.5,37.3,39.1,40.5,41.6,42.6,43.3,44.1,44.8,45.3,45.9,46.3,46.7],
+  p85: [35.6,38.4,40.1,41.5,42.6,43.5,44.3,45.0,45.7,46.2,46.8,47.2,47.6],
+  p97: [36.9,39.5,41.1,42.4,43.5,44.4,45.1,45.9,46.6,47.1,47.6,48.1,48.5],
+};
+
+const OMS_MESES = [0,1,2,3,4,5,6,7,8,9,10,11,12];
+const OMS_MAP = { peso: OMS_PESO, altura: OMS_ALTURA, pc: OMS_PC };
+const CRESC_UNIDADE = { peso:'kg', altura:'cm', pc:'cm' };
+const CRESC_LABEL = { peso:'Peso', altura:'Comprimento', pc:'P. Cefálico' };
+const CRESC_COR_ARTHUR = '#00d4ff';
+
+let _crescChartInstance = null;
+
+// Navegação sub-abas Órbitas
+function showOrbitasTab(tab, btn) {
+  document.querySelectorAll('.orbitas-stab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.orbitas-panel').forEach(p => p.style.display = 'none');
+  if (btn) btn.classList.add('active');
+  else document.getElementById('ostab-' + tab)?.classList.add('active');
+  document.getElementById('orbitas-panel-' + tab).style.display = 'block';
+  if (tab === 'crescimento') {
+    initCrescForm();
+    renderCrescimento();
+    setTimeout(renderGraficoCrescimento, 50); // aguarda layout
+  }
+}
+
+function setCrescMetrica(m, btn) {
+  _crescMetrica = m;
+  document.querySelectorAll('.cresc-mtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGraficoCrescimento();
+}
+
+// Inicializar data de hoje no formulário
+function initCrescForm() {
+  const inp = document.getElementById('cresc-data');
+  if (inp && !inp.value) {
+    const hoje = new Date();
+    inp.value = hoje.toISOString().split('T')[0];
+  }
+  // Sugerir mês atual do Arthur
+  const nasc = new Date('2026-03-12');
+  const hoje2 = new Date();
+  const meses = Math.floor((hoje2 - nasc) / (1000 * 60 * 60 * 24 * 30.44));
+  const sel = document.getElementById('cresc-mes');
+  if (sel && meses >= 0 && meses <= 12) sel.value = String(Math.min(meses, 12));
+}
+
+function salvarCrescimento() {
+  const data   = document.getElementById('cresc-data').value;
+  const mes    = parseInt(document.getElementById('cresc-mes').value);
+  const pesoRaw   = document.getElementById('cresc-peso').value;
+  const alturaRaw = document.getElementById('cresc-altura').value;
+  const pcRaw     = document.getElementById('cresc-pc').value;
+  const obs    = document.getElementById('cresc-obs').value.trim();
+
+  if (!data) { alert('⚠️ Defina o Ciclo Galáctico da consulta!'); return; }
+  if (!pesoRaw && !alturaRaw && !pcRaw) { alert('⚠️ Registre ao menos uma medida antes de gravar!'); return; }
+
+  const reg = {
+    id: Date.now(),
+    data,
+    mes,
+    peso:   pesoRaw   ? parseFloat(pesoRaw)   : null,
+    altura: alturaRaw ? parseFloat(alturaRaw) : null,
+    pc:     pcRaw     ? parseFloat(pcRaw)     : null,
+    obs,
+  };
+
+  crescData.push(reg);
+  crescData.sort((a,b) => a.mes - b.mes || a.id - b.id);
+  saveCrescimentoLocal(crescData);
+
+  // Salvar no Firebase
+  try { EXTRAS_REF && EXTRAS_REF.set({ crescimento: crescData }); } catch(e) {}
+
+  // Limpar campos
+  document.getElementById('cresc-peso').value   = '';
+  document.getElementById('cresc-altura').value = '';
+  document.getElementById('cresc-pc').value     = '';
+  document.getElementById('cresc-obs').value    = '';
+
+  renderCrescimento();
+  renderGraficoCrescimento();
+  showToast('📏 Medidas gravadas nas crônicas do Padawan!');
+}
+
+function deleteCrescimento(id) {
+  confirmarDelete('crescimento', id, 'Apagar este registro de crescimento? A ação é irreversível como o lado sombrio.');
+}
+
+function renderCrescimento() {
+  const el = document.getElementById('lista-crescimento');
+  if (!el) return;
+  if (!crescData.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida gravada ainda — registre a primeira consulta</p></div>`;
+    return;
+  }
+  const nomeMes = m => m === 0 ? '🌌 Nascimento' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
+  const fmt = (v, u) => v != null ? `${v}${u}` : null;
+
+  el.innerHTML = [...crescData].reverse().map(r => `
+    <div class="cresc-item">
+      <div class="cresc-item-mes">${nomeMes(r.mes)}</div>
+      <div class="cresc-item-body">
+        <div class="cresc-item-data">📅 ${r.data ? new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</div>
+        <div class="cresc-item-medidas">
+          ${fmt(r.peso,'kg')   ? `<span class="cresc-badge">⚖️ ${fmt(r.peso,'kg')}</span>` : ''}
+          ${fmt(r.altura,'cm') ? `<span class="cresc-badge">📐 ${fmt(r.altura,'cm')}</span>` : ''}
+          ${fmt(r.pc,'cm')     ? `<span class="cresc-badge">🔵 ${fmt(r.pc,'cm')}</span>` : ''}
+        </div>
+        ${r.obs ? `<div class="cresc-item-obs">${r.obs}</div>` : ''}
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="deleteCrescimento(${r.id})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function renderGraficoCrescimento() {
+  const canvas = document.getElementById('cresc-chart');
+  if (!canvas) return;
+
+  const oms = OMS_MAP[_crescMetrica];
+  const unid = CRESC_UNIDADE[_crescMetrica];
+  const label = CRESC_LABEL[_crescMetrica];
+
+  // Pontos do Arthur para a métrica atual
+  const pontosArthur = crescData
+    .filter(r => r[_crescMetrica] != null)
+    .map(r => ({ x: r.mes, y: r[_crescMetrica] }));
+
+  // Calcular dimensões
+  const W = canvas.parentElement.offsetWidth || 320;
+  const H = Math.min(260, W * 0.65);
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Margens
+  const ml = 44, mr = 12, mt = 14, mb = 32;
+  const pw = W - ml - mr, ph = H - mt - mb;
+
+  // Min/max Y dinâmico
+  const allVals = [
+    ...Object.values(oms).flat(),
+    ...pontosArthur.map(p => p.y)
+  ];
+  let yMin = Math.min(...allVals) * 0.97;
+  let yMax = Math.max(...allVals) * 1.03;
+
+  const scaleX = m => ml + (m / 12) * pw;
+  const scaleY = v => mt + ph - ((v - yMin) / (yMax - yMin)) * ph;
+
+  // Fundo
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,180,255,0.07)';
+  ctx.lineWidth = 1;
+  for (let m = 0; m <= 12; m += 2) {
+    ctx.beginPath();
+    ctx.moveTo(scaleX(m), mt);
+    ctx.lineTo(scaleX(m), mt + ph);
+    ctx.stroke();
+  }
+  const gridLines = 5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = mt + (ph / gridLines) * i;
+    ctx.beginPath();
+    ctx.moveTo(ml, y);
+    ctx.lineTo(ml + pw, y);
+    ctx.stroke();
+  }
+
+  // Zona sombreada P15–P85
+  ctx.beginPath();
+  OMS_MESES.forEach((m,i) => {
+    const x = scaleX(m), y = scaleY(oms.p85[i]);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  [...OMS_MESES].reverse().forEach((m,i) => {
+    const idx = OMS_MESES.length - 1 - i;
+    ctx.lineTo(scaleX(m), scaleY(oms.p15[idx]));
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,180,255,0.06)';
+  ctx.fill();
+
+  // Curvas OMS
+  const curvas = [
+    { key:'p3',  cor:'rgba(255,100,100,0.5)', dash:[4,3] },
+    { key:'p15', cor:'rgba(255,200,50,0.45)', dash:[3,2] },
+    { key:'p50', cor:'rgba(57,255,20,0.7)',   dash:[]    },
+    { key:'p85', cor:'rgba(255,200,50,0.45)', dash:[3,2] },
+    { key:'p97', cor:'rgba(255,100,100,0.5)', dash:[4,3] },
+  ];
+  curvas.forEach(({ key, cor, dash }) => {
+    ctx.beginPath();
+    ctx.strokeStyle = cor;
+    ctx.lineWidth = key === 'p50' ? 1.8 : 1.2;
+    ctx.setLineDash(dash);
+    OMS_MESES.forEach((m, i) => {
+      const x = scaleX(m), y = scaleY(oms[key][i]);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Linha do Arthur
+  if (pontosArthur.length > 1) {
+    ctx.beginPath();
+    ctx.strokeStyle = CRESC_COR_ARTHUR;
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = CRESC_COR_ARTHUR;
+    ctx.shadowBlur = 6;
+    pontosArthur.forEach((p, i) => {
+      const x = scaleX(p.x), y = scaleY(p.y);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  // Pontos do Arthur
+  pontosArthur.forEach(p => {
+    const x = scaleX(p.x), y = scaleY(p.y);
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = CRESC_COR_ARTHUR;
+    ctx.shadowColor = CRESC_COR_ARTHUR;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // Valor
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold 9px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(p.y + unid, x, y - 9);
+  });
+
+  // Eixo X — meses
+  ctx.fillStyle = 'rgba(122,179,212,0.8)';
+  ctx.font = '9px Arial';
+  ctx.textAlign = 'center';
+  OMS_MESES.filter(m => m % 2 === 0).forEach(m => {
+    ctx.fillText(m === 0 ? 'Nasc' : m + 'm', scaleX(m), H - 6);
+  });
+
+  // Eixo Y
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= gridLines; i++) {
+    const v = yMin + ((yMax - yMin) / gridLines) * (gridLines - i);
+    ctx.fillText(v.toFixed(1), ml - 4, mt + (ph / gridLines) * i + 3);
+  }
+
+  // Título
+  ctx.fillStyle = 'rgba(0,212,255,0.9)';
+  ctx.font = 'bold 10px Orbitron, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${label.toUpperCase()} (${unid}) · CURVAS OMS`, W / 2, 11);
+
+  // Legenda
+  const legEl = document.getElementById('cresc-legenda');
+  if (legEl) {
+    legEl.innerHTML = [
+      { cor: CRESC_COR_ARTHUR,        label: '⚡ Arthur' },
+      { cor: 'rgba(57,255,20,0.8)',   label: 'P50 (mediana)' },
+      { cor: 'rgba(255,200,50,0.7)',  label: 'P15 / P85' },
+      { cor: 'rgba(255,100,100,0.7)', label: 'P3 / P97' },
+    ].map(l => `
+      <div class="cresc-leg-item">
+        <div class="cresc-leg-dot" style="background:${l.cor}"></div>
+        <span>${l.label}</span>
+      </div>
+    `).join('');
+  }
 }
 
 // ── VACINAS ──
@@ -5422,6 +5875,7 @@ function renderAll() {
   renderMesversario();
   renderVacinas();
   renderMedicacao();
+  renderCrescimento();
 }
 
 initMedForm();
@@ -5692,6 +6146,18 @@ const GLOSS_DADOS = [
   { cat:'sistema',sec:'⚙️ Sistema',               jedi:'💬 Crônica Livre',           comum:'Nota livre / Observação',                obs:'Categoria do mesversário' },
   { cat:'sistema',sec:'⚙️ Sistema',               jedi:'🔄 Se necessário pela Força', comum:'Se necessário / SOS',                   obs:'Frequência de medicação' },
   { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Ritual concluído em',        comum:'Vacinado em / Data de aplicação',        obs:'' },
+  // ── CRESCIMENTO ──
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📏 Crescimento',              comum:'Curvas de crescimento / Gráfico de peso, altura e PC', obs:'Sub-aba dentro de Órbitas' },
+  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🌙 Marcos',                   comum:'Mesversário / Conquistas mensais',        obs:'Sub-aba dentro de Órbitas' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'⚖️ Peso',                     comum:'Peso em kg',                              obs:'Medida de crescimento' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'📐 Comprimento',              comum:'Comprimento / Altura em cm',              obs:'Medida de crescimento' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'🔵 Perímetro Cefálico',       comum:'Circunferência da cabeça em cm',          obs:'Sigla: PC' },
+  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Obs. da Consulta',            comum:'Observações da pediatra na consulta',     obs:'' },
+  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📏 Gravar Medidas nas Crônicas', comum:'Salvar registro de crescimento',       obs:'' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Curvas OMS',                  comum:'Referência mundial de crescimento saudável (OMS)', obs:'Organização Mundial da Saúde' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P3 / P50 / P97',              comum:'Percentis de crescimento (P3=abaixo da média, P50=mediana, P97=acima da média)', obs:'P50 = metade das crianças' },
+  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P15 / P85',                   comum:'Faixa de crescimento normal / Zona verde', obs:'Entre P15 e P85 é considerado crescimento adequado' },
+  { cat:'status', sec:'📊 Status e Mensagens',     jedi:'📏 Medidas gravadas nas crônicas do Padawan!', comum:'Registro de crescimento salvo!', obs:'' },
 ];
 
 // ── GLOSSÁRIO — FUNÇÕES ──
