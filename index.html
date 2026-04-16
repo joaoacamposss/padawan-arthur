@@ -2210,9 +2210,9 @@
     <!-- SUB-ABA: CRESCIMENTO -->
     <div id="orbitas-panel-crescimento" class="orbitas-panel" style="display:none">
       <div class="card">
-        <div class="section-title">📏 Registro de Crescimento</div>
+        <div class="section-title">📏 Escaneamento Galáctico do Padawan</div>
         <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5;margin-bottom:12px">
-          Registre os dados das consultas com a Curandeira Jedi. Os pontos são plotados sobre as curvas de referência da OMS.
+          Registre as medições das Audiências com a Curandeira Jedi. Os dados do Padawan são comparados às referências da Ordem da Saúde Galáctica (OMS).
         </div>
         <div class="row-2">
           <div class="form-group">
@@ -2220,9 +2220,9 @@
             <input type="date" id="cresc-data">
           </div>
           <div class="form-group">
-            <label>Órbita (meses)</label>
+            <label>Órbita Galáctica</label>
             <select id="cresc-mes">
-              <option value="0">Nascimento</option>
+              <option value="0">🌌 Chegada à Galáxia</option>
               <option value="1">1ª Órbita</option>
               <option value="2">2ª Órbita</option>
               <option value="3">3ª Órbita</option>
@@ -2240,33 +2240,43 @@
         </div>
         <div class="row-2">
           <div class="form-group">
-            <label>⚖️ Peso (kg)</label>
-            <input type="number" id="cresc-peso" placeholder="ex: 4.350" step="0.001" min="0" max="30">
+            <label>⚖️ Massa do Padawan (kg)</label>
+            <input type="number" id="cresc-peso" placeholder="ex: 3.715 (em kg)" step="0.001" min="0" max="30">
           </div>
           <div class="form-group">
-            <label>📐 Comprimento (cm)</label>
-            <input type="number" id="cresc-altura" placeholder="ex: 52.5" step="0.1" min="0" max="120">
+            <label>📐 Estatura do Padawan (cm)</label>
+            <input type="number" id="cresc-altura" placeholder="ex: 52.5 (em cm)" step="0.1" min="0" max="120">
           </div>
         </div>
         <div class="row-2">
           <div class="form-group">
-            <label>🔵 Perímetro Cefálico (cm)</label>
-            <input type="number" id="cresc-pc" placeholder="ex: 35.0" step="0.1" min="0" max="60">
+            <label>🔵 Escudo Craniano (cm)</label>
+            <input type="number" id="cresc-pc" placeholder="ex: 35.0 (em cm)" step="0.1" min="0" max="60">
           </div>
           <div class="form-group">
-            <label>Observações da Audiência</label>
-            <input type="text" id="cresc-obs" placeholder="ex: Padawan respondendo bem aos ensinamentos da Força">
+            <label>📜 Crônica da Audiência</label>
+            <input type="text" id="cresc-obs" placeholder="ex: Padawan em pleno alinhamento com a Força">
           </div>
         </div>
         <button class="btn btn-primary btn-full" onclick="salvarCrescimento()">📏 Registrar Medidas nas Crônicas da Força</button>
       </div>
 
+      <!-- Botão Relatório Crescimento -->
+      <button class="btn-relatorio-diario" onclick="abrirRelatorioCrescimento()" style="margin-top:0">
+        <span style="font-size:1.1rem">📊</span>
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--white)">RELATÓRIO GALÁCTICO DE CRESCIMENTO</div>
+          <div style="font-size:0.65rem;color:var(--text-dim);margin-top:1px">Evolução comparada às referências da Ordem (OMS)</div>
+        </div>
+        <span style="margin-left:auto;color:var(--blue-neon);font-size:0.9rem">›</span>
+      </button>
+
       <!-- Gráfico -->
       <div class="card" style="padding:14px 12px">
         <div class="cresc-metric-tabs">
-          <button class="cresc-mtab active" id="cmtab-peso"   onclick="setCrescMetrica('peso',this)">⚖️ Peso</button>
-          <button class="cresc-mtab"        id="cmtab-altura" onclick="setCrescMetrica('altura',this)">📐 Comprimento</button>
-          <button class="cresc-mtab"        id="cmtab-pc"     onclick="setCrescMetrica('pc',this)">🔵 P. Cefálico</button>
+          <button class="cresc-mtab active" id="cmtab-peso"   onclick="setCrescMetrica('peso',this)">⚖️ Massa</button>
+          <button class="cresc-mtab"        id="cmtab-altura" onclick="setCrescMetrica('altura',this)">📐 Estatura</button>
+          <button class="cresc-mtab"        id="cmtab-pc"     onclick="setCrescMetrica('pc',this)">🔵 Escudo Craniano</button>
         </div>
         <div style="position:relative;width:100%;margin-top:10px">
           <canvas id="cresc-chart" style="width:100%;max-height:280px;display:block"></canvas>
@@ -2365,6 +2375,25 @@
     <div class="modal-btns">
       <button class="btn btn-responder" style="padding:10px 18px;font-size:0.72rem" onclick="confirmarResposta()">💾 Gravar no Holocron</button>
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharModalResposta()">Abortar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RELATÓRIO CRESCIMENTO -->
+<div id="modal-relatorio-crescimento" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:400px;text-align:left;border-color:rgba(0,212,255,0.3);max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="font-size:1.8rem">📊</div>
+      <div style="flex:1">
+        <div class="modal-title" style="text-align:left;margin-bottom:2px;font-size:0.82rem">RELATÓRIO GALÁCTICO DE CRESCIMENTO</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em">Referências da Ordem da Saúde Galáctica (OMS)</div>
+      </div>
+      <button onclick="fecharRelatorioCrescimento()" style="background:rgba(0,50,100,0.4);border:1px solid rgba(0,180,255,0.2);border-radius:8px;color:var(--text-dim);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+    <div id="rel-cresc-conteudo"></div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="copiarRelatorioCrescimento()">📋 Copiar Relatório</button>
+      <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);font-size:0.68rem" onclick="fecharRelatorioCrescimento()">Fechar</button>
     </div>
   </div>
 </div>
@@ -4367,7 +4396,7 @@ const OMS_PC = {
 const OMS_MESES = [0,1,2,3,4,5,6,7,8,9,10,11,12];
 const OMS_MAP = { peso: OMS_PESO, altura: OMS_ALTURA, pc: OMS_PC };
 const CRESC_UNIDADE = { peso:'kg', altura:'cm', pc:'cm' };
-const CRESC_LABEL = { peso:'Peso', altura:'Comprimento', pc:'P. Cefálico' };
+const CRESC_LABEL = { peso:'Massa do Padawan', altura:'Estatura do Padawan', pc:'Escudo Craniano' };
 const CRESC_COR_ARTHUR = '#00d4ff';
 
 let _crescChartInstance = null;
@@ -4421,6 +4450,16 @@ function salvarCrescimento() {
 
   if (!data) { alert('⚠️ Defina o Ciclo Galáctico da consulta!'); return; }
   if (!pesoRaw && !alturaRaw && !pcRaw) { alert('⚠️ Registre ao menos uma medida antes de gravar!'); return; }
+  // Validação de range — peso em kg (bebê: 0.5 a 15 kg), estatura em cm (30 a 120), PC em cm (20 a 60)
+  if (pesoRaw && (parseFloat(pesoRaw) > 30)) {
+    if (!confirm(`⚠️ Peso de ${pesoRaw} kg parece muito alto para um bebê.\nO campo espera quilogramas (kg), não gramas.\nEx: 3.715 kg — não 3715 g.\n\nDeseja gravar mesmo assim?`)) return;
+  }
+  if (alturaRaw && (parseFloat(alturaRaw) > 120 || parseFloat(alturaRaw) < 20)) {
+    alert('⚠️ Verifique a Estatura — deve ser em centímetros (cm). Ex: 52.5'); return;
+  }
+  if (pcRaw && (parseFloat(pcRaw) > 60 || parseFloat(pcRaw) < 20)) {
+    alert('⚠️ Verifique o Escudo Craniano — deve ser em centímetros (cm). Ex: 35.0'); return;
+  }
 
   const reg = {
     id: Date.now(),
@@ -4461,7 +4500,7 @@ function renderCrescimento() {
     el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida registrada — aguarde a primeira Audiência com a Curandeira Jedi</p></div>`;
     return;
   }
-  const nomeMes = m => m === 0 ? '🌌 Nascimento' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
+  const nomeMes = m => m === 0 ? '🌌 Chegada à Galáxia' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
   const fmt = (v, u) => v != null ? `${v}${u}` : null;
 
   el.innerHTML = [...crescData].reverse().map(r => `
@@ -4623,13 +4662,13 @@ function renderGraficoCrescimento() {
   ctx.fillStyle = 'rgba(0,212,255,0.9)';
   ctx.font = 'bold 10px Orbitron, Arial';
   ctx.textAlign = 'center';
-  ctx.fillText(`${label.toUpperCase()} (${unid}) · CURVAS OMS`, W / 2, 11);
+  ctx.fillText(`${label.toUpperCase()} (${unid}) · REFERÊNCIAS DA ORDEM (OMS)`, W / 2, 11);
 
   // Legenda
   const legEl = document.getElementById('cresc-legenda');
   if (legEl) {
     legEl.innerHTML = [
-      { cor: CRESC_COR_ARTHUR,        label: '⚡ Arthur' },
+      { cor: CRESC_COR_ARTHUR,        label: '⚡ Padawan Arthur' },
       { cor: 'rgba(57,255,20,0.8)',   label: 'P50 (mediana)' },
       { cor: 'rgba(255,200,50,0.7)',  label: 'P15 / P85' },
       { cor: 'rgba(255,100,100,0.7)', label: 'P3 / P97' },
@@ -5995,6 +6034,173 @@ function fecharFotoGuardiao() {
 atualizarFotoArthurHeader();
 
 // ── INIT ──
+// ── RELATÓRIO CRESCIMENTO ──
+function abrirRelatorioCrescimento() {
+  renderRelatorioCrescimento();
+  document.getElementById('modal-relatorio-crescimento').style.display = 'flex';
+}
+
+function fecharRelatorioCrescimento() {
+  document.getElementById('modal-relatorio-crescimento').style.display = 'none';
+}
+
+function _percentilArthur(valor, tabela, mes) {
+  // Retorna o percentil aproximado do Arthur para um dado mês e valor
+  if (valor == null || isNaN(valor)) return null;
+  const p3  = tabela.p3[mes];
+  const p15 = tabela.p15[mes];
+  const p50 = tabela.p50[mes];
+  const p85 = tabela.p85[mes];
+  const p97 = tabela.p97[mes];
+  if (valor < p3)  return { faixa: '< P3',  status: '⚠️ Abaixo do esperado', cor: '#ff6b6b',  desc: 'Abaixo de P3 — avaliação da Curandeira Jedi recomendada' };
+  if (valor < p15) return { faixa: 'P3–P15', status: '🔵 Abaixo da mediana', cor: '#7ab3d4',  desc: 'Entre P3 e P15 — zona de atenção' };
+  if (valor < p50) return { faixa: 'P15–P50', status: '✅ Faixa normal', cor: '#39ff14',      desc: 'Entre P15 e P50 — crescimento adequado' };
+  if (valor < p85) return { faixa: 'P50–P85', status: '✅ Faixa normal', cor: '#39ff14',      desc: 'Entre P50 e P85 — crescimento adequado' };
+  if (valor < p97) return { faixa: 'P85–P97', status: '🟡 Acima da mediana', cor: '#ffe066',  desc: 'Entre P85 e P97 — monitorar com a Curandeira' };
+  return           { faixa: '> P97', status: '⚠️ Acima do esperado', cor: '#ffaa00',           desc: 'Acima de P97 — avaliação da Curandeira Jedi recomendada' };
+}
+
+function renderRelatorioCrescimento() {
+  const el = document.getElementById('rel-cresc-conteudo');
+  if (!el) return;
+
+  const dados = crescData || [];
+
+  if (!dados.length) {
+    el.innerHTML = `<div class="rel-empty"><div style="font-size:2rem;margin-bottom:8px">📏</div>
+      <div>Nenhuma medida gravada nas crônicas — registre a primeira Audiência</div></div>`;
+    return;
+  }
+
+  const nomeMes = m => m === 0 ? '🌌 Chegada à Galáxia' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
+  const fmtData = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  const omsTabs = { peso: OMS_PESO, altura: OMS_ALTURA, pc: OMS_PC };
+  const metricas = [
+    { key: 'peso',   label: '⚖️ Massa do Padawan',  unid: 'kg' },
+    { key: 'altura', label: '📐 Estatura',           unid: 'cm' },
+    { key: 'pc',     label: '🔵 Escudo Craniano',    unid: 'cm' },
+  ];
+
+  // Resumo geral — última medição
+  const ultimo = [...dados].sort((a,b) => b.mes - a.mes || b.id - a.id)[0];
+
+  let html = '';
+
+  // Bloco total — última medição
+  html += `<div class="rel-total-box" style="margin-bottom:12px">
+    <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:6px">ÚLTIMA MEDIÇÃO · ${nomeMes(ultimo.mes)}</div>
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+      ${ultimo.peso   != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.peso}</div><div class="rel-total-label">kg</div></div>` : ''}
+      ${ultimo.altura != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.altura}</div><div class="rel-total-label">cm</div></div>` : ''}
+      ${ultimo.pc     != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.pc}</div><div class="rel-total-label">PC cm</div></div>` : ''}
+    </div>
+    <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px">📅 ${fmtData(ultimo.data)}</div>
+  </div>`;
+
+  // Por métrica — análise com percentil OMS
+  metricas.forEach(({ key, label, unid }) => {
+    const registros = dados.filter(r => r[key] != null).sort((a,b) => a.mes - b.mes);
+    if (!registros.length) return;
+
+    html += `<div class="rel-section-title">${label} (${unid})</div>`;
+
+    registros.forEach(r => {
+      const mesIdx = Math.min(r.mes, 12);
+      const perc = _percentilArthur(r[key], omsTabs[key], mesIdx);
+      const ref50 = omsTabs[key].p50[mesIdx];
+      const diff  = r[key] != null ? (r[key] - ref50).toFixed(2) : null;
+      const diffStr = diff !== null ? (parseFloat(diff) >= 0 ? `+${diff}` : `${diff}`) + ` ${unid} vs P50` : '';
+
+      html += `<div class="rel-stat-row" style="flex-direction:column;align-items:flex-start;padding:8px 0;gap:4px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+          <span class="rel-stat-label">${nomeMes(r.mes)} · ${fmtData(r.data)}</span>
+          <span class="rel-stat-value" style="font-size:0.85rem">${r[key]} ${unid}</span>
+        </div>
+        ${perc ? `
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:0.72rem;color:${perc.cor};font-family:'Orbitron',monospace">${perc.faixa}</span>
+          <span style="font-size:0.68rem;color:var(--text-dim)">${diffStr}</span>
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-dim);font-style:italic">${perc.desc}</div>
+        ` : ''}
+      </div>`;
+    });
+
+    // Evolução entre medições
+    if (registros.length >= 2) {
+      const primeiroR = registros[0];
+      const ultimoR   = registros[registros.length - 1];
+      const variac = (ultimoR[key] - primeiroR[key]).toFixed(key === 'peso' ? 3 : 1);
+      html += `<div style="background:rgba(0,60,130,0.25);border-radius:8px;padding:7px 10px;margin-top:4px;font-size:0.72rem;color:var(--text-dim)">
+        📈 Evolução: <span style="color:var(--blue-neon);font-family:'Orbitron',monospace">+${variac} ${unid}</span> (${nomeMes(primeiroR.mes)} → ${nomeMes(ultimoR.mes)})
+      </div>`;
+    }
+  });
+
+  // Referência OMS
+  html += `<div style="margin-top:14px;padding:10px;background:rgba(0,20,50,0.5);border-radius:8px;border:1px solid rgba(0,180,255,0.15)">
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.07em;margin-bottom:5px">📡 REFERÊNCIA DA ORDEM</div>
+    <div style="font-size:0.68rem;color:var(--text-dim);line-height:1.6">
+      <div>• <b style="color:var(--white)">P50</b> = mediana — metade das crianças está acima, metade abaixo</div>
+      <div>• <b style="color:#39ff14">P15–P85</b> = faixa de crescimento adequado pela OMS</div>
+      <div>• <b style="color:#ff6b6b">Abaixo de P3</b> ou <b style="color:#ffaa00">acima de P97</b> = avaliação médica recomendada</div>
+      <div style="margin-top:4px;opacity:0.7">Curvas OMS para meninos, 0–12 meses</div>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+function copiarRelatorioCrescimento() {
+  const dados = crescData || [];
+  if (!dados.length) { showToast('⚠️ Nenhuma medida para exportar'); return; }
+
+  const nomeMes = m => m === 0 ? 'Chegada à Galáxia' : m === 12 ? '1ª Volta ao Sol' : `${m}ª Órbita`;
+  const fmtData = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+  const omsTabs = { peso: OMS_PESO, altura: OMS_ALTURA, pc: OMS_PC };
+  const metricas = [
+    { key:'peso',   label:'Massa (kg)' },
+    { key:'altura', label:'Estatura (cm)' },
+    { key:'pc',     label:'Escudo Craniano - PC (cm)' },
+  ];
+
+  let texto = '📊 RELATÓRIO GALÁCTICO DE CRESCIMENTO\n';
+  texto += 'Padawan Arthur · Arquivos da Ordem Jedi\n';
+  texto += '─'.repeat(34) + '\n\n';
+
+  const ultimo = [...dados].sort((a,b) => b.mes - a.mes || b.id - a.id)[0];
+  texto += `🏆 ÚLTIMA MEDIÇÃO — ${nomeMes(ultimo.mes)}\n`;
+  if (ultimo.peso   != null) texto += `  ⚖️  Massa: ${ultimo.peso} kg\n`;
+  if (ultimo.altura != null) texto += `  📐 Estatura: ${ultimo.altura} cm\n`;
+  if (ultimo.pc     != null) texto += `  🔵 Escudo Craniano: ${ultimo.pc} cm\n`;
+  texto += `  📅 ${fmtData(ultimo.data)}\n\n`;
+
+  metricas.forEach(({ key, label }) => {
+    const regs = dados.filter(r => r[key] != null).sort((a,b) => a.mes - b.mes);
+    if (!regs.length) return;
+    texto += `── ${label} ──\n`;
+    regs.forEach(r => {
+      const mesIdx = Math.min(r.mes, 12);
+      const perc = _percentilArthur(r[key], omsTabs[key], mesIdx);
+      const ref50 = omsTabs[key].p50[mesIdx];
+      const diff = (r[key] - ref50).toFixed(key === 'peso' ? 3 : 1);
+      texto += `  ${nomeMes(r.mes)} (${fmtData(r.data)}): ${r[key]}  |  ${perc?.faixa || '—'}  |  ${parseFloat(diff) >= 0 ? '+' : ''}${diff} vs P50\n`;
+    });
+    texto += '\n';
+  });
+
+  texto += '📡 Referência: OMS — curvas de crescimento para meninos, 0–12 meses\n';
+  texto += '⚔️ Arquivos da Ordem Jedi · Padawan Arthur';
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto)
+      .then(() => showToast('📋 Relatório copiado para a área de transferência!'))
+      .catch(() => { prompt('Copie o relatório:', texto); });
+  } else {
+    prompt('Copie o relatório:', texto);
+  }
+}
+
 // ── RELATÓRIO DIÁRIO ──
 let _relDataAtual = null;
 
