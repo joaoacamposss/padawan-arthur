@@ -2774,20 +2774,30 @@ function mostrarTelaFaceIDAutomatico(id) {
 function mostrarBannerFaceID(guardiao_id) {
   if (!webAuthnDisponivel()) return;
   if (biometriaData[guardiao_id]) return; // já registrado, não exibir
-  // Mostra no app, não na tela de login
+  // Remove banner anterior se existir
+  dispensarBannerFaceID();
   const banner = document.createElement('div');
   banner.id = 'banner-faceid';
-  banner.className = 'biometria-banner';
-  banner.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:8500;animation:fadeIn 0.3s ease';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    width:calc(100% - 32px);max-width:360px;
+    background:linear-gradient(135deg,rgba(0,30,70,0.97),rgba(0,15,45,0.98));
+    border:1px solid rgba(0,180,255,0.35);border-radius:12px;
+    padding:14px 16px;z-index:7000;
+    box-shadow:0 4px 24px rgba(0,0,0,0.5);
+    animation:fadeIn 0.3s ease;
+  `;
   banner.innerHTML = `
-    <div class="biometria-banner-title">🔐 ATIVAR FACE ID</div>
-    <div class="biometria-banner-sub">Entre mais rápido no próximo acesso sem digitar o código</div>
+    <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:var(--blue-neon);letter-spacing:0.08em;margin-bottom:5px;text-align:center">🔐 ATIVAR FACE ID</div>
+    <div style="font-size:0.75rem;color:var(--text-dim);margin-bottom:10px;text-align:center;line-height:1.4">Entre mais rápido no próximo acesso sem digitar o código</div>
     <div style="display:flex;gap:8px;justify-content:center">
       <button class="btn btn-primary" style="font-size:0.68rem;padding:8px 16px" onclick="ativarFaceIDAgora('${guardiao_id}')">⚡ Ativar agora</button>
       <button class="btn" style="font-size:0.68rem;padding:8px 14px;background:rgba(0,30,60,0.5);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim)" onclick="dispensarBannerFaceID()">Agora não</button>
     </div>
   `;
   document.body.appendChild(banner);
+  // Auto-dispensar após 10s
+  setTimeout(dispensarBannerFaceID, 10000);
 }
 
 async function ativarFaceIDAgora(guardiao_id) {
