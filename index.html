@@ -6076,75 +6076,230 @@ function renderRelatorioCrescimento() {
   const fmtData = d => d ? new Date(d+'T12:00:00').toLocaleDateString('pt-BR') : '—';
   const omsTabs = { peso: OMS_PESO, altura: OMS_ALTURA, pc: OMS_PC };
   const metricas = [
-    { key: 'peso',   label: '⚖️ Massa do Padawan',  unid: 'kg' },
-    { key: 'altura', label: '📐 Estatura',           unid: 'cm' },
-    { key: 'pc',     label: '🔵 Escudo Craniano',    unid: 'cm' },
+    { key: 'peso',   icon: '⚖️', label: 'Massa do Padawan', unid: 'kg',  dec: 3 },
+    { key: 'altura', icon: '📐', label: 'Estatura',          unid: 'cm', dec: 1 },
+    { key: 'pc',     icon: '🔵', label: 'Escudo Craniano',   unid: 'cm', dec: 1 },
   ];
 
-  // Resumo geral — última medição
-  const ultimo = [...dados].sort((a,b) => b.mes - a.mes || b.id - a.id)[0];
+  // Função para calcular posição percentual na barra (0–100%)
+  function calcBarPos(val, tab, mes) {
+    const p3 = tab.p3[mes], p97 = tab.p97[mes];
+    if (val <= p3)  return 2;
+    if (val >= p97) return 98;
+    return Math.round(2 + ((val - p3) / (p97 - p3)) * 96);
+  }
 
+  // Função para calcular percentil interpolado aproximado
+  function calcPercentilNum(val, tab, mes) {
+    const pts = [
+      { p: 3,  v: tab.p3[mes]  },
+      { p: 15, v: tab.p15[mes] },
+      { p: 50, v: tab.p50[mes] },
+      { p: 85, v: tab.p85[mes] },
+      { p: 97, v: tab.p97[mes] },
+    ];
+    if (val <= pts[0].v) return '< P3';
+    if (val >= pts[4].v) return '> P97';
+    for (let i = 0; i < pts.length - 1; i++) {
+      if (val >= pts[i].v && val <= pts[i+1].v) {
+        const frac = (val - pts[i].v) / (pts[i+1].v - pts[i].v);
+        const approx = Math.round(pts[i].p + frac * (pts[i+1].p - pts[i].p));
+        return `P${approx}`;
+      }
+    }
+    return '—';
+  }
+
+  const ultimo = [...dados].sort((a,b) => b.mes - a.mes || b.id - a.id)[0];
   let html = '';
 
-  // Bloco total — última medição
-  html += `<div class="rel-total-box" style="margin-bottom:12px">
-    <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:6px">ÚLTIMA MEDIÇÃO · ${nomeMes(ultimo.mes)}</div>
-    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
-      ${ultimo.peso   != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.peso}</div><div class="rel-total-label">kg</div></div>` : ''}
-      ${ultimo.altura != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.altura}</div><div class="rel-total-label">cm</div></div>` : ''}
-      ${ultimo.pc     != null ? `<div style="text-align:center"><div class="rel-total-num" style="font-size:1.2rem">${ultimo.pc}</div><div class="rel-total-label">PC cm</div></div>` : ''}
+  // ── RESUMO — ÚLTIMA MEDIÇÃO ──
+  html += `<div class="rel-total-box" style="margin-bottom:14px">
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.08em;margin-bottom:8px">⚡ ÚLTIMA MEDIÇÃO · ${nomeMes(ultimo.mes)} · ${fmtData(ultimo.data)}</div>
+    <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+      ${ultimo.peso   != null ? `<div style="text-align:center"><div class="rel-total-num">${ultimo.peso}</div><div class="rel-total-label">⚖️ kg</div><div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">OMS P50: ${OMS_PESO.p50[Math.min(ultimo.mes,12)]} kg</div></div>` : ''}
+      ${ultimo.altura != null ? `<div style="text-align:center"><div class="rel-total-num">${ultimo.altura}</div><div class="rel-total-label">📐 cm</div><div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">OMS P50: ${OMS_ALTURA.p50[Math.min(ultimo.mes,12)]} cm</div></div>` : ''}
+      ${ultimo.pc     != null ? `<div style="text-align:center"><div class="rel-total-num">${ultimo.pc}</div><div class="rel-total-label">🔵 PC cm</div><div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px">OMS P50: ${OMS_PC.p50[Math.min(ultimo.mes,12)]} cm</div></div>` : ''}
     </div>
-    <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px">📅 ${fmtData(ultimo.data)}</div>
   </div>`;
 
-  // Por métrica — análise com percentil OMS
-  metricas.forEach(({ key, label, unid }) => {
-    const registros = dados.filter(r => r[key] != null).sort((a,b) => a.mes - b.mes);
-    if (!registros.length) return;
+  // ── POR REGISTRO — tabela comparativa Arthur x OMS ──
+  const registrosPorMes = [...dados].sort((a,b) => a.mes - b.mes);
 
-    html += `<div class="rel-section-title">${label} (${unid})</div>`;
+  registrosPorMes.forEach(r => {
+    const mesIdx = Math.min(r.mes, 12);
+    const temAlguma = metricas.some(m => r[m.key] != null);
+    if (!temAlguma) return;
 
-    registros.forEach(r => {
-      const mesIdx = Math.min(r.mes, 12);
-      const perc = _percentilArthur(r[key], omsTabs[key], mesIdx);
-      const ref50 = omsTabs[key].p50[mesIdx];
-      const diff  = r[key] != null ? (r[key] - ref50).toFixed(2) : null;
-      const diffStr = diff !== null ? (parseFloat(diff) >= 0 ? `+${diff}` : `${diff}`) + ` ${unid} vs P50` : '';
+    // Cabeçalho do registro
+    html += `<div style="
+      background:rgba(0,30,70,0.6);
+      border:1px solid rgba(0,180,255,0.2);
+      border-radius:10px;
+      padding:12px;
+      margin-bottom:10px;
+    ">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--gold)">${nomeMes(r.mes)}</div>
+        <div style="font-size:0.65rem;color:var(--text-dim)">📅 ${fmtData(r.data)}</div>
+      </div>`;
 
-      html += `<div class="rel-stat-row" style="flex-direction:column;align-items:flex-start;padding:8px 0;gap:4px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
-          <span class="rel-stat-label">${nomeMes(r.mes)} · ${fmtData(r.data)}</span>
-          <span class="rel-stat-value" style="font-size:0.85rem">${r[key]} ${unid}</span>
+    metricas.forEach(({ key, icon, label, unid, dec }) => {
+      if (r[key] == null) return;
+
+      const val   = r[key];
+      const tab   = omsTabs[key];
+      const perc  = _percentilArthur(val, tab, mesIdx);
+      const pNum  = calcPercentilNum(val, tab, mesIdx);
+      const barPos = calcBarPos(val, tab, mesIdx);
+
+      // Valores OMS de referência
+      const vP3  = tab.p3[mesIdx];
+      const vP15 = tab.p15[mesIdx];
+      const vP50 = tab.p50[mesIdx];
+      const vP85 = tab.p85[mesIdx];
+      const vP97 = tab.p97[mesIdx];
+      const diff = (val - vP50).toFixed(dec);
+      const diffStr = parseFloat(diff) >= 0 ? `+${diff}` : diff;
+
+      // Cor do status
+      const corStatus = perc ? perc.cor : '#7ab3d4';
+      const statusTxt = perc ? perc.status : '—';
+      const descTxt   = perc ? perc.desc   : '';
+
+      html += `<div style="margin-bottom:12px">
+        <!-- Linha principal: medida do Arthur -->
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+          <span style="font-size:0.75rem;color:var(--text-dim)">${icon} ${label}</span>
+          <span style="display:flex;align-items:baseline;gap:6px">
+            <span style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--blue-neon);font-weight:700">${val}</span>
+            <span style="font-size:0.68rem;color:var(--text-dim)">${unid}</span>
+            <span style="font-size:0.7rem;color:${corStatus};font-family:'Orbitron',monospace;font-weight:700">${pNum}</span>
+          </span>
         </div>
-        ${perc ? `
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-size:0.72rem;color:${perc.cor};font-family:'Orbitron',monospace">${perc.faixa}</span>
-          <span style="font-size:0.68rem;color:var(--text-dim)">${diffStr}</span>
+
+        <!-- Barra visual de percentil -->
+        <div style="position:relative;height:14px;background:rgba(0,20,50,0.6);border-radius:7px;margin-bottom:5px;overflow:hidden">
+          <!-- Zona verde P15–P85 -->
+          <div style="
+            position:absolute;
+            left:16%;width:69%;height:100%;
+            background:rgba(57,255,20,0.15);
+            border-left:1px dashed rgba(57,255,20,0.4);
+            border-right:1px dashed rgba(57,255,20,0.4);
+          "></div>
+          <!-- Marcadores P3, P50, P97 -->
+          <div style="position:absolute;left:2%;top:0;bottom:0;width:1px;background:rgba(255,100,100,0.5)"></div>
+          <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(57,255,20,0.6)"></div>
+          <div style="position:absolute;left:98%;top:0;bottom:0;width:1px;background:rgba(255,100,100,0.5)"></div>
+          <!-- Posição do Arthur -->
+          <div style="
+            position:absolute;
+            left:${barPos}%;
+            top:50%;transform:translate(-50%,-50%);
+            width:10px;height:10px;
+            background:${corStatus};
+            border-radius:50%;
+            box-shadow:0 0 6px ${corStatus};
+            z-index:2;
+          "></div>
         </div>
-        <div style="font-size:0.68rem;color:var(--text-dim);font-style:italic">${perc.desc}</div>
-        ` : ''}
+
+        <!-- Labels da barra -->
+        <div style="display:flex;justify-content:space-between;font-size:0.58rem;color:var(--text-dim);margin-bottom:6px;font-family:'Orbitron',monospace">
+          <span style="color:rgba(255,100,100,0.7)">P3</span>
+          <span style="color:rgba(57,255,20,0.6)">P15</span>
+          <span style="color:rgba(57,255,20,0.9)">P50</span>
+          <span style="color:rgba(57,255,20,0.6)">P85</span>
+          <span style="color:rgba(255,100,100,0.7)">P97</span>
+        </div>
+
+        <!-- Tabela comparativa Arthur x OMS -->
+        <div style="
+          background:rgba(0,15,40,0.5);
+          border-radius:8px;
+          padding:8px;
+          font-size:0.7rem;
+        ">
+          <!-- Cabeçalho -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:4px;text-align:center;margin-bottom:4px;font-family:'Orbitron',monospace;font-size:0.56rem;color:var(--text-dim)">
+            <div style="color:var(--blue-neon);font-weight:700">ARTHUR</div>
+            <div style="color:rgba(255,100,100,0.7)">P3</div>
+            <div style="color:rgba(57,255,20,0.6)">P15</div>
+            <div style="color:rgba(57,255,20,1)">P50</div>
+            <div style="color:rgba(57,255,20,0.6)">P85</div>
+            <div style="color:rgba(255,100,100,0.7)">P97</div>
+          </div>
+          <!-- Valores -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:4px;text-align:center">
+            <div style="font-family:'Orbitron',monospace;font-weight:700;color:var(--blue-neon);font-size:0.78rem">${val}</div>
+            <div style="color:rgba(255,120,120,0.8)">${vP3}</div>
+            <div style="color:rgba(57,255,20,0.7)">${vP15}</div>
+            <div style="color:rgba(57,255,20,1);font-weight:700">${vP50}</div>
+            <div style="color:rgba(57,255,20,0.7)">${vP85}</div>
+            <div style="color:rgba(255,120,120,0.8)">${vP97}</div>
+          </div>
+          <!-- Unidade -->
+          <div style="text-align:center;font-size:0.58rem;color:var(--text-dim);margin-top:3px;font-family:'Orbitron',monospace;letter-spacing:0.06em">${unid} · OMS meninos ${mesIdx}m</div>
+        </div>
+
+        <!-- Status + diferença vs mediana -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <span style="
+            background:${corStatus}22;
+            border:1px solid ${corStatus}55;
+            border-radius:20px;
+            padding:3px 10px;
+            font-size:0.68rem;
+            color:${corStatus};
+            font-weight:700;
+          ">${statusTxt}</span>
+          <span style="font-size:0.68rem;color:var(--text-dim)">${diffStr} ${unid} vs mediana (P50)</span>
+        </div>
+        ${descTxt ? `<div style="font-size:0.65rem;color:var(--text-dim);font-style:italic;margin-top:3px">${descTxt}</div>` : ''}
       </div>`;
     });
 
-    // Evolução entre medições
-    if (registros.length >= 2) {
-      const primeiroR = registros[0];
-      const ultimoR   = registros[registros.length - 1];
-      const variac = (ultimoR[key] - primeiroR[key]).toFixed(key === 'peso' ? 3 : 1);
-      html += `<div style="background:rgba(0,60,130,0.25);border-radius:8px;padding:7px 10px;margin-top:4px;font-size:0.72rem;color:var(--text-dim)">
-        📈 Evolução: <span style="color:var(--blue-neon);font-family:'Orbitron',monospace">+${variac} ${unid}</span> (${nomeMes(primeiroR.mes)} → ${nomeMes(ultimoR.mes)})
-      </div>`;
+    // Obs do registro
+    if (r.obs) {
+      html += `<div style="border-top:1px solid rgba(0,180,255,0.1);padding-top:8px;margin-top:4px;font-size:0.72rem;color:var(--text-dim);font-style:italic">📜 ${r.obs}</div>`;
     }
+
+    html += `</div>`; // fecha card do registro
   });
 
-  // Referência OMS
-  html += `<div style="margin-top:14px;padding:10px;background:rgba(0,20,50,0.5);border-radius:8px;border:1px solid rgba(0,180,255,0.15)">
-    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.07em;margin-bottom:5px">📡 REFERÊNCIA DA ORDEM</div>
-    <div style="font-size:0.68rem;color:var(--text-dim);line-height:1.6">
-      <div>• <b style="color:var(--white)">P50</b> = mediana — metade das crianças está acima, metade abaixo</div>
-      <div>• <b style="color:#39ff14">P15–P85</b> = faixa de crescimento adequado pela OMS</div>
-      <div>• <b style="color:#ff6b6b">Abaixo de P3</b> ou <b style="color:#ffaa00">acima de P97</b> = avaliação médica recomendada</div>
-      <div style="margin-top:4px;opacity:0.7">Curvas OMS para meninos, 0–12 meses</div>
+  // ── LEGENDA / REFERÊNCIA OMS ──
+  html += `<div style="margin-top:4px;padding:10px 12px;background:rgba(0,20,50,0.5);border-radius:8px;border:1px solid rgba(0,180,255,0.12)">
+    <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.07em;margin-bottom:7px">📡 LEGENDA DOS PERCENTIS — ORDEM DA SAÚDE GALÁCTICA (OMS)</div>
+    <div style="display:flex;flex-direction:column;gap:4px;font-size:0.68rem;">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#ff6b6b;flex-shrink:0"></div>
+        <span style="color:#ff6b6b;font-weight:700">Abaixo de P3</span>
+        <span style="color:var(--text-dim)">— Avaliação da Curandeira Jedi recomendada</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#7ab3d4;flex-shrink:0"></div>
+        <span style="color:#7ab3d4;font-weight:700">P3 – P15</span>
+        <span style="color:var(--text-dim)">— Abaixo da mediana, zona de atenção</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#39ff14;flex-shrink:0"></div>
+        <span style="color:#39ff14;font-weight:700">P15 – P85</span>
+        <span style="color:var(--text-dim)">— Faixa de crescimento adequado (zona verde)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#ffe066;flex-shrink:0"></div>
+        <span style="color:#ffe066;font-weight:700">P85 – P97</span>
+        <span style="color:var(--text-dim)">— Acima da mediana, monitorar com a Curandeira</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#ffaa00;flex-shrink:0"></div>
+        <span style="color:#ffaa00;font-weight:700">Acima de P97</span>
+        <span style="color:var(--text-dim)">— Avaliação da Curandeira Jedi recomendada</span>
+      </div>
+    </div>
+    <div style="margin-top:6px;font-size:0.6rem;color:rgba(122,179,212,0.5);border-top:1px solid rgba(0,180,255,0.1);padding-top:5px">
+      P50 = mediana OMS — metade das crianças está acima, metade abaixo · Curvas para meninos, 0–12 meses
     </div>
   </div>`;
 
@@ -6179,12 +6334,19 @@ function copiarRelatorioCrescimento() {
     const regs = dados.filter(r => r[key] != null).sort((a,b) => a.mes - b.mes);
     if (!regs.length) return;
     texto += `── ${label} ──\n`;
+    texto += `  ${'Órbita'.padEnd(20)} ${'Arthur'.padEnd(8)} ${'Percentil'.padEnd(10)} ${'P3'.padEnd(7)} ${'P50'.padEnd(7)} ${'P97'.padEnd(7)} vs P50\n`;
+    texto += `  ${'-'.repeat(65)}\n`;
     regs.forEach(r => {
       const mesIdx = Math.min(r.mes, 12);
-      const perc = _percentilArthur(r[key], omsTabs[key], mesIdx);
-      const ref50 = omsTabs[key].p50[mesIdx];
-      const diff = (r[key] - ref50).toFixed(key === 'peso' ? 3 : 1);
-      texto += `  ${nomeMes(r.mes)} (${fmtData(r.data)}): ${r[key]}  |  ${perc?.faixa || '—'}  |  ${parseFloat(diff) >= 0 ? '+' : ''}${diff} vs P50\n`;
+      const tab = omsTabs[key];
+      const perc = _percentilArthur(r[key], tab, mesIdx);
+      const ref50 = tab.p50[mesIdx];
+      const ref3  = tab.p3[mesIdx];
+      const ref97 = tab.p97[mesIdx];
+      const dec = key === 'peso' ? 3 : 1;
+      const diff = (r[key] - ref50).toFixed(dec);
+      const nomM = nomeMes(r.mes) + ' (' + fmtData(r.data) + ')';
+      texto += `  ${nomM.padEnd(20)} ${String(r[key]).padEnd(8)} ${(perc?.faixa||'—').padEnd(10)} ${String(ref3).padEnd(7)} ${String(ref50).padEnd(7)} ${String(ref97).padEnd(7)} ${parseFloat(diff) >= 0 ? '+' : ''}${diff}\n`;
     });
     texto += '\n';
   });
