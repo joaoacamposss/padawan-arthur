@@ -1920,20 +1920,42 @@
       <div class="row-2">
         <div class="form-group">
           <label>Fonte de Energia</label>
-          <select id="m-tipo">
+          <select id="m-tipo" onchange="toggleMistoFields(this.value, 'm-misto-fields')">
             <option value="peito">🤱 Fonte Natural</option>
             <option value="formula">🥛 Fórmula Alquímica</option>
             <option value="misto">✨ Combinação da Força</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Dose (ml)</label>
+          <label>Dose Total (ml)</label>
           <select id="m-ml">
             <option value="">— selecione a dose —</option>
             <script>for(let v=10;v<=500;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
           </select>
         </div>
       </div>
+
+      <!-- Detalhes Combinação da Força — aparece só quando tipo=misto -->
+      <div id="m-misto-fields" style="display:none;background:rgba(0,30,80,0.3);border:1px solid rgba(255,200,80,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.09em;margin-bottom:8px">✨ DETALHAMENTO DA COMBINAÇÃO</div>
+        <div class="row-2">
+          <div class="form-group" style="margin:0">
+            <label>🤱 Fonte Natural (ml)</label>
+            <select id="m-ml-peito">
+              <option value="">— ml peito —</option>
+              <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>🥛 Fórmula Alquímica (ml)</label>
+            <select id="m-ml-formula">
+              <option value="">— ml fórmula —</option>
+              <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>Observações do Mestre</label>
         <input type="text" id="m-obs" placeholder="ex: o Padawan adormeceu durante a recarga da Força...">
@@ -2328,18 +2350,39 @@
     <div class="row-2" style="margin-bottom:10px">
       <div class="form-group" style="margin:0">
         <label>Fonte de Energia</label>
-        <select id="edit-m-tipo">
+        <select id="edit-m-tipo" onchange="toggleMistoFields(this.value, 'edit-m-misto-fields')">
           <option value="peito">🤱 Fonte Natural</option>
           <option value="formula">🥛 Fórmula Alquímica</option>
           <option value="misto">✨ Combinação da Força</option>
         </select>
       </div>
       <div class="form-group" style="margin:0">
-        <label>Dose (ml)</label>
+        <label>Dose Total (ml)</label>
         <select id="edit-m-ml">
           <option value="">— selecione a dose —</option>
           <script>for(let v=10;v<=500;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
         </select>
+      </div>
+    </div>
+
+    <!-- Detalhes Combinação da Força — modal edição -->
+    <div id="edit-m-misto-fields" style="display:none;background:rgba(0,30,80,0.3);border:1px solid rgba(255,200,80,0.2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+      <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.09em;margin-bottom:8px">✨ DETALHAMENTO DA COMBINAÇÃO</div>
+      <div class="row-2">
+        <div class="form-group" style="margin:0">
+          <label>🤱 Fonte Natural (ml)</label>
+          <select id="edit-m-ml-peito">
+            <option value="">— ml peito —</option>
+            <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>🥛 Fórmula Alquímica (ml)</label>
+          <select id="edit-m-ml-formula">
+            <option value="">— ml fórmula —</option>
+            <script>for(let v=5;v<=300;v+=5)document.write(`<option value="${v}">${v} ml</option>`);</script>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -3762,21 +3805,48 @@ function ordenarMamadas(arr) {
   });
 }
 
+// ── Mostrar/ocultar campos de detalhamento da Combinação da Força ──
+function toggleMistoFields(tipo, fieldId) {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  el.style.display = tipo === 'misto' ? 'block' : 'none';
+}
+
 function salvarMamada() {
-  const data = document.getElementById('m-data').value;
-  const hora = document.getElementById('m-hora').value;
-  const tipo = document.getElementById('m-tipo').value;
-  const ml   = document.getElementById('m-ml').value;
-  const obs  = document.getElementById('m-obs').value;
+  const data   = document.getElementById('m-data').value;
+  const hora   = document.getElementById('m-hora').value;
+  const tipo   = document.getElementById('m-tipo').value;
+  const ml     = document.getElementById('m-ml').value;
+  const obs    = document.getElementById('m-obs').value;
 
   if (!data || !hora) { alert('⚠️ Defina o ciclo galáctico e a hora-padrão antes de registrar!'); return; }
 
-  db.mamadas.push({ id: Date.now(), data, hora, tipo, ml: ml ? parseInt(ml) : null, obs, autor: usuarioAtual });
-  db.mamadas = ordenarMamadas(db.mamadas); // mantém sempre ordenado
+  // Campos de combinação (só relevantes quando tipo=misto)
+  let ml_peito   = null;
+  let ml_formula = null;
+  if (tipo === 'misto') {
+    const vp = document.getElementById('m-ml-peito').value;
+    const vf = document.getElementById('m-ml-formula').value;
+    ml_peito   = vp ? parseInt(vp) : null;
+    ml_formula = vf ? parseInt(vf) : null;
+  }
+
+  db.mamadas.push({
+    id: Date.now(), data, hora, tipo,
+    ml: ml ? parseInt(ml) : null,
+    ml_peito, ml_formula,
+    obs, autor: usuarioAtual
+  });
+  db.mamadas = ordenarMamadas(db.mamadas);
   saveData(db);
-  document.getElementById('m-ml').value  = '';
-  document.getElementById('m-obs').value = '';
-  document.getElementById('m-hora').value = nowTime();
+  document.getElementById('m-ml').value       = '';
+  document.getElementById('m-ml-peito').value   = '';
+  document.getElementById('m-ml-formula').value = '';
+  document.getElementById('m-obs').value        = '';
+  document.getElementById('m-hora').value       = nowTime();
+  // Esconder campos misto após salvar
+  toggleMistoFields('', 'm-misto-fields');
+  document.getElementById('m-tipo').value = 'peito';
   renderMamadas();
   renderDashboard();
   showToast('⚡ Recarga registrada nas crônicas!');
@@ -3850,6 +3920,10 @@ function abrirModalEditarMamada(id) {
   document.getElementById('edit-m-hora').value = m.hora;
   document.getElementById('edit-m-tipo').value = m.tipo;
   document.getElementById('edit-m-ml').value = m.ml || '';
+  // Campos misto
+  document.getElementById('edit-m-ml-peito').value   = m.ml_peito   || '';
+  document.getElementById('edit-m-ml-formula').value = m.ml_formula || '';
+  toggleMistoFields(m.tipo, 'edit-m-misto-fields');
   document.getElementById('edit-m-obs').value = m.obs || '';
   document.getElementById('modal-editar-mamada').style.display = 'flex';
 }
@@ -3865,6 +3939,16 @@ function salvarEdicaoMamada() {
   m.data  = document.getElementById('edit-m-data').value;
   m.hora  = document.getElementById('edit-m-hora').value;
   m.tipo  = document.getElementById('edit-m-tipo').value;
+  // Campos misto
+  if (m.tipo === 'misto') {
+    const vp = document.getElementById('edit-m-ml-peito').value;
+    const vf = document.getElementById('edit-m-ml-formula').value;
+    m.ml_peito   = vp ? parseInt(vp) : null;
+    m.ml_formula = vf ? parseInt(vf) : null;
+  } else {
+    m.ml_peito   = null;
+    m.ml_formula = null;
+  }
   const mlVal = document.getElementById('edit-m-ml').value;
   m.ml    = mlVal ? parseInt(mlVal) : null;
   m.obs   = document.getElementById('edit-m-obs').value.trim();
@@ -3898,8 +3982,14 @@ function renderMamadas() {
     <div class="feed-item ${m.tipo}">
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱 Fonte Natural' : m.tipo === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação'}</span>
-          ${m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>` : ''}
+          <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱 Fonte Natural' : m.tipo === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação da Força'}</span>
+          ${m.tipo === 'misto' && (m.ml_peito || m.ml_formula) ? `
+            <span style="font-size:0.7rem;color:var(--text-dim)">
+              ${m.ml_peito   ? `<span style="color:#7ab3d4">🤱 ${m.ml_peito}ml</span>` : ''}
+              ${m.ml_peito && m.ml_formula ? '<span style="color:var(--text-dim)"> + </span>' : ''}
+              ${m.ml_formula ? `<span style="color:#b0d4f0">🥛 ${m.ml_formula}ml</span>` : ''}
+            </span>
+          ` : m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>` : ''}
         </div>
         <div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>
         ${m.obs ? `<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>` : ''}
@@ -4262,7 +4352,7 @@ function renderDashboard() {
     fr.innerHTML = recentes.map(m => `
       <div class="feed-item ${m.tipo}" style="margin-bottom:6px">
         <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱' : m.tipo === 'formula' ? '🥛' : '✨'} ${m.tipo === 'peito' ? 'Natural' : m.tipo === 'formula' ? 'Fórmula' : 'Combinação'}</span>
-        ${m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.8rem">${m.ml}ml</span>` : ''}
+        ${m.tipo === 'misto' && (m.ml_peito || m.ml_formula) ? `<span style="font-size:0.72rem;color:var(--text-dim)">${m.ml_peito ? '🤱'+m.ml_peito+'ml' : ''}${m.ml_peito&&m.ml_formula?'+':''}${m.ml_formula ? '🥛'+m.ml_formula+'ml' : ''}</span>` : m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.8rem">${m.ml}ml</span>` : ''}
         <span class="feed-meta" style="margin-left:auto">${m.hora} · ${formatDate(m.data)}</span>
       </div>
     `).join('');
@@ -6685,7 +6775,11 @@ function renderRelatorio() {
       <div class="rel-mamada-item">
         <span style="color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.7rem;min-width:44px">${m.hora || '—'}</span>
         <span class="badge badge-${m.tipo}" style="font-size:0.65rem;padding:2px 6px">${nomeTipo(m.tipo)}</span>
-        ${m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.72rem">${m.ml}ml</span>` : ''}
+        ${m.tipo === 'misto' && (m.ml_peito || m.ml_formula) ? `
+          <span style="font-size:0.7rem;color:var(--text-dim)">
+            ${m.ml_peito   ? `<span style="color:#7ab3d4">🤱${m.ml_peito}ml</span>` : ''}${m.ml_peito && m.ml_formula ? '<span>+</span>' : ''}${m.ml_formula ? `<span style="color:#b0d4f0">🥛${m.ml_formula}ml</span>` : ''}
+          </span>
+        ` : m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.72rem">${m.ml}ml</span>` : ''}
         ${m.obs ? `<span style="color:var(--text-dim);font-size:0.68rem;flex:1;text-align:right;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${m.obs}</span>` : ''}
       </div>
     `).join('')}
@@ -6719,7 +6813,12 @@ function copiarRelatorio() {
 
   ordenadas.forEach(m => {
     texto += `  ${m.hora || '--:--'} · ${nomeTipo(m.tipo)}`;
-    if (m.ml) texto += ` · ${m.ml}ml`;
+    if (m.tipo === 'misto' && (m.ml_peito || m.ml_formula)) {
+      if (m.ml_peito)   texto += ` · Peito: ${m.ml_peito}ml`;
+      if (m.ml_formula) texto += ` · Formula: ${m.ml_formula}ml`;
+    } else if (m.ml) {
+      texto += ` · ${m.ml}ml`;
+    }
     if (m.obs) texto += ` — ${m.obs}`;
     texto += '\n';
   });
