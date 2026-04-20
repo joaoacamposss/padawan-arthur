@@ -4431,7 +4431,6 @@ function initFirebaseRefs() {
     });
   }
   const fs   = firebase.firestore();
-  try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
   DOC_REF        = fs.collection('diario').doc('arthur');
   VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
   EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
