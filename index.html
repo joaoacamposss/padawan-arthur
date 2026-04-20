@@ -27,6 +27,7 @@
 <!-- Firebase SDK — síncrono para garantia de inicialização -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 
@@ -4430,6 +4431,11 @@ function initFirebaseRefs() {
       appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
     });
   }
+  // Auth anônima — necessária se as regras do Firestore exigem request.auth != null
+  try {
+    firebase.auth().signInAnonymously().catch(() => {});
+  } catch(e) {}
+
   const fs   = firebase.firestore();
   try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
   DOC_REF        = fs.collection('diario').doc('arthur');
