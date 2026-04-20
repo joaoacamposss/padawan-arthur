@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-  <!-- Cache-Control: forçar browser a sempre buscar do servidor -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -29,7 +28,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<title>Padawan Arthur · Ordem Jedi</title>
+<title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 
 <!-- SPLASH: CSS crítico inline — renderiza instantaneamente sem esperar fontes ou Firebase -->
 <style>
@@ -2500,24 +2499,6 @@
 </style>
 </head>
 <body>
-<script>
-// ══ LIMPEZA DE SERVICE WORKERS — EXECUTA PRIMEIRO ══
-// Garante que nenhum SW antigo intercepte o Firebase
-(function() {
-  if (!('serviceWorker' in navigator)) return;
-  // Limpar caches antigos que podem bloquear Firebase
-  if ('caches' in window) {
-    caches.keys().then(function(names) {
-      names.forEach(function(name) {
-        // Manter apenas o cache atual (com timestamp no nome)
-        if (name.startsWith('padawan-arthur-')) {
-          caches.delete(name);
-        }
-      });
-    }).catch(function(){});
-  }
-})();
-</script>
 
 <!-- SPLASH SCREEN — aparece imediatamente, some quando o app estiver pronto -->
 <div id="splash">
@@ -2876,18 +2857,6 @@
     <span class="nav-label">Escudos</span>
   </button>
 </nav>
-
-<script>
-// ── DIAGNÓSTICO ──
-console.log('[Padawan] Build: 2026-04-20-v2 carregado');
-(function(){
-  var ls = localStorage.getItem('diario_arthur_offline');
-  console.log('[Padawan] localStorage:', ls ? (JSON.parse(ls).mamadas||[]).length+'mamadas' : 'VAZIO');
-  window.addEventListener('load', function(){
-    console.log('[Padawan] Firebase SDK:', typeof firebase !== 'undefined' ? 'OK' : 'AUSENTE');
-  });
-})();
-</script>
 
 <main>
 
@@ -3827,9 +3796,7 @@ if (!IS_CAPACITOR) {
   document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
 
   // Service Worker inline para offline
-  // Service Worker desativado — GitHub Pages tem conflito com Firebase
-// Os dados são sincronizados diretamente pelo Firebase SDK
-} // fim if (!IS_CAPACITOR)
+  } // fim if (!IS_CAPACITOR)
 
 // ── SISTEMA DE AUTENTICAÇÃO COM SENHA + AES-256 ──
 const SENHA_CORRETA = '120326';
@@ -4277,30 +4244,6 @@ function fazerLogin(id) {
     setTimeout(() => initPresence(id), 1500);
     // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
     setTimeout(() => mostrarBannerFaceID(id), 2000);
-  }).catch(err => {
-    // Falhou tudo — tentar localStorage como última salvaguarda
-    console.warn('[Padawan] loadData falhou, tentando localStorage:', err);
-    try {
-      const keys = [
-        'diario_arthur_offline',
-        'diario_arthur_v1',
-        'diario_arthur_v2_enc'
-      ];
-      for (const k of keys) {
-        const raw = localStorage.getItem(k);
-        if (!raw) continue;
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
-          db = parsed;
-          renderAll();
-          console.warn('[Padawan] Dados recuperados de localStorage:', k);
-          return;
-        }
-      }
-    } catch(e2) {}
-    // Sem dados em lugar nenhum — iniciar vazio mas funcional
-    db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
-    renderAll();
   });
   // Sync crescimento do Firebase
   try {
@@ -4477,30 +4420,23 @@ function iniciarAutoLock() {
 let DOC_REF, VACINHAS_REF, EXTRAS_REF, GUARDIOES_REF, MED_REF;
 
 function initFirebaseRefs() {
-  try {
-    if (!firebase.apps.length) {
-      firebase.initializeApp({
-        apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
-        authDomain:        "padawan-arthur.firebaseapp.com",
-        projectId:         "padawan-arthur",
-        storageBucket:     "padawan-arthur.firebasestorage.app",
-        messagingSenderId: "38758983138",
-        appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
-      });
-    }
-    const fs = firebase.firestore();
-  // LongPolling: mais confiavel que WebSocket em GitHub Pages / iOS Safari
-  try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
-    DOC_REF       = fs.collection('diario').doc('arthur');
-    VACINHAS_REF  = fs.collection('diario').doc('arthur_vacinas');
-    EXTRAS_REF    = fs.collection('diario').doc('arthur_vacinas_extras');
-    GUARDIOES_REF = fs.collection('diario').doc('arthur_guardioes');
-    MED_REF       = fs.collection('diario').doc('arthur_medicacao');
-    window._firebaseReady = true;
-  } catch(e) {
-    console.warn('[Padawan] Firebase indisponível, modo offline:', e.message || e);
-    window._firebaseReady = false;
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+      authDomain:        "padawan-arthur.firebaseapp.com",
+      projectId:         "padawan-arthur",
+      storageBucket:     "padawan-arthur.firebasestorage.app",
+      messagingSenderId: "38758983138",
+      appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+    });
   }
+  const fs   = firebase.firestore();
+  try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
+  DOC_REF        = fs.collection('diario').doc('arthur');
+  VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
+  EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
+  GUARDIOES_REF  = fs.collection('diario').doc('arthur_guardioes');
+  MED_REF        = fs.collection('diario').doc('arthur_medicacao');
 }
 
 function removerSplash() {
@@ -4581,39 +4517,17 @@ window.addEventListener('offline', () => mostrarStatusConexao(false));
 const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
-  // Garantir que DOC_REF foi inicializado
-  if (!DOC_REF) {
-    console.warn('[Padawan] DOC_REF não inicializado, usando localStorage');
-    try {
-      const cache = localStorage.getItem(LOCAL_KEY);
-      if (cache) return JSON.parse(cache);
-    } catch(e) {}
-    return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
-  }
   try {
     const snap = await DOC_REF.get();
     if (snap.exists) {
       const { _ultimaAtualizacao, ...dados } = snap.data();
+      // Salva cache local sem o metadado de atualização
       localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
       return dados;
     }
-    // Doc existe mas vazio — tentar cache local
-    const cacheEmpty = localStorage.getItem(LOCAL_KEY);
-    if (cacheEmpty) {
-      try { return JSON.parse(cacheEmpty); } catch(e2) {}
-    }
   } catch(e) {
-    // Firebase falhou (offline, CORS, etc) — usar cache local
-    console.warn('[Padawan] Firebase offline, usando cache local:', e.message || e);
-    try {
-      const cache = localStorage.getItem(LOCAL_KEY);
-      if (cache) {
-        const parsed = JSON.parse(cache);
-        if (parsed && typeof parsed === 'object') return parsed;
-      }
-    } catch(e2) {
-      console.warn('[Padawan] Cache local corrompido:', e2);
-    }
+    const cache = localStorage.getItem(LOCAL_KEY);
+    if (cache) return JSON.parse(cache);
   }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
@@ -4621,13 +4535,10 @@ async function loadData() {
 async function saveData(data) {
   // Sempre salva local imediatamente
   localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
-  // Indicador de sync
-  if (typeof mostrarSync === 'function') mostrarSync('syncing');
   // Registra timestamp da última atualização com autor
   const agora = Date.now();
   const autor  = usuarioAtual ? (GUARDIOES[usuarioAtual]?.nome || 'Guardião') : 'Guardião';
   try {
-    if (!DOC_REF) { if (typeof mostrarSync === 'function') mostrarSync('hidden'); return; }
     await DOC_REF.set({
       ...data,
       _ultimaAtualizacao: {
@@ -4639,10 +4550,8 @@ async function saveData(data) {
         mesvers: (data.mesversario|| []).length,
       }
     });
-      if (typeof mostrarSync === 'function') mostrarSync('synced');
   } catch(e) {
     console.warn('Firebase offline, dados em cache local');
-    if (typeof mostrarSync === 'function') mostrarSync('hidden');
   }
 }
 
@@ -7959,7 +7868,7 @@ let _presenceHeartbeat = null;
 let _outroGuardiaoOnline = false;
 
 function initPresence(userId) {
-  if (typeof firebase === 'undefined') return; // Firebase SDK não carregado
+  if (!window._firebaseReady || !window.firebase) return;
   try {
     const fs  = firebase.firestore();
     const rtdb = firebase.database ? firebase.database() : null;
@@ -8177,8 +8086,18 @@ showTab = function(id) {
   }, { passive: true });
 })();
 
-// ── SYNC INDICATOR: integrado diretamente no saveData ──
-// (hook removido para evitar sobrescrita prematura da função)
+// ── HOOK no saveData para mostrar sync indicator ──
+const _saveDataOriginal = saveData;
+saveData = async function(data) {
+  mostrarSync('syncing');
+  try {
+    await _saveDataOriginal(data);
+    mostrarSync('synced');
+  } catch(e) {
+    mostrarSync('hidden');
+    throw e;
+  }
+};
 
 // ── MARCAR SESSION START ──
 if (!sessionStorage.getItem('session_start')) {
