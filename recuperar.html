@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Recuperar Dados · Padawan Arthur</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #020b18; color: #e8f4fd; font-family: 'Courier New', monospace; padding: 20px; }
+h1 { color: #00d4ff; font-size: 1.1rem; margin-bottom: 16px; }
+.card { background: rgba(0,20,50,0.8); border: 1px solid rgba(0,180,255,0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.ok   { color: #39ff14; }
+.err  { color: #ff3b3b; }
+.warn { color: #ffe066; }
+.info { color: #00d4ff; }
+pre { background: #000; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 0.75rem; margin-top: 8px; white-space: pre-wrap; word-break: break-all; }
+button { width: 100%; padding: 14px; background: #00d4ff; color: #000; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 8px; }
+button:disabled { background: #333; color: #666; }
+#status { font-size: 0.9rem; line-height: 1.8; }
+</style>
+</head>
+<body>
+<h1>🔧 Recuperação de Dados · Padawan Arthur</h1>
+<div class="card" id="status">
+  <div class="info">Aguardando Firebase carregar...</div>
+</div>
+<button id="btn-recuperar" onclick="recuperar()" disabled>⏳ Aguarde...</button>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const STATUS = document.getElementById('status');
+const BTN    = document.getElementById('btn-recuperar');
+
+function log(msg, tipo) {
+  const d = document.createElement('div');
+  d.className = tipo || 'info';
+  d.innerHTML = msg;
+  STATUS.appendChild(d);
+}
+
+function logPre(label, obj) {
+  const d = document.createElement('div');
+  d.innerHTML = '<span class="warn">' + label + '</span><pre>' + JSON.stringify(obj, null, 2) + '</pre>';
+  STATUS.appendChild(d);
+}
+
+// Inicializar Firebase assim que SDKs carregarem
+window.addEventListener('load', function() {
+  try {
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+      authDomain:        "padawan-arthur.firebaseapp.com",
+      projectId:         "padawan-arthur",
+      storageBucket:     "padawan-arthur.firebasestorage.app",
+      messagingSenderId: "38758983138",
+      appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+    });
+    STATUS.innerHTML = '';
+    log('✅ Firebase pronto', 'ok');
+    BTN.disabled = false;
+    BTN.textContent = '🔄 Recuperar dados do Firebase agora';
+  } catch(e) {
+    log('❌ Erro ao inicializar Firebase: ' + e.message, 'err');
+  }
+});
+
+async function recuperar() {
+  BTN.disabled = true;
+  BTN.textContent = '⏳ Buscando dados...';
+  STATUS.innerHTML = '';
+  
+  const fs = firebase.firestore();
+  const LOCAL_KEY = 'diario_arthur_offline';
+  
+  // ── 1. Ler documento principal ──
+  log('📡 Lendo /diario/arthur...', 'info');
+  try {
+    const snap = await fs.collection('diario').doc('arthur').get();
+    
+    if (!snap.exists) {
+      log('❌ Documento não existe!', 'err');
+      BTN.disabled = false;
+      BTN.textContent = 'Tentar novamente';
+      return;
+    }
+    
+    const raw  = snap.data();
+    const { _ultimaAtualizacao, ...dados } = raw;
+    
+    log('✅ Documento encontrado!', 'ok');
+    logPre('📊 Resumo dos dados', {
+      mamadas:     (dados.mamadas    || []).length,
+      duvidas:     (dados.duvidas    || []).length,
+      eventos:     (dados.eventos    || []).length,
+      mesversario: (dados.mesversario|| []).length,
+      ultima_atualizacao: _ultimaAtualizacao
+    });
+    
+    // ── 2. Salvar em TODOS os possíveis localStorage keys ──
+    const keys = ['diario_arthur_offline', 'diario_arthur_v1', 'diario_arthur_v2'];
+    keys.forEach(k => {
+      try { localStorage.setItem(k, JSON.stringify(dados)); } catch(e) {}
+    });
+    log('✅ Dados salvos no localStorage (' + keys.join(', ') + ')', 'ok');
+    
+    // ── 3. Mostrar última mamada ──
+    if ((dados.mamadas||[]).length > 0) {
+      const ultima = dados.mamadas[0];
+      log('🍼 Última mamada: ' + ultima.data + ' ' + ultima.hora + ' — ' + ultima.tipo, 'ok');
+    }
+    
+    // ── 4. Tentar ler outros documentos ──
+    log('', 'info');
+    log('📡 Lendo outros documentos...', 'info');
+    
+    try {
+      const snapVac = await fs.collection('diario').doc('arthur_vacinas').get();
+      if (snapVac.exists) {
+        log('✅ arthur_vacinas: OK', 'ok');
+        localStorage.setItem('arthur_vacinas_offline', JSON.stringify(snapVac.data()));
+      }
+    } catch(e) { log('⚠️ arthur_vacinas: ' + e.message, 'warn'); }
+    
+    try {
+      const snapMed = await fs.collection('diario').doc('arthur_medicacao').get();
+      if (snapMed.exists) {
+        log('✅ arthur_medicacao: OK', 'ok');
+        localStorage.setItem('arthur_med_offline', JSON.stringify(snapMed.data()));
+      }
+    } catch(e) { log('⚠️ arthur_medicacao: ' + e.message, 'warn'); }
+    
+    try {
+      const snapExt = await fs.collection('diario').doc('arthur_vacinas_extras').get();
+      if (snapExt.exists) {
+        log('✅ arthur_vacinas_extras: OK', 'ok');
+        localStorage.setItem('arthur_extras_offline', JSON.stringify(snapExt.data()));
+      }
+    } catch(e) { log('⚠️ arthur_vacinas_extras: ' + e.message, 'warn'); }
+    
+    try {
+      const snapG = await fs.collection('diario').doc('arthur_guardioes').get();
+      if (snapG.exists) {
+        log('✅ arthur_guardioes: OK', 'ok');
+        localStorage.setItem('arthur_guardioes_offline', JSON.stringify(snapG.data()));
+      }
+    } catch(e) { log('⚠️ arthur_guardioes: ' + e.message, 'warn'); }
+    
+    // ── 5. Sucesso ──
+    log('', 'ok');
+    log('🎉 RECUPERAÇÃO COMPLETA!', 'ok');
+    log('Agora abra o app principal:', 'ok');
+    
+    BTN.disabled = false;
+    BTN.textContent = '▶ Abrir App Padawan Arthur';
+    BTN.onclick = function() { window.location.href = './index.html'; };
+    
+  } catch(e) {
+    log('❌ ERRO: ' + e.code + ' — ' + e.message, 'err');
+    if (e.code === 'permission-denied') {
+      log('🔒 Regras do Firestore bloqueando. Atualize as regras no console Firebase.', 'err');
+    }
+    BTN.disabled = false;
+    BTN.textContent = 'Tentar novamente';
+    BTN.onclick = recuperar;
+  }
+}
+</script>
+</body>
+</html>
