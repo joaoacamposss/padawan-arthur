@@ -66,10 +66,6 @@
     animation: splash-load 2s ease-out forwards;
     box-shadow: 0 0 8px #00d4ff;
   }
-  @keyframes rippleAnim {
-    from { transform: scale(0); opacity: 1; }
-    to   { transform: scale(2.5); opacity: 0; }
-  }
   @keyframes splash-pulse {
     0%,100% { filter: drop-shadow(0 0 8px #00d4ff); transform: scale(1); }
     50%      { filter: drop-shadow(0 0 20px #00d4ff); transform: scale(1.08); }
@@ -162,109 +158,39 @@
   header {
     position: relative; z-index: 10;
     text-align: center;
-    padding: 20px 16px 14px;
-    background: linear-gradient(180deg, rgba(0,15,40,0.98) 0%, rgba(0,10,28,0.9) 60%, transparent 100%);
+    padding: 24px 16px 16px;
+    background: linear-gradient(180deg, rgba(0,20,50,0.95) 0%, transparent 100%);
   }
 
-  /* EMBLEMA JEDI */
-  .jedi-emblem-wrap {
-    position: relative;
-    width: 110px; height: 110px;
-    margin: 0 auto 10px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .jedi-emblem-svg {
-    width: 110px; height: 110px;
-    animation: emblem-float 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 8px rgba(0,180,255,0.4));
-    transition: filter 0.3s;
-  }
-  .jedi-emblem-wrap:active .jedi-emblem-svg {
-    filter: drop-shadow(0 0 20px rgba(0,212,255,0.8));
-    transform: scale(0.96);
-  }
-  @keyframes emblem-float {
-    0%,100% { transform: translateY(0);   filter: drop-shadow(0 0 8px rgba(0,180,255,0.4)); }
-    50%      { transform: translateY(-4px); filter: drop-shadow(0 0 18px rgba(0,212,255,0.7)) drop-shadow(0 0 40px rgba(0,180,255,0.2)); }
-  }
-  .jedi-emblem-emoji {
-    font-family: 'Orbitron', monospace;
-    fill: rgba(0,212,255,0.7);
-    font-size: 18px;
-  }
-  .arthur-photo-edit {
-    position: absolute;
-    bottom: 4px; right: 4px;
-    width: 22px; height: 22px;
-    background: rgba(0,30,70,0.9);
-    border: 1px solid rgba(0,180,255,0.35);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.65rem;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .jedi-emblem-wrap:hover .arthur-photo-edit { opacity: 1; }
-
-  /* Título com linhas de sabre */
-  .jedi-title-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  .jedi-title-line {
-    flex: 1;
-    max-width: 50px;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, rgba(0,180,255,0.6));
-    border-radius: 1px;
-  }
-  .jedi-title-wrap .jedi-title-line:last-child {
-    background: linear-gradient(90deg, rgba(0,180,255,0.6), transparent);
-  }
-
-  header h1 {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(1.15rem, 4.5vw, 1.75rem);
-    font-weight: 900;
-    color: var(--white);
-    text-shadow: 0 0 20px var(--blue-neon), 0 0 50px rgba(0,180,255,0.5), 0 0 80px rgba(0,100,200,0.3);
-    letter-spacing: 0.18em;
-    margin: 0 0 6px;
-    white-space: nowrap;
-  }
-  .header-subtitle {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
-    color: rgba(0,180,255,0.45);
-    letter-spacing: 0.2em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .header-dot {
-    font-size: 0.4rem;
-    color: var(--gold);
-    opacity: 0.5;
-  }
-
-  header p.subtitle {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.52rem;
-    color: var(--gold);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 5px;
-    opacity: 0.75;
+  .header-emblem {
+    font-size: 40px;
+    filter: drop-shadow(0 0 12px var(--blue-neon));
+    animation: pulse-glow 3s ease-in-out infinite;
   }
 
   @keyframes pulse-glow {
     0%, 100% { filter: drop-shadow(0 0 8px var(--blue-neon)); }
     50% { filter: drop-shadow(0 0 20px var(--blue-neon)) drop-shadow(0 0 40px rgba(0,212,255,0.5)); }
+  }
+
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: 900;
+    color: var(--white);
+    text-shadow: 0 0 20px var(--blue-glow), 0 0 40px rgba(0,180,255,0.4);
+    letter-spacing: 0.1em;
+    margin-top: 6px;
+  }
+
+  header p.subtitle {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    opacity: 0.85;
   }
 
   /* PADAWAN META */
@@ -304,887 +230,147 @@
   }
 
   /* NAV TABS */
-
-  /* ═══════════════════════════════════════════════════════
-     UX v3 — NAVEGAÇÃO, CARDS, FORMULÁRIOS, MICRO-INTERAÇÕES
-     ═══════════════════════════════════════════════════════ */
-
-  /* ── VARIÁVEIS NOVAS ── */
-  :root {
-    --nav-h: 62px;
-    --radius-lg: 18px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --shadow-card: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
-    --shadow-glow: 0 0 20px rgba(0,180,255,0.15);
-    --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-    --color-nutricao: #00d4ff;
-    --color-cura:     #39ff14;
-    --color-jornada:  #ffe066;
-    --color-escudos:  #ff6b6b;
-    --color-holocron: #b48eff;
-  }
-
-  /* ── NAV BOTTOM — redesign completo ── */
   nav {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    z-index: 100;
+    position: relative; z-index: 10;
     display: flex;
-    background: rgba(2, 8, 20, 0.92);
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
-    border-top: 1px solid rgba(0,180,255,0.12);
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-    overflow: hidden;
-    box-shadow: 0 -4px 30px rgba(0,0,0,0.5), 0 -1px 0 rgba(0,180,255,0.08);
+    background: rgba(0,15,35,0.9);
+    border-bottom: 1px solid rgba(0,180,255,0.2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 0;
   }
   nav::-webkit-scrollbar { display: none; }
 
   nav button {
     flex: 1;
-    min-width: 0;
-    padding: 8px 4px 6px;
-    height: var(--nav-h);
+    min-width: 72px;
+    /* Touch target mínimo 44px Apple HIG */
+    padding: 10px 6px 12px;
+    min-height: 56px;
     background: none;
     border: none;
-    color: rgba(122,179,212,0.5);
+    color: var(--text-dim);
     font-family: 'Orbitron', monospace;
-    font-size: 0.48rem;
-    letter-spacing: 0.05em;
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
     cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    border-bottom: 2px solid transparent;
     white-space: nowrap;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 5px;
+    gap: 3px;
     -webkit-tap-highlight-color: transparent;
-    position: relative;
-    transition: color 0.2s var(--transition-smooth);
-    overflow: hidden;
   }
 
-  /* Ripple effect no toque */
-  nav button::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(0,180,255,0.15), transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  nav button:active::after { opacity: 1; }
-
-  nav button .nav-icon {
-    font-size: 1.35rem;
-    transition: transform 0.3s var(--transition-spring), filter 0.3s;
-    display: block;
-    line-height: 1;
-  }
-
-  nav button .nav-label {
-    font-size: 0.48rem;
-    letter-spacing: 0.06em;
-    transition: color 0.2s;
-  }
-
-  /* Indicador de aba ativa — pill no topo */
-  nav button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%) scaleX(0);
-    width: 32px;
-    height: 2px;
-    border-radius: 0 0 2px 2px;
-    background: var(--blue-neon);
-    box-shadow: 0 0 8px var(--blue-neon), 0 0 16px rgba(0,180,255,0.4);
-    transition: transform 0.35s var(--transition-spring);
-  }
+  nav button .nav-icon { font-size: 1.25rem; }
 
   nav button.active {
     color: var(--blue-neon);
-  }
-  nav button.active::before { transform: translateX(-50%) scaleX(1); }
-  nav button.active .nav-icon {
-    transform: translateY(-2px) scale(1.15);
-    filter: drop-shadow(0 0 6px var(--blue-neon));
+    border-bottom-color: var(--blue-neon);
+    background: rgba(0,212,255,0.05);
   }
 
-  /* Cores por módulo no ícone ativo */
-  nav button:nth-child(1).active { color: var(--color-holocron); }
-  nav button:nth-child(1).active::before { background: var(--color-holocron); box-shadow: 0 0 8px var(--color-holocron); }
-  nav button:nth-child(1).active .nav-icon { filter: drop-shadow(0 0 6px var(--color-holocron)); }
-
-  nav button:nth-child(2).active { color: var(--color-nutricao); }
-  nav button:nth-child(2).active::before { background: var(--color-nutricao); box-shadow: 0 0 8px var(--color-nutricao); }
-  nav button:nth-child(2).active .nav-icon { filter: drop-shadow(0 0 6px var(--color-nutricao)); }
-
-  nav button:nth-child(3).active { color: var(--color-cura); }
-  nav button:nth-child(3).active::before { background: var(--color-cura); box-shadow: 0 0 8px var(--color-cura); }
-  nav button:nth-child(3).active .nav-icon { filter: drop-shadow(0 0 6px var(--color-cura)); }
-
-  nav button:nth-child(4).active { color: var(--color-jornada); }
-  nav button:nth-child(4).active::before { background: var(--color-jornada); box-shadow: 0 0 8px var(--color-jornada); }
-  nav button:nth-child(4).active .nav-icon { filter: drop-shadow(0 0 6px var(--color-jornada)); }
-
-  nav button:nth-child(5).active { color: var(--color-escudos); }
-  nav button:nth-child(5).active::before { background: var(--color-escudos); box-shadow: 0 0 8px var(--color-escudos); }
-  nav button:nth-child(5).active .nav-icon { filter: drop-shadow(0 0 6px var(--color-escudos)); }
-
-  /* ── MAIN CONTENT — padding extra para nav fixa ── */
+  /* MAIN CONTENT */
   main {
     position: relative; z-index: 10;
     padding: 12px 14px;
     max-width: 600px;
     margin: 0 auto;
-    padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+    /* Espaço para o safe area do iPhone na base */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    min-height: calc(100vh - 120px);
   }
 
-  /* ── TAB PANEL — animação de entrada ── */
-  .tab-panel { display: none; }
-  .tab-panel.active {
-    display: block;
-    animation: tabSlideIn 0.28s var(--transition-spring) both;
-  }
-  @keyframes tabSlideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .tab-panel { display: none; animation: fadeIn 0.25s ease; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-  /* ── SUB-TABS — pill slider ── */
-  .sub-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 16px;
-    background: rgba(0,8,20,0.6);
-    border: 1px solid rgba(0,180,255,0.12);
-    border-radius: var(--radius-md);
-    padding: 4px;
-    position: relative;
-  }
-  .sub-tab {
-    flex: 1;
-    padding: 9px 6px;
-    min-height: 40px;
-    background: none;
-    border: none;
-    color: rgba(122,179,212,0.55);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: color 0.25s, background 0.25s;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    z-index: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .sub-tab.active {
-    color: var(--white);
-    background: rgba(0,180,255,0.15);
-    box-shadow: 0 0 12px rgba(0,180,255,0.1), inset 0 1px 0 rgba(0,180,255,0.2);
-  }
-  .sub-tab:not(.active):active {
-    background: rgba(0,180,255,0.07);
-    color: rgba(122,179,212,0.8);
-  }
-
-  /* ── ORBITAS STAB — mesmo sistema ── */
-  .orbitas-stab {
-    flex:1; padding:9px 6px; border-radius: var(--radius-sm); border:none;
-    background:transparent; color:rgba(122,179,212,0.55);
-    font-family:'Orbitron',monospace; font-size:0.58rem; letter-spacing:0.07em;
-    cursor:pointer; transition: color 0.25s, background 0.25s;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .orbitas-stab.active {
-    color: var(--white);
-    background: rgba(0,180,255,0.15);
-    box-shadow: 0 0 12px rgba(0,180,255,0.1), inset 0 1px 0 rgba(0,180,255,0.2);
-  }
-
-  /* ── CARDS — hierarquia visual e profundidade ── */
+  /* CARDS */
   .card {
-    background: linear-gradient(145deg,
-      rgba(6, 18, 42, 0.95) 0%,
-      rgba(3, 11, 28, 0.98) 100%);
-    border: 1px solid rgba(0,180,255,0.14);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow-card);
-    position: relative;
-    overflow: hidden;
-  }
-  /* Shimmer no topo do card */
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(0,180,255,0.3) 30%,
-      rgba(0,212,255,0.5) 50%,
-      rgba(0,180,255,0.3) 70%,
-      transparent 100%);
+    background: linear-gradient(135deg, rgba(5,25,55,0.9) 0%, rgba(3,15,35,0.95) 100%);
+    border: 1px solid rgba(0,180,255,0.2);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(0,180,255,0.08);
   }
 
-  /* ── SECTION TITLE — redesign com linha lateral ── */
+  /* SECTION TITLES */
   .section-title {
     font-family: 'Orbitron', monospace;
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     color: var(--gold);
-    letter-spacing: 0.14em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     margin-bottom: 14px;
     display: flex;
     align-items: center;
-    gap: 10px;
-  }
-  .section-title::before {
-    content: '';
-    display: block;
-    width: 3px;
-    height: 16px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, var(--gold), rgba(255,224,102,0.3));
-    flex-shrink: 0;
+    gap: 8px;
   }
   .section-title::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255,224,102,0.15), transparent);
-  }
-
-  /* ── STATS GRID ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .stat-card {
-    background: linear-gradient(145deg, rgba(0,40,90,0.6), rgba(0,18,45,0.85));
-    border: 1px solid rgba(0,180,255,0.18);
-    border-radius: var(--radius-md);
-    padding: 16px 12px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s var(--transition-spring), box-shadow 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .stat-card:active {
-    transform: scale(0.96);
-  }
-  .stat-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--blue-neon), transparent);
+    background: linear-gradient(90deg, var(--gold-dim), transparent);
     opacity: 0.4;
   }
-  .stat-value {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 2rem;
-    font-weight: 400;
-    color: var(--blue-neon);
-    text-shadow: 0 0 16px rgba(0,180,255,0.5);
-    line-height: 1;
-    margin-bottom: 6px;
-    letter-spacing: -0.02em;
-  }
-  .stat-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.45rem;
-    color: rgba(122,179,212,0.6);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    line-height: 1.3;
-  }
 
-  /* ── TODAY BANNER ── */
-  .today-banner {
-    background: linear-gradient(135deg, rgba(0,40,100,0.5), rgba(0,15,45,0.7));
-    border: 1px solid rgba(0,180,255,0.2);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
-  .today-banner::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0,180,255,0.4), transparent);
-  }
-  #relogio {
-    font-family: 'Share Tech Mono', 'Courier New', monospace;
-    font-size: 1.7rem;
-    font-weight: 400;
-    color: var(--blue-neon);
-    text-shadow: 0 0 16px rgba(0,180,255,0.65);
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
-  .today-date {
-    font-family: 'Share Tech Mono', 'Courier New', monospace;
-    font-size: 0.68rem;
-    color: rgba(0,180,255,0.55);
-    letter-spacing: 0.06em;
-    margin-top: 4px;
-  }
+  /* FORM ELEMENTS */
+  .form-group { margin-bottom: 12px; }
 
-  /* ── FEED ITEMS ── */
-  .feed-item {
-    background: rgba(4,14,32,0.85);
-    border: 1px solid rgba(0,180,255,0.12);
-    border-left: 3px solid var(--blue-glow);
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    transition: transform 0.18s var(--transition-spring),
-                box-shadow 0.18s,
-                border-color 0.18s;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-  }
-  .feed-item:active { transform: scale(0.985); }
-  .feed-item.peito    { border-left-color: #7ab3d4; }
-  .feed-item.formula  { border-left-color: #b0c4de; }
-  .feed-item.misto    { border-left-color: var(--gold); }
-  .feed-meta {
-    font-size: 0.72rem;
-    color: rgba(122,179,212,0.6);
-    margin-top: 3px;
-  }
-
-  /* ── BADGES ── */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 0.68rem;
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-  .badge-peito   { background:rgba(0,130,200,0.2);   color:#7ab3d4; border:1px solid rgba(0,130,200,0.3); }
-  .badge-formula { background:rgba(150,180,220,0.15); color:#b0c4de; border:1px solid rgba(150,180,220,0.3); }
-  .badge-misto   { background:rgba(255,224,102,0.12); color:var(--gold); border:1px solid rgba(255,224,102,0.25); }
-
-  /* ── FILTER BAR ── */
-  .filter-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    padding: 7px 13px;
-    min-height: 36px;
-    border-radius: 20px;
-    border: 1px solid rgba(0,180,255,0.18);
-    background: rgba(0,20,50,0.4);
-    color: rgba(122,179,212,0.7);
-    font-size: 0.65rem;
-    cursor: pointer;
-    font-family: 'Exo 2', sans-serif;
-    transition: all 0.2s var(--transition-smooth);
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    letter-spacing: 0.02em;
-  }
-  .filter-btn.active {
-    background: rgba(0,180,255,0.18);
-    color: var(--blue-neon);
-    border-color: rgba(0,180,255,0.4);
-    box-shadow: 0 0 10px rgba(0,180,255,0.12);
-  }
-  .filter-btn:active:not(.active) {
-    background: rgba(0,180,255,0.08);
-    transform: scale(0.96);
-  }
-
-  /* ── FORM GROUPS — inputs com foco melhorado ── */
-  .form-group {
-    margin-bottom: 14px;
-  }
-  .form-group label {
+  label {
     display: block;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
     font-family: 'Orbitron', monospace;
-    font-size: 0.58rem;
-    color: rgba(122,179,212,0.7);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 7px;
-    transition: color 0.2s;
   }
-  .form-group:focus-within label {
-    color: var(--blue-neon);
-  }
-  input[type="text"],
-  input[type="date"],
-  input[type="time"],
-  input[type="number"],
-  input[type="tel"],
-  input[type="email"],
-  select,
-  textarea {
+
+  input, select, textarea {
     width: 100%;
-    background: rgba(0,15,40,0.7);
-    border: 1px solid rgba(0,180,255,0.2);
-    border-radius: var(--radius-sm);
+    background: rgba(0,20,50,0.8);
+    border: 1px solid rgba(0,180,255,0.25);
+    border-radius: 10px;
     color: var(--white);
-    font-family: 'Exo 2', sans-serif;
+    /* Mínimo 16px para evitar zoom no iOS */
     font-size: 16px !important;
-    padding: 11px 13px;
+    font-family: 'Exo 2', sans-serif;
+    /* Touch target: altura mínima 44px */
+    min-height: 44px;
+    padding: 10px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    /* Sem aparência nativa em mobile */
     -webkit-appearance: none;
     appearance: none;
+    touch-action: manipulation;
   }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--blue-neon);
-    box-shadow: 0 0 0 3px rgba(0,180,255,0.12), 0 0 12px rgba(0,180,255,0.08);
-    background: rgba(0,22,55,0.8);
-  }
-  input:not(:placeholder-shown):not(:focus),
-  textarea:not(:placeholder-shown):not(:focus) {
-    border-color: rgba(0,180,255,0.3);
-  }
-  input::placeholder, textarea::placeholder {
-    color: rgba(122,179,212,0.35);
-    font-size: 0.85rem;
-  }
+
   select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237ab3d4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    /* Seta customizada para select */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%237ab3d4'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 12px center;
+    background-position: right 14px center;
     padding-right: 36px;
   }
-  textarea {
-    min-height: 80px;
-    resize: vertical;
-    line-height: 1.5;
-  }
 
-  /* ── BOTÕES — spring e feedback ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 18px;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(0,180,255,0.25);
-    background: rgba(0,30,70,0.6);
-    color: var(--text-dim);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: transform 0.18s var(--transition-spring),
-                box-shadow 0.18s,
-                background 0.18s,
-                border-color 0.18s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    white-space: nowrap;
-  }
-  .btn:active { transform: scale(0.94); }
-
-  .btn-primary {
-    background: linear-gradient(135deg, rgba(0,100,200,0.7), rgba(0,60,140,0.8));
-    border-color: rgba(0,180,255,0.4);
-    color: var(--white);
-    box-shadow: 0 4px 15px rgba(0,100,200,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-  }
-  .btn-primary:active {
-    transform: scale(0.94);
-    box-shadow: 0 2px 8px rgba(0,100,200,0.2);
-  }
-  .btn-gold {
-    background: linear-gradient(135deg, rgba(180,140,0,0.5), rgba(120,90,0,0.6));
-    border-color: rgba(255,224,102,0.35);
-    color: var(--gold);
-    box-shadow: 0 4px 15px rgba(180,140,0,0.15);
-  }
-  .btn-gold:active { transform: scale(0.94); }
-  .btn-danger {
-    background: rgba(255,59,59,0.15);
-    border-color: rgba(255,59,59,0.3);
-    color: var(--red-saber);
-  }
-  .btn-danger:active { transform: scale(0.94); }
-  .btn-full { width: 100%; }
-  .btn-sm { padding: 8px 12px; font-size: 0.6rem; }
-
-  /* ── ROW-2 ── */
-  .row-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .row-2 .form-group { margin-bottom: 0; }
-
-  /* ── PRESENÇA EM TEMPO REAL ── */
-  .presence-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #39ff14;
-    box-shadow: 0 0 6px #39ff14, 0 0 12px rgba(57,255,20,0.4);
-    animation: presence-pulse 2s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  .presence-dot.offline {
-    background: rgba(122,179,212,0.3);
-    box-shadow: none;
-    animation: none;
-  }
-  .presence-dot.away {
-    background: #ffe066;
-    box-shadow: 0 0 6px #ffe066;
-  }
-  @keyframes presence-pulse {
-    0%,100% { transform: scale(1);   opacity: 1; }
-    50%      { transform: scale(1.3); opacity: 0.7; }
-  }
-
-  /* Badge de presença no header do guardião logado */
-  #badge-na-online {
-    display: none;
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 8px);
-    right: 14px;
-    z-index: 200;
-    background: rgba(2,8,20,0.9);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(57,255,20,0.3);
-    border-radius: 20px;
-    padding: 5px 10px 5px 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.52rem;
-    color: #39ff14;
-    letter-spacing: 0.06em;
-    box-shadow: 0 0 12px rgba(57,255,20,0.15);
-    cursor: pointer;
-    transition: opacity 0.3s;
-  }
-  #badge-na-online.hidden { display: none !important; }
-  #badge-na-online.visible { display: flex; }
-
-  /* Toast de presença — quando o outro guardian entra */
-  .presence-toast {
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 10px);
-    left: 50%;
-    transform: translateX(-50%) translateY(-80px);
-    z-index: 99998;
-    background: linear-gradient(135deg, rgba(0,40,20,0.95), rgba(0,20,10,0.98));
-    border: 1px solid rgba(57,255,20,0.4);
-    border-radius: 24px;
-    padding: 10px 18px 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.6rem;
-    color: #39ff14;
-    letter-spacing: 0.06em;
-    box-shadow: 0 4px 20px rgba(57,255,20,0.2), 0 0 40px rgba(57,255,20,0.05);
-    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  .presence-toast.show {
-    transform: translateX(-50%) translateY(0);
-  }
-  .presence-toast.hide {
-    transform: translateX(-50%) translateY(-80px);
-    opacity: 0;
-  }
-
-  /* ── BADGES NA NAV (notificações) ── */
-  .nav-badge {
-    position: absolute;
-    top: 6px; right: 50%;
-    transform: translateX(calc(50% + 8px));
-    background: var(--red-saber);
-    color: white;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.42rem;
-    font-weight: 700;
-    min-width: 14px; height: 14px;
-    border-radius: 7px;
-    padding: 0 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid rgba(2,8,20,0.9);
-    box-shadow: 0 0 6px rgba(255,59,59,0.5);
-    pointer-events: none;
-    animation: badgePop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-  @keyframes badgePop {
-    from { transform: translateX(calc(50% + 8px)) scale(0); }
-    to   { transform: translateX(calc(50% + 8px)) scale(1); }
-  }
-
-  /* ── BOTÕES ATALHO (agora / hoje) ── */
-  .btn-atalho {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    border: 1px solid rgba(0,180,255,0.25);
-    background: rgba(0,30,70,0.5);
-    color: rgba(0,180,255,0.8);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.52rem;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
-  }
-  .btn-atalho:active {
-    background: rgba(0,180,255,0.2);
-    transform: scale(0.94);
-  }
-  .label-with-atalho {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 7px;
-  }
-  .label-with-atalho label {
-    margin-bottom: 0 !important;
-  }
-
-  /* ── INDICADOR DE SYNC ── */
-  #sync-indicator {
-    position: fixed;
-    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
-    right: 14px;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(2,8,20,0.85);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,180,255,0.2);
-    border-radius: 16px;
-    padding: 5px 10px;
-    font-family: 'Orbitron', monospace;
-    font-size: 0.5rem;
-    color: rgba(0,180,255,0.7);
-    letter-spacing: 0.06em;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-  }
-  #sync-indicator.syncing {
-    opacity: 1; transform: translateY(0);
-    color: rgba(0,180,255,0.9);
-    border-color: rgba(0,180,255,0.35);
-  }
-  #sync-indicator.synced {
-    opacity: 1; transform: translateY(0);
-    color: #39ff14;
-    border-color: rgba(57,255,20,0.3);
-  }
-  .sync-spin {
-    width: 8px; height: 8px;
-    border: 1.5px solid rgba(0,180,255,0.3);
-    border-top-color: var(--blue-neon);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    flex-shrink: 0;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── EMPTY STATE COM CTA ── */
-  .empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: rgba(122,179,212,0.5);
-  }
-  .empty-icon {
-    font-size: 2.8rem;
-    margin-bottom: 12px;
-    opacity: 0.6;
-    filter: grayscale(0.3);
-  }
-  .empty p {
-    font-size: 0.82rem;
-    line-height: 1.5;
-    margin-bottom: 14px;
-  }
-  .empty .btn-atalho-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 18px;
-    border-radius: 20px;
-    border: 1px solid rgba(0,180,255,0.3);
-    background: rgba(0,40,100,0.4);
-    color: var(--blue-neon);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.07em;
-    cursor: pointer;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .empty .btn-atalho-cta:active {
-    transform: scale(0.95);
-    background: rgba(0,60,140,0.5);
-  }
-
-  /* ── USER BADGE com presença ── */
-  #user-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: rgba(0,20,50,0.6);
-    border: 1px solid rgba(0,180,255,0.2);
-    transition: background 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #user-badge:active { background: rgba(0,40,90,0.7); }
-
-
-  /* ── FACE ID / BIOMETRIA ── */
-  .btn-faceid {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, rgba(0,60,120,0.5), rgba(0,30,70,0.6));
-    border: 1px solid rgba(0,180,255,0.4);
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'Orbitron', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.2s;
-    margin-bottom: 10px;
-    box-shadow: 0 0 14px rgba(0,180,255,0.1);
-  }
-  .btn-faceid:active {
-    transform: scale(0.97);
-    box-shadow: 0 0 20px rgba(0,180,255,0.3);
-  }
-  .btn-faceid .faceid-icon {
-    font-size: 1.4rem;
-    filter: drop-shadow(0 0 6px var(--blue-neon));
-  }
-
-  .lembrar-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 10px 0 4px;
-    cursor: pointer;
-  }
-  .lembrar-toggle {
-    width: 36px; height: 20px;
-    background: rgba(0,50,100,0.4);
-    border-radius: 10px;
-    border: 1px solid rgba(0,180,255,0.3);
-    position: relative;
-    transition: background 0.2s;
-    flex-shrink: 0;
-  }
-  .lembrar-toggle.on {
-    background: rgba(0,120,220,0.5);
+  input:focus, select:focus, textarea:focus {
     border-color: var(--blue-neon);
-    box-shadow: 0 0 8px rgba(0,180,255,0.3);
-  }
-  .lembrar-toggle::after {
-    content: '';
-    position: absolute;
-    top: 2px; left: 2px;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: rgba(0,180,255,0.5);
-    transition: transform 0.2s, background 0.2s;
-  }
-  .lembrar-toggle.on::after {
-    transform: translateX(16px);
-    background: var(--blue-neon);
-    box-shadow: 0 0 6px var(--blue-neon);
-  }
-  .lembrar-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.58rem;
-    color: var(--text-dim);
-    letter-spacing: 0.07em;
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
   }
 
-  .biometria-banner {
-    background: linear-gradient(135deg, rgba(0,40,90,0.7), rgba(0,20,50,0.8));
-    border: 1px solid rgba(0,180,255,0.3);
-    border-radius: 10px;
-    padding: 14px;
-    margin-top: 14px;
-    text-align: center;
-  }
-  .biometria-banner-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.7rem;
-    color: var(--blue-neon);
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-  }
-  .biometria-banner-sub {
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    margin-bottom: 12px;
-    line-height: 1.5;
+  select option { background: #0a2040; }
+  textarea {
+    resize: none;
+    min-height: 80px;
   }
 
-  /* ── GUARDIAN COM FACE ID ATIVO ── */
-  .guardian-biometria-badge { font-size:0.75rem; opacity:0.7; margin-left:4px; }
-
-  /* ── RECUPERADOS DO BACKUP — componentes específicos ── */
-
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
   /* Em telas muito pequenas, row-2 empilha */
@@ -1291,124 +477,6 @@
   .badge-misto { background: rgba(57,255,20,0.1); color: #7fff60; border: 1px solid rgba(57,255,20,0.3); }
 
   /* DUVIDAS */
-  .duvida-item {
-    background: rgba(3,12,28,0.8);
-    border: 1px solid rgba(255,200,0,0.2);
-    border-left: 3px solid var(--gold);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .duvida-item.respondida {
-    border-left-color: rgba(57,255,20,0.5);
-  }
-
-  .duvida-text { font-size: 0.9rem; flex: 1; }
-  .duvida-actions { display: flex; gap: 6px; }
-
-  /* AGENDA */
-  .evento-item {
-    background: rgba(3,12,28,0.8);
-    border: 1px solid rgba(0,212,255,0.2);
-    border-left: 3px solid var(--blue-neon);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .evento-item.passado { opacity: 0.45; }
-
-  .evento-date {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.65rem;
-    color: var(--blue-neon);
-    margin-top: 3px;
-  }
-
-  /* DASHBOARD */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .stat-card {
-    background: linear-gradient(135deg, rgba(0,50,100,0.5), rgba(0,20,50,0.8));
-    border: 1px solid rgba(0,180,255,0.2);
-    border-radius: 10px;
-    padding: 14px 12px;
-    text-align: center;
-  }
-
-  .stat-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 1.6rem;
-    font-weight: 900;
-    color: var(--blue-neon);
-    text-shadow: 0 0 15px var(--blue-neon);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    margin-top: 5px;
-    letter-spacing: 0.05em;
-  }
-
-  /* EMPTY STATE */
-  .empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-dim);
-  }
-  .empty .empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.4; }
-  .empty p { font-size: 0.85rem; opacity: 0.6; }
-
-  /* TOGGLE CHECKBOX */
-  /* MODAL CONFIRMAÇÃO */
-
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 9500;
-    background: rgba(0,5,15,0.92);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-    animation: fadeIn 0.2s ease;
-    overflow-y: auto;
-  }
-  .modal-box {
-    background: linear-gradient(135deg, rgba(5,25,55,0.98), rgba(3,15,35,0.99));
-    border: 1px solid rgba(255,59,59,0.4);
-    border-radius: 14px;
-    padding: 24px 20px;
-    max-width: 320px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(255,59,59,0.15), 0 8px 32px rgba(0,0,0,0.6);
-  }
-  .modal-icon { font-size: 2.2rem; margin-bottom: 10px; }
-  .modal-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.85rem;
-    color: #ff6b6b;
-    letter-spacing: 0.1em;
-    margin-bottom: 8px;
-  }
-  .modal-msg { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5; }
-  .modal-btns { display: flex; gap: 10px; justify-content: center; }
-
-  /* SUB-ABAS DÚVIDAS */
-
   .duvida-item {
     background: rgba(3,12,28,0.8);
     border: 1px solid rgba(255,200,0,0.2);
@@ -1907,6 +975,102 @@
   }
   .btn-del-vac-extra:hover { background: rgba(200,30,30,0.35); color: #ff6b6b; }
 
+  /* ── FACE ID / BIOMETRIA ── */
+  .btn-faceid {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(0,60,120,0.5), rgba(0,30,70,0.6));
+    border: 1px solid rgba(0,180,255,0.4);
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    box-shadow: 0 0 14px rgba(0,180,255,0.1);
+  }
+  .btn-faceid:active {
+    transform: scale(0.97);
+    box-shadow: 0 0 20px rgba(0,180,255,0.3);
+  }
+  .btn-faceid .faceid-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 6px var(--blue-neon));
+  }
+
+  .lembrar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0 4px;
+    cursor: pointer;
+  }
+  .lembrar-toggle {
+    width: 36px; height: 20px;
+    background: rgba(0,50,100,0.4);
+    border-radius: 10px;
+    border: 1px solid rgba(0,180,255,0.3);
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .lembrar-toggle.on {
+    background: rgba(0,120,220,0.5);
+    border-color: var(--blue-neon);
+    box-shadow: 0 0 8px rgba(0,180,255,0.3);
+  }
+  .lembrar-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: rgba(0,180,255,0.5);
+    transition: transform 0.2s, background 0.2s;
+  }
+  .lembrar-toggle.on::after {
+    transform: translateX(16px);
+    background: var(--blue-neon);
+    box-shadow: 0 0 6px var(--blue-neon);
+  }
+  .lembrar-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 0.07em;
+  }
+
+  .biometria-banner {
+    background: linear-gradient(135deg, rgba(0,40,90,0.7), rgba(0,20,50,0.8));
+    border: 1px solid rgba(0,180,255,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 14px;
+    text-align: center;
+  }
+  .biometria-banner-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--blue-neon);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .biometria-banner-sub {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── GUARDIAN COM FACE ID ATIVO ── */
+  .guardian-biometria-badge { font-size:0.75rem; opacity:0.7; margin-left:4px; }
 
   /* ── RELATÓRIO DIÁRIO ── */
   .btn-relatorio-diario {
@@ -2620,173 +1784,29 @@
 </div>
 
 <header>
-
-  <!-- ══════════════════════════════════════════════════════
-       LOGO PADAWAN ARTHUR — Emblema da Ordem Jedi Padawan
-       ═══════════════════════════════════════════════════ -->
-  <div class="jedi-emblem-wrap" onclick="abrirFotoArthur()">
-    <svg class="jedi-emblem-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Gradientes -->
-        <radialGradient id="bgGrad" cx="50%" cy="35%" r="65%">
-          <stop offset="0%"   stop-color="#0d2a5e"/>
-          <stop offset="60%"  stop-color="#060f28"/>
-          <stop offset="100%" stop-color="#020810"/>
-        </radialGradient>
-        <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stop-color="rgba(0,212,255,0.22)"/>
-          <stop offset="70%"  stop-color="rgba(0,100,200,0.06)"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="swordGrad" cx="50%" cy="0%" r="100%">
-          <stop offset="0%"   stop-color="#ffffff"/>
-          <stop offset="25%"  stop-color="#00d4ff"/>
-          <stop offset="70%"  stop-color="#0080cc"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%"   stop-color="#fff7aa"/>
-          <stop offset="50%"  stop-color="#ffe066"/>
-          <stop offset="100%" stop-color="#b08000"/>
-        </radialGradient>
-        <linearGradient id="hiltGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#2a4a8a"/>
-          <stop offset="100%" stop-color="#0a1a40"/>
-        </linearGradient>
-        <!-- Filtros de glow -->
-        <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glowStrong" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="5" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="glowGold" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.6)"/>
-        </filter>
-      </defs>
-
-      <!-- ── Anéis externos ── -->
-      <circle cx="80" cy="80" r="76" fill="none" stroke="rgba(0,180,255,0.08)" stroke-width="1"/>
-      <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(0,180,255,0.12)" stroke-width="0.5"/>
-      <!-- Marcadores dos 8 pontos cardeais -->
-      <g stroke="rgba(0,180,255,0.35)" stroke-width="1.2">
-        <line x1="80" y1="4"  x2="80" y2="12"/>   <!-- N -->
-        <line x1="80" y1="148" x2="80" y2="156"/>  <!-- S -->
-        <line x1="4"  y1="80" x2="12" y2="80"/>    <!-- W -->
-        <line x1="148" y1="80" x2="156" y2="80"/>  <!-- E -->
-        <line x1="26.3" y1="26.3" x2="31.9" y2="31.9"/>  <!-- NW -->
-        <line x1="128.1" y1="26.3" x2="133.7" y2="31.9"/> <!-- NE -->
-        <line x1="26.3" y1="133.7" x2="31.9" y2="128.1"/> <!-- SW -->
-        <line x1="128.1" y1="133.7" x2="133.7" y2="128.1"/> <!-- SE -->
-      </g>
-
-      <!-- ── Disco principal ── -->
-      <circle cx="80" cy="80" r="70" fill="url(#bgGrad)" stroke="rgba(0,180,255,0.4)" stroke-width="1.5"/>
-      <!-- Anel decorativo interno -->
-      <circle cx="80" cy="80" r="64" fill="none" stroke="rgba(0,180,255,0.08)" stroke-width="0.8" stroke-dasharray="4,6"/>
-      <!-- Glow interno -->
-      <circle cx="80" cy="80" r="55" fill="url(#innerGlow)"/>
-
-      <!-- ══════════════════════════════════════════
-           SÍMBOLO DA ORDEM JEDI
-           ═══════════════════════════════════════ -->
-
-      <!-- ── Elipse central (corpo do emblema Jedi) ── -->
-      <ellipse cx="80" cy="80" rx="18" ry="28"
-        fill="none" stroke="url(#goldGrad)" stroke-width="2"
-        filter="url(#glowGold)"/>
-
-      <!-- ── Asas laterais (o símbolo Jedi tem duas "asas" curvas) ── -->
-      <!-- Asa esquerda -->
-      <path d="M62 80 C48 60, 38 52, 36 44 C34 36, 42 30, 52 34 C56 36, 60 42, 62 52"
-        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
-        filter="url(#glowGold)"/>
-      <!-- Ponta asa esquerda inferior -->
-      <path d="M62 80 C50 92, 40 96, 38 108 C36 118, 44 122, 54 116 C58 113, 61 108, 62 100"
-        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
-        filter="url(#glowGold)"/>
-      <!-- Asa direita (espelho) -->
-      <path d="M98 80 C112 60, 122 52, 124 44 C126 36, 118 30, 108 34 C104 36, 100 42, 98 52"
-        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
-        filter="url(#glowGold)"/>
-      <!-- Ponta asa direita inferior -->
-      <path d="M98 80 C110 92, 120 96, 122 108 C124 118, 116 122, 106 116 C102 113, 99 108, 98 100"
-        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
-        filter="url(#glowGold)"/>
-
-      <!-- ── Sabre de luz central — lâmina AZUL ── -->
-      <!-- Brilho da lâmina (camada mais larga, baixa opacidade) -->
-      <rect x="78" y="20" width="4" height="52" rx="2"
-        fill="rgba(0,212,255,0.25)" filter="url(#glowStrong)"/>
-      <!-- Lâmina principal -->
-      <rect x="79" y="20" width="2" height="52" rx="1"
-        fill="url(#swordGrad)" filter="url(#glowBlue)"/>
-      <!-- Ponta da lâmina -->
-      <path d="M79 20 L80 14 L81 20Z" fill="rgba(255,255,255,0.9)" filter="url(#glowBlue)"/>
-
-      <!-- Cabo do sabre (hilt) -->
-      <rect x="76.5" y="72" width="7" height="20" rx="2.5"
-        fill="url(#hiltGrad)" stroke="rgba(0,180,255,0.5)" stroke-width="1"/>
-      <!-- Detalhes do cabo -->
-      <rect x="75.5" y="76" width="9" height="1.5" rx="0.75" fill="rgba(0,212,255,0.6)"/>
-      <rect x="75.5" y="80" width="9" height="1"   rx="0.5"  fill="rgba(0,212,255,0.4)"/>
-      <rect x="75.5" y="83.5" width="9" height="1" rx="0.5"  fill="rgba(0,212,255,0.3)"/>
-      <!-- Cristal da empunhadura (ponto de luz) -->
-      <circle cx="80" cy="78" r="1.5" fill="rgba(0,212,255,0.9)" filter="url(#glowBlue)"/>
-      <!-- Guarda -->
-      <rect x="72" y="70" width="16" height="3" rx="1.5"
-        fill="#1a3a6a" stroke="rgba(0,180,255,0.6)" stroke-width="0.8"/>
-      <!-- Detalhes da guarda -->
-      <circle cx="72.5" cy="71.5" r="1.2" fill="rgba(0,212,255,0.7)"/>
-      <circle cx="87.5" cy="71.5" r="1.2" fill="rgba(0,212,255,0.7)"/>
-
-      <!-- ── Estrelas decorativas (fundo espacial) ── -->
-      <g fill="rgba(255,255,255,0.7)">
-        <circle cx="28" cy="35" r="0.8"/>
-        <circle cx="132" cy="35" r="0.8"/>
-        <circle cx="22" cy="80" r="0.6"/>
-        <circle cx="138" cy="80" r="0.6"/>
-        <circle cx="45" cy="125" r="0.7"/>
-        <circle cx="115" cy="125" r="0.7"/>
-        <circle cx="35" cy="110" r="0.5"/>
-        <circle cx="125" cy="110" r="0.5"/>
-      </g>
-
-      <!-- ── Foto do Arthur (se tiver) ── -->
-      <image id="arthur-emblem-img" href="" x="62" y="94" width="36" height="36" clip-path="url(#arthurClip)" style="display:none"/>
-      <clipPath id="arthurClip"><circle cx="80" cy="112" r="18"/></clipPath>
-      <!-- Emoji fallback -->
-      <text id="arthur-emblem-emoji" x="80" y="120" text-anchor="middle" font-size="22" class="jedi-emblem-emoji">🌟</text>
-
-      <!-- ── Editar foto overlay ── -->
-      <g class="arthur-photo-edit" opacity="0">
-        <circle cx="80" cy="112" r="18" fill="rgba(0,0,0,0.55)"/>
-        <text x="80" y="117" text-anchor="middle" font-size="14">✏️</text>
-      </g>
-    </svg>
+  <!-- Foto do Arthur -->
+  <div class="arthur-photo-wrap" onclick="abrirFotoArthur()">
+    <div class="arthur-photo" id="arthur-photo-el">
+      <span id="arthur-photo-emoji">🛸</span>
+      <img id="arthur-photo-img" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </div>
+    <div class="arthur-photo-edit">✏️</div>
   </div>
-
-  <!-- Título -->
   <h1>PADAWAN ARTHUR</h1>
-  <div class="header-subtitle">
-    <span class="header-dot">◆</span>
-    ARQUIVOS DA ORDEM JEDI
-    <span class="header-dot">◆</span>
-    PRIMEIRA GALÁXIA
+  <div class="padawan-meta">
+    <span class="pm-nasc" id="hdr-nascimento">12/03/2026</span>
+    <span class="pm-sep">·</span>
+    <span class="pm-idade" id="hdr-idade">—</span>
   </div>
-
-  <div id="hdr-info" style="display:flex;align-items:center;gap:14px;justify-content:center;margin-top:8px;font-family:'Orbitron',monospace;font-size:0.62rem;color:rgba(0,180,255,0.55);letter-spacing:0.08em">
-    <span id="hdr-nascimento">12/03/2026</span>
-    <span style="color:rgba(0,180,255,0.25)">·</span>
-    <span id="hdr-idade" style="color:var(--gold)"></span>
+  <p class="subtitle">Arquivos da Ordem Jedi · Primeira Galáxia</p>
+  <div class="user-badge" id="user-badge" title="Opções do Guardião">
+    <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)" style="overflow:hidden;position:relative">
+      <span id="ubadge-emoji">?</span>
+      <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </div>
+    <span class="user-badge-name" id="user-badge-name" onclick="abrirMenuGuardiao(event)">—</span>
+    <span class="user-badge-exit" onclick="sairSessao()" title="Sair" style="cursor:pointer;padding:4px">↩</span>
   </div>
-
 </header>
 
 <!-- MENU GUARDIÃO — fora do header para evitar stacking context -->
@@ -2817,44 +1837,21 @@
 
 <div class="saber-line"></div>
 
-<!-- Badge: outro guardião online -->
-<div id="badge-na-online" class="hidden">
-  <div class="presence-dot"></div>
-  <span id="badge-na-nome">Ná</span> online
-</div>
-
-<!-- Toast de presença -->
-<div id="presence-toast" class="presence-toast">
-  <span id="presence-toast-emoji">👩</span>
-  <span id="presence-toast-msg">Ná entrou nas Crônicas</span>
-</div>
-
-<!-- Sync indicator -->
-<div id="sync-indicator">
-  <div class="sync-spin" id="sync-spin"></div>
-  <span id="sync-text">SINCRONIZANDO</span>
-</div>
-
 <nav>
   <button class="active" onclick="showTab('dashboard')">
-    <span class="nav-icon">🌌</span>
-    <span class="nav-label">Holocron</span>
+    <span class="nav-icon">🌌</span>Holocron
   </button>
   <button onclick="showTab('mamadas')">
-    <span class="nav-icon">🍼</span>
-    <span class="nav-label">Energia</span>
+    <span class="nav-icon">🍼</span>Fonte de Energia
   </button>
   <button onclick="showTab('agenda')">
-    <span class="nav-icon">🩺</span>
-    <span class="nav-label">Cura</span>
+    <span class="nav-icon">🩺</span>Ordem da Cura
   </button>
   <button onclick="showTab('mesversario')">
-    <span class="nav-icon">📈</span>
-    <span class="nav-label">Jornada</span>
+    <span class="nav-icon">📈</span>Jornada
   </button>
   <button onclick="showTab('vacinas')">
-    <span class="nav-icon">🛡️</span>
-    <span class="nav-label">Escudos</span>
+    <span class="nav-icon">🛡️</span>Escudos
   </button>
 </nav>
 
@@ -2915,17 +1912,11 @@
       <div class="section-title">🍼 Recarga de Energia do Padawan</div>
       <div class="row-2">
         <div class="form-group">
-          <div class="label-with-atalho">
-            <label>Ciclo Galáctico</label>
-            <button class="btn-atalho" onclick="document.getElementById('m-data').value=todayISO()">📅 Hoje</button>
-          </div>
+          <label>Ciclo Galáctico</label>
           <input type="date" id="m-data">
         </div>
         <div class="form-group">
-          <div class="label-with-atalho">
-            <label>Hora-Padrão</label>
-            <button class="btn-atalho" onclick="document.getElementById('m-hora').value=nowTime()">⏱ Agora</button>
-          </div>
+          <label>Hora-Padrão</label>
           <input type="time" id="m-hora">
         </div>
       </div>
@@ -3004,17 +1995,11 @@
         </div>
         <div class="row-2">
           <div class="form-group">
-            <div class="label-with-atalho">
-              <label>Ciclo Galáctico</label>
-              <button class="btn-atalho" onclick="document.getElementById('a-data').value=todayISO()">📅 Hoje</button>
-            </div>
+            <label>Ciclo Galáctico</label>
             <input type="date" id="a-data">
           </div>
           <div class="form-group">
-            <div class="label-with-atalho">
-              <label>Hora-Padrão</label>
-              <button class="btn-atalho" onclick="document.getElementById('a-hora').value=nowTime()">⏱ Agora</button>
-            </div>
+            <label>Hora-Padrão</label>
             <input type="time" id="a-hora">
           </div>
         </div>
@@ -3259,10 +2244,7 @@
         </div>
         <div class="row-2">
           <div class="form-group">
-            <div class="label-with-atalho">
-              <label>Ciclo Galáctico</label>
-              <button class="btn-atalho" onclick="document.getElementById('cresc-data').value=todayISO()">📅 Hoje</button>
-            </div>
+            <label>Ciclo Galáctico</label>
             <input type="date" id="cresc-data">
           </div>
           <div class="form-group">
@@ -4235,27 +3217,15 @@ function fazerLogin(id) {
   document.getElementById('tela-login').style.display = 'none';
   atualizarBadge();
   iniciarAutoLock();
-
-  // Carregar localStorage imediatamente (sem esperar Firebase)
-  try {
-    const lsRaw = localStorage.getItem(LOCAL_KEY);
-    if (lsRaw) {
-      const lsDados = JSON.parse(lsRaw);
-      const temDados = (lsDados.mamadas||[]).length + (lsDados.eventos||[]).length
-                     + (lsDados.duvidas||[]).length + (lsDados.mesversario||[]).length;
-      if (temDados > 0) {
-        db = lsDados;
-        renderAll();
-      }
-    }
-  } catch(e) {}
-
-  // Iniciar sync em tempo real — onSnapshot vai atualizar db quando Firebase responder
-  iniciarSyncTempoReal();
-
-  setTimeout(() => verificarNovidades(id), 1000);
-  setTimeout(() => initPresence(id), 1500);
-  setTimeout(() => mostrarBannerFaceID(id), 2000);
+  // Carrega dados e inicia sync em tempo real
+  loadData().then(d => {
+    db = d;
+    renderAll();
+    iniciarSyncTempoReal();
+    setTimeout(() => verificarNovidades(id), 1000);
+    // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
+    setTimeout(() => mostrarBannerFaceID(id), 2000);
+  });
   // Sync crescimento do Firebase
   try {
     EXTRAS_REF.get().then(snap => {
@@ -4284,11 +3254,6 @@ function fazerLogin(id) {
 }
 
 function sairSessao() {
-  // Limpar presença
-  if (typeof PRESENCE_REF !== 'undefined' && PRESENCE_REF && usuarioAtual) {
-    try { PRESENCE_REF.set({ [usuarioAtual]: { online: false, ts: Date.now() } }, { merge: true }); } catch(e) {}
-  }
-  if (typeof _presenceHeartbeat !== 'undefined') clearInterval(_presenceHeartbeat);
   const id = usuarioAtual;
   usuarioAtual = null;
   _pinAtual = '';
@@ -4527,53 +3492,18 @@ window.addEventListener('offline', () => mostrarStatusConexao(false));
 const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
-  // Tentar até 3 vezes com delay entre tentativas
-  for (let tentativa = 1; tentativa <= 3; tentativa++) {
-    try {
-      if (!DOC_REF) throw new Error('DOC_REF nao inicializado');
-      const snap = await DOC_REF.get();
-
-      if (snap.exists) {
-        const raw   = snap.data();
-        const { _ultimaAtualizacao, ...dados } = raw;
-        const n = (dados.mamadas||[]).length + (dados.eventos||[]).length
-                + (dados.duvidas||[]).length + (dados.mesversario||[]).length;
-
-        if (n > 0) {
-          // Firebase tem dados reais — salvar e retornar
-          localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
-          return dados;
-        }
-        // Firebase retornou doc vazio — verificar cache local
-        const lsRaw = localStorage.getItem(LOCAL_KEY);
-        if (lsRaw) {
-          try {
-            const lsDados = JSON.parse(lsRaw);
-            const nLocal  = (lsDados.mamadas||[]).length + (lsDados.eventos||[]).length;
-            if (nLocal > 0) return lsDados;
-          } catch(ep) {}
-        }
-        // Firebase vazio E cache local vazio — aguardar e tentar de novo
-        if (tentativa < 3) {
-          await new Promise(r => setTimeout(r, 1500 * tentativa));
-          continue;
-        }
-        return dados;
-      }
-
-    } catch(e) {
-      // Firebase falhou — cache local
-      const lsRaw = localStorage.getItem(LOCAL_KEY);
-      if (lsRaw) { try { return JSON.parse(lsRaw); } catch(ep) {} }
-      if (tentativa < 3) {
-        await new Promise(r => setTimeout(r, 1500 * tentativa));
-        continue;
-      }
+  try {
+    const snap = await DOC_REF.get();
+    if (snap.exists) {
+      const { _ultimaAtualizacao, ...dados } = snap.data();
+      // Salva cache local sem o metadado de atualização
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
+      return dados;
     }
+  } catch(e) {
+    const cache = localStorage.getItem(LOCAL_KEY);
+    if (cache) return JSON.parse(cache);
   }
-  // Última tentativa: cache local
-  const lsRaw = localStorage.getItem(LOCAL_KEY);
-  if (lsRaw) { try { return JSON.parse(lsRaw); } catch(e) {} }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
 
@@ -4602,31 +3532,21 @@ async function saveData(data) {
 
 // Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
 function iniciarSyncTempoReal() {
-  if (!DOC_REF) return;
   DOC_REF.onSnapshot(snap => {
     if (!snap.exists) return;
     const novos = snap.data();
-    const { _ultimaAtualizacao: _ignore, ...dadosFirebase } = novos;
-
-    // Contar dados no Firebase
-    const nFb = (dadosFirebase.mamadas    ||[]).length
-              + (dadosFirebase.duvidas    ||[]).length
-              + (dadosFirebase.eventos    ||[]).length
-              + (dadosFirebase.mesversario||[]).length;
-
-    if (nFb === 0) {
-      // Firebase retornou vazio — não sobrescrever dados locais
-      return;
+    // Remove metadado antes de comparar — _ultimaAtualizacao não é dado do app
+    const { _ultimaAtualizacao: _a, ...dadosNovos } = novos;
+    const { _ultimaAtualizacao: _b, ...dadosLocais } = db;
+    const local  = JSON.stringify(dadosLocais);
+    const remoto = JSON.stringify(dadosNovos);
+    // Só atualiza se os dados reais são diferentes (evita loop por _ultimaAtualizacao)
+    if (local !== remoto) {
+      db = dadosNovos;
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosNovos));
+      if (usuarioAtual) renderAll();
     }
-
-    // Firebase tem dados — atualizar db e salvar no localStorage
-    db = dadosFirebase;
-    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosFirebase)); } catch(e) {}
-
-    // Renderizar se usuário estiver logado
-    if (usuarioAtual) renderAll();
-
-  }, err => { /* Firebase offline — dados já carregados do localStorage */ });
+  }, err => console.warn('Sync error:', err));
 }
 
 // Carregamento async dos dados
@@ -5387,31 +4307,12 @@ function renderAgenda() {
 }
 
 // ── DASHBOARD ──
-// ── HELPER ml real de uma mamada (resolve bug misto) ──
-function mlReal(m) {
-  if (m.tipo === 'misto') {
-    const p = m.ml_peito   ? parseInt(m.ml_peito)   : 0;
-    const f = m.ml_formula ? parseInt(m.ml_formula) : 0;
-    if (p + f > 0) return p + f;
-    return m.ml ? parseInt(m.ml) : 0;
-  }
-  if (m.tipo === 'peito') {
-    if (m.ml_peito)   return parseInt(m.ml_peito);
-    return m.ml ? parseInt(m.ml) : 0;
-  }
-  if (m.tipo === 'formula') {
-    if (m.ml_formula) return parseInt(m.ml_formula);
-    return m.ml ? parseInt(m.ml) : 0;
-  }
-  return m.ml ? parseInt(m.ml) : 0;
-}
-
 function renderDashboard() {
   const hoje = todayISO();
 
   // Stats
   const mamadasHoje = db.mamadas.filter(m => m.data === hoje);
-  const mlHoje = mamadasHoje.reduce((s, m) => s + mlReal(m), 0);
+  const mlHoje = mamadasHoje.reduce((s, m) => s + (m.ml || 0), 0);
   const duvidaPend = db.duvidas.filter(d => !d.respondida).length;
   const proxEv = db.eventos.filter(e => e.data >= hoje).length;
 
@@ -5419,8 +4320,6 @@ function renderDashboard() {
   document.getElementById('stat-ml').textContent = mlHoje;
   document.getElementById('stat-duvidas').textContent = duvidaPend;
   document.getElementById('stat-agenda').textContent = proxEv;
-  // Atualizar badges da nav
-  if (typeof atualizarNavBadges === 'function') atualizarNavBadges();
 
   // Feed recente — 3 mamadas mais recentes (ordenadas)
   const recentes = ordenarMamadas(db.mamadas).slice(0, 3);
@@ -7778,14 +6677,13 @@ function renderRelatorio() {
 
   // Calcular totais
   const totalMamadas = mamadasDia.length;
-  const totalMl      = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
-  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + mlReal(m), 0);
-  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + mlReal(m), 0);
-  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + mlReal(m), 0);
+  const totalMl      = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
+  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + (m.ml||0), 0);
+  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + (m.ml||0), 0);
+  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (m.ml||0), 0);
   const nPeito       = mamadasDia.filter(m => m.tipo === 'peito').length;
   const nFormula     = mamadasDia.filter(m => m.tipo === 'formula').length;
   const nMisto       = mamadasDia.filter(m => m.tipo === 'misto').length;
-  // ml do componente peito/formula dentro das mamadas misto
   const mlMistoPeito   = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_peito)||0),   0);
   const mlMistoFormula = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_formula)||0), 0);
 
@@ -7841,9 +6739,9 @@ function renderRelatorio() {
 
     <!-- Por tipo -->
     <div class="rel-section-title">⚡ Distribuição por Fonte</div>
-    ${(nPeito > 0 || mlMistoPeito > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${nPeito}× ${mlPeito > 0 ? '· ' + mlPeito + ' ml' : ''}${mlMistoPeito > 0 ? '<span style="font-size:0.62rem;opacity:0.6"> (incl. ' + mlMistoPeito + 'ml de combos)</span>' : ''}</span></div>` : ''}
-    ${(nFormula > 0 || mlMistoFormula > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula Alquímica</span><span class="rel-stat-value">${nFormula}× ${mlFormula > 0 ? '· ' + mlFormula + ' ml' : ''}${mlMistoFormula > 0 ? '<span style="font-size:0.62rem;opacity:0.6"> (incl. ' + mlMistoFormula + 'ml de combos)</span>' : ''}</span></div>` : ''}
-    ${nMisto   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">✨ Combinação da Força</span><span class="rel-stat-value">${nMisto}× ${mlMisto > 0 ? '· ' + mlMisto + ' ml total' : ''}</span></div>` : ''}
+    ${nPeito   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${nPeito}× ${mlPeito > 0 ? '· ' + mlPeito + ' ml' : ''}</span></div>` : ''}
+    ${nFormula > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula Alquímica</span><span class="rel-stat-value">${nFormula}× ${mlFormula > 0 ? '· ' + mlFormula + ' ml' : ''}</span></div>` : ''}
+    ${nMisto   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">✨ Combinação da Força</span><span class="rel-stat-value">${nMisto}× ${mlMisto > 0 ? '· ' + mlMisto + ' ml' : ''}</span></div>` : ''}
 
     <!-- Horários -->
     <div class="rel-section-title">⏱️ Cronologia das Recargas</div>
@@ -7876,11 +6774,7 @@ function copiarRelatorio() {
 
   const mamadasDia = (db.mamadas || []).filter(m => m.data === dataISO);
   const ordenadas  = ordenarMamadas(mamadasDia);
-  const totalMl    = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
-  const mlMistoP   = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_peito)||0), 0);
-  const mlMistoF   = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_formula)||0), 0);
-  const mlPeito    = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + mlReal(m), 0) + mlMistoP;
-  const mlFormula  = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + mlReal(m), 0) + mlMistoF;
+  const totalMl    = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
   const nPeito     = mamadasDia.filter(m => m.tipo === 'peito').length;
   const nFormula   = mamadasDia.filter(m => m.tipo === 'formula').length;
   const nMisto     = mamadasDia.filter(m => m.tipo === 'misto').length;
@@ -7892,8 +6786,8 @@ function copiarRelatorio() {
   texto += `⚡ RECARGAS DE ENERGIA: ${mamadasDia.length}\n`;
   if (totalMl > 0) texto += `💧 Total de energia vital: ${totalMl} ml\n`;
   texto += `\n`;
-  if (nPeito > 0 || mlMistoP > 0) texto += `🤱 Fonte Natural: ${nPeito}× ${mlPeito > 0 ? '· ' + mlPeito + ' ml' : ''}\n`;
-  if (nFormula > 0 || mlMistoF > 0) texto += `🥛 Fórmula Alquímica: ${nFormula}× ${mlFormula > 0 ? '· ' + mlFormula + ' ml' : ''}\n`;
+  if (nPeito   > 0) texto += `🤱 Fonte Natural: ${nPeito}×\n`;
+  if (nFormula > 0) texto += `🥛 Fórmula Alquímica: ${nFormula}×\n`;
   if (nMisto   > 0) texto += `✨ Combinação da Força: ${nMisto}×\n`;
   texto += `\n📜 CRÔNICA DETALHADA:\n`;
 
@@ -7919,319 +6813,6 @@ function copiarRelatorio() {
       });
   } else {
     prompt('Copie o relatório abaixo:', texto);
-  }
-}
-
-// ══════════════════════════════════════════════════════════════
-// UX v3.1 — PRESENÇA, BADGES NAV, SYNC, SWIPE
-// ══════════════════════════════════════════════════════════════
-
-// ── SISTEMA DE PRESENÇA EM TEMPO REAL ──
-let PRESENCE_REF = null;
-let _presenceHeartbeat = null;
-let _outroGuardiaoOnline = false;
-
-function initPresence(userId) {
-  if (!window._firebaseReady || !window.firebase) return;
-  try {
-    const fs  = firebase.firestore();
-    const rtdb = firebase.database ? firebase.database() : null;
-
-    // Usar Firestore como fallback (sem RTDB)
-    // Gravar presença no Firestore com TTL de 30s
-    PRESENCE_REF = fs.collection('diario').doc('arthur_presence');
-
-    function marcarOnline() {
-      const nome = GUARDIOES[userId]?.nome || userId;
-      try {
-        PRESENCE_REF.set({
-          [userId]: {
-            online:   true,
-            nome,
-            emoji:    GUARDIOES[userId]?.emoji || '⚔️',
-            ts:       Date.now(),
-            ttl:      Date.now() + 35000,
-          }
-        }, { merge: true });
-      } catch(e) {}
-    }
-
-    function marcarOffline() {
-      try {
-        PRESENCE_REF.set({
-          [userId]: { online: false, ts: Date.now() }
-        }, { merge: true });
-      } catch(e) {}
-    }
-
-    // Heartbeat a cada 25s (TTL 35s = 10s de margem)
-    marcarOnline();
-    _presenceHeartbeat = setInterval(marcarOnline, 25000);
-
-    // Marcar offline ao sair
-    window.addEventListener('beforeunload', marcarOffline);
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        marcarOffline();
-        clearInterval(_presenceHeartbeat);
-      } else {
-        marcarOnline();
-        _presenceHeartbeat = setInterval(marcarOnline, 25000);
-      }
-    });
-
-    // Listener de presença dos outros
-    PRESENCE_REF.onSnapshot(snap => {
-      if (!snap.exists) return;
-      const data = snap.data();
-      const agora = Date.now();
-      let alguemOnline = false;
-
-      Object.entries(data).forEach(([uid, info]) => {
-        if (uid === userId) return; // ignorar a si mesmo
-        const online = info.online && info.ttl > agora;
-        if (online) {
-          alguemOnline = true;
-          // Se acabou de entrar (nos últimos 5s)
-          const recemEntrou = info.ts > agora - 5000;
-          if (recemEntrou && !_outroGuardiaoOnline) {
-            mostrarToastPresenca(info.nome, info.emoji);
-          }
-          atualizarBadgePresenca(info.nome, info.emoji, true);
-        }
-      });
-
-      if (!alguemOnline) {
-        atualizarBadgePresenca('', '', false);
-      }
-      _outroGuardiaoOnline = alguemOnline;
-    }, () => {});
-
-  } catch(e) {}
-}
-
-function atualizarBadgePresenca(nome, emoji, online) {
-  const badge = document.getElementById('badge-na-online');
-  const nomeEl = document.getElementById('badge-na-nome');
-  if (!badge) return;
-  if (online) {
-    if (nomeEl) nomeEl.textContent = nome;
-    const dot = badge.querySelector('.presence-dot');
-    if (dot) dot.className = 'presence-dot';
-    badge.className = 'visible';
-  } else {
-    badge.className = 'hidden';
-  }
-}
-
-function mostrarToastPresenca(nome, emoji) {
-  const toast   = document.getElementById('presence-toast');
-  const emojiEl = document.getElementById('presence-toast-emoji');
-  const msgEl   = document.getElementById('presence-toast-msg');
-  if (!toast) return;
-  if (emojiEl) emojiEl.textContent = emoji || '⚔️';
-  if (msgEl)   msgEl.textContent   = `${nome} entrou nas Crônicas`;
-  toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-    toast.classList.add('hide');
-    setTimeout(() => toast.classList.remove('hide'), 400);
-  }, 3500);
-}
-
-// ── SYNC INDICATOR ──
-let _syncTimer = null;
-function mostrarSync(estado) {
-  // estado: 'syncing' | 'synced' | 'hidden'
-  const el      = document.getElementById('sync-indicator');
-  const spin    = document.getElementById('sync-spin');
-  const txt     = document.getElementById('sync-text');
-  if (!el) return;
-  clearTimeout(_syncTimer);
-  el.className = '';
-  if (estado === 'syncing') {
-    if (spin) spin.style.display = 'block';
-    if (txt)  txt.textContent = 'SINCRONIZANDO';
-    el.classList.add('syncing');
-  } else if (estado === 'synced') {
-    if (spin) spin.style.display = 'none';
-    if (txt)  txt.textContent = '✓ SINCRONIZADO';
-    el.classList.add('synced');
-    _syncTimer = setTimeout(() => { el.className = ''; }, 2000);
-  }
-}
-
-// ── BADGES DE NAV (notificações) ──
-let _navBadges = { mamadas: 0, agenda: 0, duvidas: 0 };
-
-function atualizarNavBadges() {
-  // Contar items adicionados desde o login
-  const sessionStart = parseInt(sessionStorage.getItem('session_start') || '0');
-  if (!sessionStart) return;
-
-  const novasMamadas = (db.mamadas || []).filter(m => m.id > sessionStart).length;
-  const novasDuvidas = (db.duvidas || []).filter(d => d.id > sessionStart).length;
-
-  setNavBadge('mamadas', novasMamadas);
-  setNavBadge('agenda',  novasDuvidas); // dúvidas agora estão em agenda
-}
-
-function setNavBadge(tabId, count) {
-  // Encontrar o botão da nav correspondente
-  const navBtns = document.querySelectorAll('nav button');
-  const tabMap  = ['dashboard', 'mamadas', 'agenda', 'mesversario', 'vacinas'];
-  const idx     = tabMap.indexOf(tabId);
-  if (idx < 0 || !navBtns[idx]) return;
-  const btn = navBtns[idx];
-  let badge = btn.querySelector('.nav-badge');
-  if (count > 0) {
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'nav-badge';
-      btn.appendChild(badge);
-    }
-    badge.textContent = count > 9 ? '9+' : count;
-  } else {
-    if (badge) badge.remove();
-  }
-}
-
-// Limpar badge ao entrar na aba
-const _showTabOriginalUX = showTab;
-showTab = function(id) {
-  _showTabOriginalUX(id);
-  setNavBadge(id, 0);
-};
-
-// ── SWIPE HORIZONTAL PARA TROCAR ABAS ──
-(function initSwipe() {
-  const TABS     = ['dashboard', 'mamadas', 'agenda', 'mesversario', 'vacinas'];
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchStartTime = 0;
-
-  document.addEventListener('touchstart', e => {
-    touchStartX    = e.touches[0].clientX;
-    touchStartY    = e.touches[0].clientY;
-    touchStartTime = Date.now();
-  }, { passive: true });
-
-  document.addEventListener('touchend', e => {
-    const dx   = e.changedTouches[0].clientX - touchStartX;
-    const dy   = e.changedTouches[0].clientY - touchStartY;
-    const dt   = Date.now() - touchStartTime;
-
-    // Swipe válido: > 60px horizontal, < 60px vertical, < 350ms
-    if (Math.abs(dx) < 60 || Math.abs(dy) > 60 || dt > 350) return;
-
-    // Ignorar se o target for um input/select/scroll interno
-    const target = e.target;
-    if (target.closest('input, select, textarea, .modal-overlay, .sub-tabs, .filter-bar')) return;
-    // Ignorar se houver scroll horizontal no elemento
-    const scrollable = target.closest('[style*="overflow-x"]');
-    if (scrollable) return;
-
-    // Tab ativa atual
-    const activePanel = document.querySelector('.tab-panel.active');
-    if (!activePanel) return;
-    const activeId = activePanel.id.replace('tab-', '');
-    const curIdx   = TABS.indexOf(activeId);
-    if (curIdx < 0) return;
-
-    const nextIdx = dx < 0
-      ? Math.min(curIdx + 1, TABS.length - 1)  // swipe esquerda → próxima
-      : Math.max(curIdx - 1, 0);                // swipe direita → anterior
-
-    if (nextIdx !== curIdx) {
-      showTab(TABS[nextIdx]);
-      // Feedback háptico se disponível
-      if (navigator.vibrate) navigator.vibrate(8);
-    }
-  }, { passive: true });
-})();
-
-// ── HOOK no saveData para mostrar sync indicator ──
-const _saveDataOriginal = saveData;
-saveData = async function(data) {
-  mostrarSync('syncing');
-  try {
-    await _saveDataOriginal(data);
-    mostrarSync('synced');
-  } catch(e) {
-    mostrarSync('hidden');
-    throw e;
-  }
-};
-
-// ── MARCAR SESSION START ──
-if (!sessionStorage.getItem('session_start')) {
-  sessionStorage.setItem('session_start', Date.now().toString());
-}
-
-
-// ── MICRO-INTERAÇÕES UX v3 ──
-function animateStatValues() {
-  // Animar contadores nos stat cards ao renderizar
-  document.querySelectorAll('.stat-value').forEach(el => {
-    const target = parseInt(el.textContent) || 0;
-    if (target === 0 || isNaN(target)) return;
-    let current = 0;
-    const step  = Math.ceil(target / 12);
-    const timer = setInterval(() => {
-      current = Math.min(current + step, target);
-      el.textContent = current;
-      if (current >= target) clearInterval(timer);
-    }, 40);
-  });
-}
-
-function addRipple(e) {
-  const btn = e.currentTarget;
-  const existing = btn.querySelector('.ripple');
-  if (existing) existing.remove();
-  const circle = document.createElement('span');
-  const rect   = btn.getBoundingClientRect();
-  const size   = Math.max(rect.width, rect.height);
-  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - size/2;
-  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top  - size/2;
-  circle.style.cssText = `
-    position:absolute;border-radius:50%;pointer-events:none;
-    width:${size}px;height:${size}px;left:${x}px;top:${y}px;
-    background:rgba(0,180,255,0.18);
-    animation:rippleAnim 0.45s ease-out forwards;
-    z-index:0;
-  `;
-  circle.className = 'ripple';
-  btn.style.position = btn.style.position || 'relative';
-  btn.style.overflow  = 'hidden';
-  btn.appendChild(circle);
-  setTimeout(() => circle.remove(), 500);
-}
-
-function initRipples() {
-  document.querySelectorAll('.btn-primary, .btn-gold, .btn-danger, .btn-full').forEach(btn => {
-    btn.removeEventListener('touchstart', addRipple);
-    btn.addEventListener('touchstart', addRipple, {passive:true});
-  });
-}
-
-// Sincroniza a foto/emoji do Arthur com o emblema SVG
-function syncEmblemaArthur() {
-  const fotoKey = 'arthur_foto_arthur_v1';
-  const foto    = localStorage.getItem(fotoKey);
-  const svgImg  = document.getElementById('arthur-photo-svg');
-  const svgEmoji = document.getElementById('arthur-emoji-svg');
-  const bgCircle = document.getElementById('photo-bg-circle');
-
-  if (foto && svgImg) {
-    svgImg.setAttribute('href', foto);
-    svgImg.style.display = 'block';
-    if (svgEmoji) svgEmoji.style.display = 'none';
-    if (bgCircle) bgCircle.style.display = 'none';
-  } else {
-    if (svgImg) svgImg.style.display = 'none';
-    if (svgEmoji) { svgEmoji.style.display = 'block'; svgEmoji.textContent = '⚡'; }
-    if (bgCircle) bgCircle.style.display = 'block';
   }
 }
 
