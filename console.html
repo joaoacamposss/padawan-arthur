@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<title>Console · Padawan</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#000; color:#0f0; font-family:monospace; font-size:12px; padding:10px; }
+.ok   { color:#0f0 }  .err { color:#f44 }
+.warn { color:#ff0 }  .inf { color:#0ff }
+.box  { border:1px solid #333; border-radius:4px; padding:8px; margin:6px 0; word-break:break-all; }
+h2    { color:#fff; font-size:14px; margin:12px 0 4px; border-bottom:1px solid #333; padding-bottom:4px; }
+pre   { background:#111; padding:6px; border-radius:4px; overflow-x:auto; white-space:pre-wrap; font-size:11px; }
+button { width:100%; padding:12px; background:#0a3; color:#fff; border:none; border-radius:6px; font-size:14px; font-weight:bold; margin:4px 0; cursor:pointer; }
+</style>
+</head>
+<body>
+<h2>🔍 Console · Padawan Arthur</h2>
+<div id="log"></div>
+<button onclick="rodar()">▶ EXECUTAR DIAGNÓSTICO</button>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const LOG = document.getElementById('log');
+
+function p(msg, cls) {
+  const d = document.createElement('div');
+  d.className = 'box ' + (cls||'inf');
+  d.textContent = msg;
+  LOG.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+function pre(label, obj) {
+  const d = document.createElement('div');
+  d.className = 'box warn';
+  d.innerHTML = label + '<pre>' + JSON.stringify(obj,null,2) + '</pre>';
+  LOG.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function rodar() {
+  LOG.innerHTML = '';
+  p('BUILD: 2026-04-20-CONSOLE', 'inf');
+  p('URL: ' + location.href, 'inf');
+
+  // 1. localStorage
+  p('--- 1. localStorage ---', 'warn');
+  const lsRaw = localStorage.getItem('diario_arthur_offline');
+  if (lsRaw) {
+    try {
+      const ls = JSON.parse(lsRaw);
+      p('LS mamadas.length: ' + (ls.mamadas||[]).length, (ls.mamadas||[]).length > 0 ? 'ok' : 'err');
+      p('LS eventos: ' + (ls.eventos||[]).length, 'ok');
+      p('LS duvidas: ' + (ls.duvidas||[]).length, 'ok');
+      if ((ls.mamadas||[]).length > 0) {
+        pre('LS primeira mamada:', ls.mamadas[0]);
+      }
+    } catch(e) { p('LS corrompido: ' + e, 'err'); }
+  } else {
+    p('LS VAZIO', 'err');
+  }
+
+  // 2. Firebase init
+  p('--- 2. Firebase ---', 'warn');
+  let fs;
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+        authDomain:        "padawan-arthur.firebaseapp.com",
+        projectId:         "padawan-arthur",
+        storageBucket:     "padawan-arthur.firebasestorage.app",
+        messagingSenderId: "38758983138",
+        appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+      });
+    }
+    fs = firebase.firestore();
+    p('Firebase OK', 'ok');
+  } catch(e) { p('Firebase ERRO: ' + e, 'err'); return; }
+
+  // 3. .get() direto
+  p('--- 3. DOC_REF.get() ---', 'warn');
+  try {
+    const snap = await fs.collection('diario').doc('arthur').get();
+    if (snap.exists) {
+      const d = snap.data();
+      const nMam = (d.mamadas||[]).length;
+      p('snap.exists: TRUE', 'ok');
+      p('mamadas: ' + nMam, nMam > 0 ? 'ok' : 'err');
+      p('duvidas: ' + (d.duvidas||[]).length, 'ok');
+      p('eventos: ' + (d.eventos||[]).length, 'ok');
+      p('mesversario: ' + (d.mesversario||[]).length, 'ok');
+      pre('_ultimaAtualizacao:', d._ultimaAtualizacao);
+      if (nMam > 0) {
+        pre('mamadas[0]:', d.mamadas[0]);
+        pre('mamadas[1]:', d.mamadas[1] || null);
+        // Salvar no LS
+        const { _ultimaAtualizacao:_, ...dados } = d;
+        localStorage.setItem('diario_arthur_offline', JSON.stringify(dados));
+        p('DADOS SALVOS NO LOCALSTORAGE!', 'ok');
+      }
+    } else {
+      p('snap.exists: FALSE — documento não existe!', 'err');
+    }
+  } catch(e) {
+    p('.get() ERRO: ' + e.code + ' ' + e.message, 'err');
+  }
+
+  // 4. onSnapshot
+  p('--- 4. onSnapshot ---', 'warn');
+  const unsub = fs.collection('diario').doc('arthur').onSnapshot(snap => {
+    if (!snap.exists) { p('onSnapshot: não existe', 'err'); return; }
+    const d = snap.data();
+    p('onSnapshot mamadas: ' + (d.mamadas||[]).length, (d.mamadas||[]).length > 0 ? 'ok' : 'err');
+    unsub();
+  }, e => p('onSnapshot ERRO: ' + e, 'err'));
+
+  // 5. todayISO simulado
+  p('--- 5. Datas ---', 'warn');
+  const now = new Date();
+  const hoje = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0');
+  p('hoje (local): ' + hoje, 'ok');
+  p('UTC: ' + new Date().toISOString().split('T')[0], 'ok');
+  p('timezone offset: ' + new Date().getTimezoneOffset() + 'min', 'ok');
+
+  // 6. Verificar mamadas do dia
+  const lsRaw2 = localStorage.getItem('diario_arthur_offline');
+  if (lsRaw2) {
+    try {
+      const ls = JSON.parse(lsRaw2);
+      const mamadasHoje = (ls.mamadas||[]).filter(m => m.data === hoje);
+      p('mamadas de hoje (' + hoje + '): ' + mamadasHoje.length, 'ok');
+      if ((ls.mamadas||[]).length > 0) {
+        const datas = [...new Set((ls.mamadas||[]).map(m=>m.data))].sort().reverse().slice(0,5);
+        p('últimas datas nas mamadas: ' + datas.join(', '), 'ok');
+      }
+    } catch(e) {}
+  }
+
+  p('=== DIAGNÓSTICO COMPLETO ===', 'ok');
+}
+</script>
+</body>
+</html>
