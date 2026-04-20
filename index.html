@@ -7785,6 +7785,9 @@ function renderRelatorio() {
   const nPeito       = mamadasDia.filter(m => m.tipo === 'peito').length;
   const nFormula     = mamadasDia.filter(m => m.tipo === 'formula').length;
   const nMisto       = mamadasDia.filter(m => m.tipo === 'misto').length;
+  // ml do componente peito/formula dentro das mamadas misto
+  const mlMistoPeito   = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_peito)||0),   0);
+  const mlMistoFormula = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_formula)||0), 0);
 
   // Intervalo médio entre mamadas
   let intervaloMedio = '—';
