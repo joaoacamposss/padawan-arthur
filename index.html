@@ -166,53 +166,23 @@
   /* EMBLEMA JEDI */
   .jedi-emblem-wrap {
     position: relative;
-    width: 130px; height: 130px;
-    margin: 0 auto 12px;
+    width: 110px; height: 110px;
+    margin: 0 auto 10px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
-  /* Anel externo girando lentamente */
-  .jedi-emblem-wrap::before {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    border-top-color: rgba(255,220,60,0.35);
-    border-right-color: rgba(255,220,60,0.15);
-    animation: emblem-ring-spin 12s linear infinite;
-    pointer-events: none;
-  }
-  .jedi-emblem-wrap::after {
-    content: '';
-    position: absolute;
-    inset: -12px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    border-bottom-color: rgba(0,180,255,0.2);
-    border-left-color: rgba(0,180,255,0.1);
-    animation: emblem-ring-spin 20s linear infinite reverse;
-    pointer-events: none;
-  }
   .jedi-emblem-svg {
-    width: 130px; height: 130px;
-    animation: emblem-float 5s ease-in-out infinite;
-    filter:
-      drop-shadow(0 0 10px rgba(255,200,50,0.35))
-      drop-shadow(0 0 22px rgba(0,180,255,0.25));
+    width: 110px; height: 110px;
+    animation: emblem-float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(0,180,255,0.4));
     transition: filter 0.3s;
   }
   .jedi-emblem-wrap:active .jedi-emblem-svg {
-    filter:
-      drop-shadow(0 0 20px rgba(255,200,50,0.6))
-      drop-shadow(0 0 40px rgba(0,212,255,0.5));
+    filter: drop-shadow(0 0 20px rgba(0,212,255,0.8));
     transform: scale(0.96);
   }
-  @keyframes emblem-ring-spin {
-    to { transform: rotate(360deg); }
-  }
   @keyframes emblem-float {
-    0%,100% { transform: translateY(0px);  filter: drop-shadow(0 0 10px rgba(255,200,50,0.35)) drop-shadow(0 0 20px rgba(0,180,255,0.25)); }
+    0%,100% { transform: translateY(0);   filter: drop-shadow(0 0 8px rgba(0,180,255,0.4)); }
     50%      { transform: translateY(-4px); filter: drop-shadow(0 0 18px rgba(0,212,255,0.7)) drop-shadow(0 0 40px rgba(0,180,255,0.2)); }
   }
   .jedi-emblem-emoji {
@@ -255,32 +225,13 @@
 
   header h1 {
     font-family: 'Orbitron', monospace;
-    font-size: clamp(1.2rem, 4.8vw, 1.9rem);
+    font-size: clamp(1.15rem, 4.5vw, 1.75rem);
     font-weight: 900;
     color: var(--white);
-    letter-spacing: 0.22em;
-    text-shadow:
-      0 0 10px rgba(255,255,255,0.9),
-      0 0 25px var(--blue-neon),
-      0 0 55px rgba(0,180,255,0.5),
-      0 0 90px rgba(0,100,200,0.3);
-    margin: 0 0 4px;
+    text-shadow: 0 0 20px var(--blue-neon), 0 0 50px rgba(0,180,255,0.5), 0 0 80px rgba(0,100,200,0.3);
+    letter-spacing: 0.18em;
+    margin: 0 0 6px;
     white-space: nowrap;
-    position: relative;
-  }
-  header h1::after {
-    content: '';
-    display: block;
-    width: 60%;
-    height: 1px;
-    margin: 5px auto 0;
-    background: linear-gradient(90deg,
-      transparent,
-      rgba(0,180,255,0.6) 30%,
-      rgba(0,212,255,0.9) 50%,
-      rgba(0,180,255,0.6) 70%,
-      transparent);
-    box-shadow: 0 0 8px rgba(0,212,255,0.4);
   }
   .header-subtitle {
     font-family: 'Orbitron', monospace;
@@ -428,20 +379,8 @@
   nav button .nav-icon {
     font-size: 1.35rem;
     transition: transform 0.3s var(--transition-spring), filter 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     line-height: 1;
-    width: 26px;
-    height: 26px;
-  }
-  nav button .nav-icon svg {
-    width: 22px;
-    height: 22px;
-    transition: transform 0.3s var(--transition-spring), filter 0.3s;
-  }
-  nav button.active .nav-icon svg {
-    transform: translateY(-2px) scale(1.15);
   }
 
   nav button .nav-label {
@@ -470,6 +409,7 @@
   }
   nav button.active::before { transform: translateX(-50%) scaleX(1); }
   nav button.active .nav-icon {
+    transform: translateY(-2px) scale(1.15);
     filter: drop-shadow(0 0 6px var(--blue-neon));
   }
 
@@ -635,24 +575,16 @@
     background: linear-gradient(145deg, rgba(0,40,90,0.6), rgba(0,18,45,0.85));
     border: 1px solid rgba(0,180,255,0.18);
     border-radius: var(--radius-md);
-    padding: 14px 10px 12px;
+    padding: 16px 12px;
     text-align: center;
     position: relative;
     overflow: hidden;
     transition: transform 0.2s var(--transition-spring), box-shadow 0.2s;
     -webkit-tap-highlight-color: transparent;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
   }
-  .stat-card svg { display: block; margin: 0 auto 3px; }
   .stat-card:active {
     transform: scale(0.96);
-    box-shadow: 0 0 20px rgba(0,180,255,0.15);
   }
-  .stat-card svg { display: block; }
   .stat-card::after {
     content: '';
     position: absolute;
@@ -1149,46 +1081,6 @@
     -webkit-tap-highlight-color: transparent;
   }
   #user-badge:active { background: rgba(0,40,90,0.7); }
-
-
-  /* ── HEADER TEXTO ── */
-  .hdr-sub {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.58rem;
-    color: var(--blue-neon);
-    letter-spacing: 0.14em;
-    opacity: 0.85;
-    margin-top: 2px;
-  }
-  .hdr-idade {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--gold);
-    letter-spacing: 0.06em;
-    opacity: 1;
-    text-shadow: 0 0 10px rgba(255,220,80,0.4);
-  }
-  .hdr-sub-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 2px 0;
-  }
-  .hdr-ordem {
-    font-size: 0.50rem;
-    letter-spacing: 0.20em;
-    opacity: 0.65;
-    margin-top: 2px;
-  }
-  .hdr-galaxia {
-    font-family: 'Orbitron', monospace;
-    font-size: 0.44rem;
-    color: rgba(0,180,255,0.38);
-    letter-spacing: 0.30em;
-    margin-top: 3px;
-  }
-  .saber-dot { font-size: 0.75em; opacity: 0.55; }
 
 
   /* ── FACE ID / BIOMETRIA ── */
@@ -2336,12 +2228,10 @@
     text-align: center;
   }
   .login-emblem {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 0 12px rgba(255,200,50,0.4)) drop-shadow(0 0 24px rgba(0,180,255,0.2));
-    animation: emblem-float 5s ease-in-out infinite;
-    margin-bottom: 14px;
+    font-size: 52px;
+    filter: drop-shadow(0 0 16px var(--blue-neon));
+    animation: pulse-glow 3s ease-in-out infinite;
+    margin-bottom: 12px;
   }
   .login-title {
     font-family: 'Orbitron', monospace;
@@ -2578,62 +2468,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* ── REFINAMENTOS FINAIS ── */
-
-  /* Stat cards clicáveis */
-  .stat-card {
-    cursor: pointer;
-  }
-  .stat-card svg {
-    display: block;
-    margin: 0 auto 4px;
-  }
-
-  /* Login emblem animado */
-  .login-emblem svg {
-    animation: emblem-float 5s ease-in-out infinite;
-    filter:
-      drop-shadow(0 0 8px rgba(255,200,50,0.4))
-      drop-shadow(0 0 20px rgba(0,180,255,0.2));
-  }
-
-  /* Guardian avatar badge na login */
-  .btn-guardian .guardian-avatar svg {
-    border-radius: 50%;
-  }
-
-  /* Empty states com SVG */
-  .empty svg {
-    display: block;
-    margin: 0 auto;
-  }
-
-  /* Badge Ná online — garantir posição correta com safe area */
-  #badge-na-online.visible {
-    display: flex;
-    animation: badgePop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-
-  /* Sync indicator — garantir acima da nav */
-  #sync-indicator {
-    z-index: 201;
-  }
-
-  /* Header h1 — adicionar gradiente dourado nas letras */
-  header h1 {
-    background: linear-gradient(180deg, #ffffff 0%, #e8f4fd 40%, #a8d0f0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Anéis da foto Arthur — borda dourada pulsante */
-  .jedi-emblem-wrap .foto-arthur-img {
-    border: 2px solid rgba(255,200,50,0.5) !important;
-    box-shadow: 0 0 16px rgba(255,200,50,0.3), 0 0 32px rgba(0,180,255,0.15);
-  }
-
-
   /* ── MEDIA QUERY: iPhone SE e telas < 375px ── */
   @media (max-width: 374px) {
     header h1 { font-size: 1.2rem; }
@@ -2677,70 +2511,7 @@
 <!-- ── TELA DE LOGIN ── -->
 <div id="tela-login">
   <div class="login-box">
-    <div class="login-emblem">
-      <svg viewBox="0 0 120 120" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="lgBg" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stop-color="#0d2a5e"/>
-            <stop offset="100%" stop-color="#010608"/>
-          </radialGradient>
-          <radialGradient id="lgAura" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(0,212,255,0.2)"/>
-            <stop offset="100%" stop-color="transparent"/>
-          </radialGradient>
-          <linearGradient id="lgGold" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#fffbe0"/>
-            <stop offset="40%" stop-color="#ffe566"/>
-            <stop offset="100%" stop-color="#7a5800"/>
-          </linearGradient>
-          <linearGradient id="lgSaber" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="20%" stop-color="#a0eeff"/>
-            <stop offset="100%" stop-color="#002040"/>
-          </linearGradient>
-          <filter id="lgGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <filter id="lgAuraF" x="-80%" y="-80%" width="360%" height="360%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="8"/>
-          </filter>
-        </defs>
-        <circle cx="60" cy="60" r="58" fill="url(#lgBg)" stroke="rgba(255,200,50,0.3)" stroke-width="1.2"/>
-        <circle cx="60" cy="60" r="50" fill="url(#lgAura)"/>
-        <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,200,50,0.1)" stroke-width="0.6" stroke-dasharray="2 8"/>
-        <!-- Aura dourada -->
-        <ellipse cx="60" cy="58" rx="14" ry="20" fill="#ffe566" filter="url(#lgAuraF)" opacity="0.35"/>
-        <!-- Asa esquerda -->
-        <path d="M 46 60 C 38 52,28 46,22 36 C 18 28,20 22,28 20 C 34 18,40 24,44 32 C 46 36,46 46,46 54" fill="none" stroke="url(#lgGold)" stroke-width="2" stroke-linecap="round" filter="url(#lgGlow)"/>
-        <path d="M 46 60 C 38 68,28 74,22 84 C 18 92,21 98,29 98 C 36 98,42 92,45 84 C 46 80,46 70,46 66" fill="none" stroke="url(#lgGold)" stroke-width="2" stroke-linecap="round" filter="url(#lgGlow)"/>
-        <!-- Penas esq -->
-        <g stroke="#ffe066" stroke-width="1" opacity="0.6" stroke-linecap="round">
-          <line x1="45" y1="42" x2="34" y2="34"/><line x1="45" y1="50" x2="32" y2="44"/>
-          <line x1="45" y1="70" x2="34" y2="78"/><line x1="45" y1="78" x2="32" y2="84"/>
-        </g>
-        <!-- Asa direita -->
-        <path d="M 74 60 C 82 52,92 46,98 36 C 102 28,100 22,92 20 C 86 18,80 24,76 32 C 74 36,74 46,74 54" fill="none" stroke="url(#lgGold)" stroke-width="2" stroke-linecap="round" filter="url(#lgGlow)"/>
-        <path d="M 74 60 C 82 68,92 74,98 84 C 102 92,99 98,91 98 C 84 98,78 92,75 84 C 74 80,74 70,74 66" fill="none" stroke="url(#lgGold)" stroke-width="2" stroke-linecap="round" filter="url(#lgGlow)"/>
-        <g stroke="#ffe066" stroke-width="1" opacity="0.6" stroke-linecap="round">
-          <line x1="75" y1="42" x2="86" y2="34"/><line x1="75" y1="50" x2="88" y2="44"/>
-          <line x1="75" y1="70" x2="86" y2="78"/><line x1="75" y1="78" x2="88" y2="84"/>
-        </g>
-        <!-- Corpo central -->
-        <ellipse cx="60" cy="58" rx="11" ry="18" fill="rgba(1,6,20,0.85)" stroke="url(#lgGold)" stroke-width="1.8" filter="url(#lgGlow)"/>
-        <!-- Chama -->
-        <path d="M 60 40 C 58 35,55 30,57 25 C 58.5 21,61.5 21,63 25 C 65 30,62 35,60 40 Z" fill="url(#lgGold)" filter="url(#lgGlow)" opacity="0.9"/>
-        <circle cx="60" cy="25" r="1.8" fill="white" opacity="0.85"/>
-        <!-- Sabre -->
-        <rect x="58.5" y="58" width="3" height="24" rx="1.5" fill="url(#lgSaber)" opacity="0.9"/>
-        <rect x="55" y="80" width="10" height="6" rx="2" fill="#0e2040" stroke="rgba(0,180,255,0.45)" stroke-width="0.8"/>
-        <!-- Pontos cardeais -->
-        <circle cx="60" cy="4"   r="2" fill="rgba(0,200,255,0.6)"/>
-        <circle cx="60" cy="116" r="2" fill="rgba(0,200,255,0.6)"/>
-        <circle cx="4"  cy="60"  r="2" fill="rgba(0,200,255,0.6)"/>
-        <circle cx="116" cy="60" r="2" fill="rgba(0,200,255,0.6)"/>
-      </svg>
-    </div>
+    <div class="login-emblem">🛸</div>
     <div class="login-title">PADAWAN ARTHUR</div>
     <div class="login-sub">Arquivos da Ordem Jedi · Acesso Restrito</div>
     <div class="login-saber"></div>
@@ -2750,13 +2521,13 @@
       <div class="login-label">Identifique-se, Guardião da Força</div>
       <div class="login-btns" id="lista-guardioes-login"></div>
       <div style="margin-top:14px">
-        <button class="btn-novo-guardiao" onclick="abrirCadastroGuardiao()">＋ Registrar Novo Guardião da Força</button>
+        <button class="btn-novo-guardiao" onclick="abrirCadastroGuardiao()">＋ Novo Guardião da Força</button>
       </div>
     </div>
 
     <!-- Passo 2: Digitar senha -->
     <div id="login-step-2" style="display:none">
-      <div class="login-label" id="login-nome-label">Acesso via Código da Força</div>
+      <div class="login-label" id="login-nome-label">Digite o código da Força</div>
 
       <!-- Input oculto que captura o teclado nativo do celular -->
       <input
@@ -2819,7 +2590,7 @@
 
     <!-- Passo 3: Cadastrar novo guardião -->
     <div id="login-step-3" style="display:none">
-      <div class="login-label">Registrar Novo Guardião da Força</div>
+      <div class="login-label">Novo Guardião da Força</div>
       <div style="margin-bottom:12px">
         <label style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.08em;display:block;margin-bottom:6px">NOME DO GUARDIÃO</label>
         <input type="text" id="novo-guardiao-nome" maxlength="20" placeholder="ex: Ana, Pedro..."
@@ -2847,232 +2618,171 @@
 
 <header>
 
-  <!-- ══════════════════════════════════════════════════════════
-       LOGO PADAWAN ARTHUR — Ordem Jedi · Padawan Arthur
-       ══════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       LOGO PADAWAN ARTHUR — Emblema da Ordem Jedi Padawan
+       ═══════════════════════════════════════════════════ -->
   <div class="jedi-emblem-wrap" onclick="abrirFotoArthur()">
-    <svg class="jedi-emblem-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+    <svg class="jedi-emblem-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="bgG" cx="50%" cy="38%" r="65%">
+        <!-- Gradientes -->
+        <radialGradient id="bgGrad" cx="50%" cy="35%" r="65%">
           <stop offset="0%"   stop-color="#0d2a5e"/>
-          <stop offset="50%"  stop-color="#04102a"/>
-          <stop offset="100%" stop-color="#010608"/>
+          <stop offset="60%"  stop-color="#060f28"/>
+          <stop offset="100%" stop-color="#020810"/>
         </radialGradient>
-        <radialGradient id="auraG" cx="50%" cy="45%" r="55%">
+        <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
           <stop offset="0%"   stop-color="rgba(0,212,255,0.22)"/>
-          <stop offset="60%"  stop-color="rgba(0,100,200,0.06)"/>
+          <stop offset="70%"  stop-color="rgba(0,100,200,0.06)"/>
           <stop offset="100%" stop-color="transparent"/>
         </radialGradient>
-        <radialGradient id="goldRadial" cx="50%" cy="30%" r="70%">
-          <stop offset="0%"   stop-color="#fff9d0"/>
-          <stop offset="35%"  stop-color="#ffe566"/>
-          <stop offset="75%"  stop-color="#c8960a"/>
-          <stop offset="100%" stop-color="#7a5800"/>
-        </radialGradient>
-        <linearGradient id="goldV" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#fffbe0"/>
-          <stop offset="30%"  stop-color="#ffe566"/>
-          <stop offset="70%"  stop-color="#c8960a"/>
-          <stop offset="100%" stop-color="#7a5800"/>
-        </linearGradient>
-        <linearGradient id="goldH" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#7a5800"/>
-          <stop offset="40%"  stop-color="#ffe566"/>
-          <stop offset="60%"  stop-color="#ffe566"/>
-          <stop offset="100%" stop-color="#7a5800"/>
-        </linearGradient>
-        <linearGradient id="saberBlade" x1="0" y1="0" x2="0" y2="1">
+        <radialGradient id="swordGrad" cx="50%" cy="0%" r="100%">
           <stop offset="0%"   stop-color="#ffffff"/>
-          <stop offset="15%"  stop-color="#a0eeff"/>
-          <stop offset="50%"  stop-color="#00c8ff"/>
-          <stop offset="100%" stop-color="#002040"/>
+          <stop offset="25%"  stop-color="#00d4ff"/>
+          <stop offset="70%"  stop-color="#0080cc"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="goldGrad" cx="50%" cy="30%" r="70%">
+          <stop offset="0%"   stop-color="#fff7aa"/>
+          <stop offset="50%"  stop-color="#ffe066"/>
+          <stop offset="100%" stop-color="#b08000"/>
+        </radialGradient>
+        <linearGradient id="hiltGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#2a4a8a"/>
+          <stop offset="100%" stop-color="#0a1a40"/>
         </linearGradient>
-        <linearGradient id="saberGlow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="rgba(160,238,255,0.8)"/>
-          <stop offset="100%" stop-color="rgba(0,120,200,0)"/>
-        </linearGradient>
-        <filter id="fGold" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="fBlue" x="-80%" y="-80%" width="360%" height="360%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+        <!-- Filtros de glow -->
+        <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <filter id="fAura" x="-100%" y="-100%" width="400%" height="400%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="b"/>
+        <filter id="glowStrong" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <filter id="fSoft" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>
+        <filter id="glowGold" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.6)"/>
         </filter>
       </defs>
 
-      <!-- ── Aura exterior ── -->
-      <circle cx="110" cy="110" r="108" fill="none" stroke="rgba(255,220,60,0.04)" stroke-width="1"/>
-      <circle cx="110" cy="110" r="105" fill="none" stroke="rgba(255,220,60,0.07)" stroke-width="0.7"/>
-      <circle cx="110" cy="110" r="102" fill="none" stroke="rgba(255,220,60,0.12)" stroke-width="1"/>
+      <!-- ── Anéis externos ── -->
+      <circle cx="80" cy="80" r="76" fill="none" stroke="rgba(0,180,255,0.08)" stroke-width="1"/>
+      <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(0,180,255,0.12)" stroke-width="0.5"/>
+      <!-- Marcadores dos 8 pontos cardeais -->
+      <g stroke="rgba(0,180,255,0.35)" stroke-width="1.2">
+        <line x1="80" y1="4"  x2="80" y2="12"/>   <!-- N -->
+        <line x1="80" y1="148" x2="80" y2="156"/>  <!-- S -->
+        <line x1="4"  y1="80" x2="12" y2="80"/>    <!-- W -->
+        <line x1="148" y1="80" x2="156" y2="80"/>  <!-- E -->
+        <line x1="26.3" y1="26.3" x2="31.9" y2="31.9"/>  <!-- NW -->
+        <line x1="128.1" y1="26.3" x2="133.7" y2="31.9"/> <!-- NE -->
+        <line x1="26.3" y1="133.7" x2="31.9" y2="128.1"/> <!-- SW -->
+        <line x1="128.1" y1="133.7" x2="133.7" y2="128.1"/> <!-- SE -->
+      </g>
 
       <!-- ── Disco principal ── -->
-      <circle cx="110" cy="110" r="100" fill="url(#bgG)" stroke="url(#goldH)" stroke-width="1.8"/>
+      <circle cx="80" cy="80" r="70" fill="url(#bgGrad)" stroke="rgba(0,180,255,0.4)" stroke-width="1.5"/>
+      <!-- Anel decorativo interno -->
+      <circle cx="80" cy="80" r="64" fill="none" stroke="rgba(0,180,255,0.08)" stroke-width="0.8" stroke-dasharray="4,6"/>
+      <!-- Glow interno -->
+      <circle cx="80" cy="80" r="55" fill="url(#innerGlow)"/>
 
-      <!-- ── Glow interno azul ── -->
-      <circle cx="110" cy="110" r="84" fill="url(#auraG)"/>
+      <!-- ══════════════════════════════════════════
+           SÍMBOLO DA ORDEM JEDI
+           ═══════════════════════════════════════ -->
 
-      <!-- ── Anel de runa interna ── -->
-      <circle cx="110" cy="110" r="92" fill="none"
-        stroke="rgba(255,200,50,0.10)" stroke-width="0.6" stroke-dasharray="2 10"/>
-      <circle cx="110" cy="110" r="86" fill="none"
-        stroke="rgba(0,180,255,0.08)" stroke-width="0.5" stroke-dasharray="4 6"/>
+      <!-- ── Elipse central (corpo do emblema Jedi) ── -->
+      <ellipse cx="80" cy="80" rx="18" ry="28"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2"
+        filter="url(#glowGold)"/>
 
-      <!-- ── Marcações dos 12 postes (tipo relógio) ── -->
-      <g stroke="rgba(255,200,50,0.25)" stroke-width="1.2" stroke-linecap="round">
-        <line x1="110" y1="14" x2="110" y2="22"/>
-        <line x1="110" y1="198" x2="110" y2="206"/>
-        <line x1="14" y1="110" x2="22" y2="110"/>
-        <line x1="198" y1="110" x2="206" y2="110"/>
-        <line x1="43" y1="33" x2="48" y2="41"/>
-        <line x1="172" y1="179" x2="177" y2="187"/>
-        <line x1="43" y1="187" x2="48" y2="179"/>
-        <line x1="172" y1="33" x2="177" y2="41"/>
-        <line x1="20" y1="68" x2="28" y2="72"/>
-        <line x1="192" y1="148" x2="200" y2="152"/>
-        <line x1="20" y1="152" x2="28" y2="148"/>
-        <line x1="192" y1="68" x2="200" y2="72"/>
-      </g>
+      <!-- ── Asas laterais (o símbolo Jedi tem duas "asas" curvas) ── -->
+      <!-- Asa esquerda -->
+      <path d="M62 80 C48 60, 38 52, 36 44 C34 36, 42 30, 52 34 C56 36, 60 42, 62 52"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
+        filter="url(#glowGold)"/>
+      <!-- Ponta asa esquerda inferior -->
+      <path d="M62 80 C50 92, 40 96, 38 108 C36 118, 44 122, 54 116 C58 113, 61 108, 62 100"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
+        filter="url(#glowGold)"/>
+      <!-- Asa direita (espelho) -->
+      <path d="M98 80 C112 60, 122 52, 124 44 C126 36, 118 30, 108 34 C104 36, 100 42, 98 52"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
+        filter="url(#glowGold)"/>
+      <!-- Ponta asa direita inferior -->
+      <path d="M98 80 C110 92, 120 96, 122 108 C124 118, 116 122, 106 116 C102 113, 99 108, 98 100"
+        fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"
+        filter="url(#glowGold)"/>
 
-      <!-- ══════════════════════
-           SÍMBOLO JEDI ÉPICO
-      ══════════════════════ -->
-
-      <!-- Aura dourada do símbolo -->
-      <g filter="url(#fAura)" opacity="0.4">
-        <ellipse cx="110" cy="108" rx="26" ry="36" fill="#ffe566"/>
-      </g>
-
-      <!-- ── ASA ESQUERDA ── -->
-      <!-- Curva superior -->
-      <path d="M 86 108 C 76 94, 60 82, 50 66 C 43 54, 44 42, 55 38 C 64 35, 74 43, 80 55 C 84 63, 86 79, 86 95"
-        fill="none" stroke="url(#goldV)" stroke-width="2.6" stroke-linecap="round" filter="url(#fGold)"/>
-      <!-- Curva inferior -->
-      <path d="M 86 108 C 76 122, 60 132, 50 148 C 43 160, 45 172, 56 174 C 66 176, 76 166, 81 154 C 84 146, 86 130, 86 118"
-        fill="none" stroke="url(#goldV)" stroke-width="2.6" stroke-linecap="round" filter="url(#fGold)"/>
-      <!-- Penas asa esquerda superior -->
-      <g stroke="#ffe066" stroke-linecap="round" filter="url(#fSoft)">
-        <line x1="83" y1="78" x2="68" y2="66" stroke-width="1.6" opacity="0.75"/>
-        <line x1="84" y1="86" x2="66" y2="76" stroke-width="1.4" opacity="0.65"/>
-        <line x1="85" y1="93" x2="65" y2="85" stroke-width="1.2" opacity="0.55"/>
-        <line x1="83" y1="70" x2="71" y2="60" stroke-width="1.0" opacity="0.45"/>
-      </g>
-      <!-- Penas asa esquerda inferior -->
-      <g stroke="#ffe066" stroke-linecap="round" filter="url(#fSoft)">
-        <line x1="83" y1="138" x2="68" y2="150" stroke-width="1.6" opacity="0.75"/>
-        <line x1="84" y1="130" x2="66" y2="140" stroke-width="1.4" opacity="0.65"/>
-        <line x1="85" y1="122" x2="65" y2="130" stroke-width="1.2" opacity="0.55"/>
-        <line x1="83" y1="146" x2="71" y2="156" stroke-width="1.0" opacity="0.45"/>
-      </g>
-
-      <!-- ── ASA DIREITA (espelho) ── -->
-      <path d="M 134 108 C 144 94, 160 82, 170 66 C 177 54, 176 42, 165 38 C 156 35, 146 43, 140 55 C 136 63, 134 79, 134 95"
-        fill="none" stroke="url(#goldV)" stroke-width="2.6" stroke-linecap="round" filter="url(#fGold)"/>
-      <path d="M 134 108 C 144 122, 160 132, 170 148 C 177 160, 175 172, 164 174 C 154 176, 144 166, 139 154 C 136 146, 134 130, 134 118"
-        fill="none" stroke="url(#goldV)" stroke-width="2.6" stroke-linecap="round" filter="url(#fGold)"/>
-      <g stroke="#ffe066" stroke-linecap="round" filter="url(#fSoft)">
-        <line x1="137" y1="78" x2="152" y2="66" stroke-width="1.6" opacity="0.75"/>
-        <line x1="136" y1="86" x2="154" y2="76" stroke-width="1.4" opacity="0.65"/>
-        <line x1="135" y1="93" x2="155" y2="85" stroke-width="1.2" opacity="0.55"/>
-        <line x1="137" y1="70" x2="149" y2="60" stroke-width="1.0" opacity="0.45"/>
-      </g>
-      <g stroke="#ffe066" stroke-linecap="round" filter="url(#fSoft)">
-        <line x1="137" y1="138" x2="152" y2="150" stroke-width="1.6" opacity="0.75"/>
-        <line x1="136" y1="130" x2="154" y2="140" stroke-width="1.4" opacity="0.65"/>
-        <line x1="135" y1="122" x2="155" y2="130" stroke-width="1.2" opacity="0.55"/>
-        <line x1="137" y1="146" x2="149" y2="156" stroke-width="1.0" opacity="0.45"/>
-      </g>
-
-      <!-- ── CORPO CENTRAL — oval principal ── -->
-      <ellipse cx="110" cy="108" rx="20" ry="32"
-        fill="rgba(1,6,20,0.85)"
-        stroke="url(#goldH)" stroke-width="2.4"
-        filter="url(#fGold)"/>
-      <!-- Detalhe interno oval -->
-      <ellipse cx="110" cy="108" rx="13" ry="22"
-        fill="none" stroke="rgba(255,220,80,0.2)" stroke-width="0.8"/>
-
-      <!-- ── CHAMA JEDI (topo) ── -->
-      <!-- Chama externa -->
-      <path d="M 110 76 C 106 68, 100 60, 104 50 C 107 43, 113 43, 116 50 C 120 60, 114 68, 110 76 Z"
-        fill="url(#goldRadial)" filter="url(#fGold)" opacity="0.95"/>
-      <!-- Chama interna brilhante -->
-      <path d="M 110 74 C 108 68, 105 62, 107 55 C 108.5 51, 111.5 51, 113 55 C 115 62, 112 68, 110 74 Z"
-        fill="rgba(255,255,210,0.75)"/>
-      <!-- Ponto de luz -->
-      <circle cx="110" cy="54" r="2.5" fill="white" opacity="0.9" filter="url(#fSoft)"/>
-
-      <!-- ── LIGHTSABER ── -->
-      <!-- Brilho externo da lâmina -->
-      <rect x="107" y="110" width="6" height="38" rx="3"
-        fill="url(#saberGlow)" filter="url(#fBlue)" opacity="0.6"/>
+      <!-- ── Sabre de luz central — lâmina AZUL ── -->
+      <!-- Brilho da lâmina (camada mais larga, baixa opacidade) -->
+      <rect x="78" y="20" width="4" height="52" rx="2"
+        fill="rgba(0,212,255,0.25)" filter="url(#glowStrong)"/>
       <!-- Lâmina principal -->
-      <rect x="108.5" y="108" width="3" height="38" rx="1.5"
-        fill="url(#saberBlade)" filter="url(#fBlue)" opacity="0.95"/>
+      <rect x="79" y="20" width="2" height="52" rx="1"
+        fill="url(#swordGrad)" filter="url(#glowBlue)"/>
       <!-- Ponta da lâmina -->
-      <ellipse cx="110" cy="108" rx="2" ry="3" fill="white" opacity="0.8"/>
-      <!-- Hilt (empunhadura) -->
-      <rect x="105" y="144" width="10" height="9" rx="2.5"
-        fill="linear-gradient(#1a3060, #0a1830)"
-        stroke="rgba(0,180,255,0.5)" stroke-width="1"/>
-      <rect x="105" y="144" width="10" height="9" rx="2.5" fill="#0e2040" stroke="rgba(0,180,255,0.45)" stroke-width="0.8"/>
-      <line x1="105" y1="147.5" x2="115" y2="147.5" stroke="rgba(0,180,255,0.35)" stroke-width="0.7"/>
-      <line x1="105" y1="150"   x2="115" y2="150"   stroke="rgba(0,180,255,0.2)"  stroke-width="0.5"/>
+      <path d="M79 20 L80 14 L81 20Z" fill="rgba(255,255,255,0.9)" filter="url(#glowBlue)"/>
 
-      <!-- ── PONTOS CARDEAIS luminosos ── -->
-      <g filter="url(#fSoft)">
-        <circle cx="110" cy="11"  r="3" fill="rgba(0,200,255,0.7)"/>
-        <circle cx="110" cy="209" r="3" fill="rgba(0,200,255,0.7)"/>
-        <circle cx="11"  cy="110" r="3" fill="rgba(0,200,255,0.7)"/>
-        <circle cx="209" cy="110" r="3" fill="rgba(0,200,255,0.7)"/>
+      <!-- Cabo do sabre (hilt) -->
+      <rect x="76.5" y="72" width="7" height="20" rx="2.5"
+        fill="url(#hiltGrad)" stroke="rgba(0,180,255,0.5)" stroke-width="1"/>
+      <!-- Detalhes do cabo -->
+      <rect x="75.5" y="76" width="9" height="1.5" rx="0.75" fill="rgba(0,212,255,0.6)"/>
+      <rect x="75.5" y="80" width="9" height="1"   rx="0.5"  fill="rgba(0,212,255,0.4)"/>
+      <rect x="75.5" y="83.5" width="9" height="1" rx="0.5"  fill="rgba(0,212,255,0.3)"/>
+      <!-- Cristal da empunhadura (ponto de luz) -->
+      <circle cx="80" cy="78" r="1.5" fill="rgba(0,212,255,0.9)" filter="url(#glowBlue)"/>
+      <!-- Guarda -->
+      <rect x="72" y="70" width="16" height="3" rx="1.5"
+        fill="#1a3a6a" stroke="rgba(0,180,255,0.6)" stroke-width="0.8"/>
+      <!-- Detalhes da guarda -->
+      <circle cx="72.5" cy="71.5" r="1.2" fill="rgba(0,212,255,0.7)"/>
+      <circle cx="87.5" cy="71.5" r="1.2" fill="rgba(0,212,255,0.7)"/>
+
+      <!-- ── Estrelas decorativas (fundo espacial) ── -->
+      <g fill="rgba(255,255,255,0.7)">
+        <circle cx="28" cy="35" r="0.8"/>
+        <circle cx="132" cy="35" r="0.8"/>
+        <circle cx="22" cy="80" r="0.6"/>
+        <circle cx="138" cy="80" r="0.6"/>
+        <circle cx="45" cy="125" r="0.7"/>
+        <circle cx="115" cy="125" r="0.7"/>
+        <circle cx="35" cy="110" r="0.5"/>
+        <circle cx="125" cy="110" r="0.5"/>
       </g>
 
-      <!-- ── ESTRELAS nos 4 cantos ── -->
-      <g fill="rgba(255,220,60,0.6)" filter="url(#fSoft)">
-        <!-- Estrela 4 pontas estilo Jedi -->
-        <polygon points="30,30 32,26 34,30 38,32 34,34 32,38 30,34 26,32" transform="scale(0.85) translate(4,4)"/>
-        <polygon points="190,30 192,26 194,30 198,32 194,34 192,38 190,34 186,32" transform="scale(0.85) translate(-18,4)"/>
-        <polygon points="30,190 32,186 34,190 38,192 34,194 32,198 30,194 26,192" transform="scale(0.85) translate(4,-18)"/>
-        <polygon points="190,190 192,186 194,190 198,192 194,194 192,198 190,194 186,192" transform="scale(0.85) translate(-18,-18)"/>
-      </g>
+      <!-- ── Foto do Arthur (se tiver) ── -->
+      <image id="arthur-emblem-img" href="" x="62" y="94" width="36" height="36" clip-path="url(#arthurClip)" style="display:none"/>
+      <clipPath id="arthurClip"><circle cx="80" cy="112" r="18"/></clipPath>
+      <!-- Emoji fallback -->
+      <text id="arthur-emblem-emoji" x="80" y="120" text-anchor="middle" font-size="22" class="jedi-emblem-emoji">🌟</text>
 
-      <!-- ── ORNAMENTOS laterais (ramos) ── -->
-      <g stroke="rgba(255,200,50,0.20)" stroke-width="0.8" fill="none" stroke-linecap="round">
-        <!-- Ramo esquerdo -->
-        <path d="M 28 90 Q 18 100, 20 110 Q 18 120, 28 130"/>
-        <line x1="20" y1="100" x2="14" y2="96"/>
-        <line x1="19" y1="110" x2="13" y2="110"/>
-        <line x1="20" y1="120" x2="14" y2="124"/>
-        <!-- Ramo direito -->
-        <path d="M 192 90 Q 202 100, 200 110 Q 202 120, 192 130"/>
-        <line x1="200" y1="100" x2="206" y2="96"/>
-        <line x1="201" y1="110" x2="207" y2="110"/>
-        <line x1="200" y1="120" x2="206" y2="124"/>
+      <!-- ── Editar foto overlay ── -->
+      <g class="arthur-photo-edit" opacity="0">
+        <circle cx="80" cy="112" r="18" fill="rgba(0,0,0,0.55)"/>
+        <text x="80" y="117" text-anchor="middle" font-size="14">✏️</text>
       </g>
     </svg>
-
-    <!-- FOTO DO ARTHUR (sobreposta ao emblema) -->
-    <img id="foto-arthur-img" class="foto-arthur-img" src="" alt=""
-      style="display:none;position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover;z-index:2"/>
   </div>
 
+  <!-- Título -->
   <h1>PADAWAN ARTHUR</h1>
-  <div id="hdr-nascimento" class="hdr-sub"></div>
-  <div class="hdr-sub-row">
-    <div id="hdr-idade" class="hdr-sub hdr-idade"></div>
+  <div class="header-subtitle">
+    <span class="header-dot">◆</span>
+    ARQUIVOS DA ORDEM JEDI
+    <span class="header-dot">◆</span>
+    PRIMEIRA GALÁXIA
   </div>
-  <div class="hdr-sub hdr-ordem">
-    <span class="saber-dot">⚔️</span> ARQUIVOS DA ORDEM JEDI <span class="saber-dot">⚔️</span>
+
+  <div id="hdr-info" style="display:flex;align-items:center;gap:14px;justify-content:center;margin-top:8px;font-family:'Orbitron',monospace;font-size:0.62rem;color:rgba(0,180,255,0.55);letter-spacing:0.08em">
+    <span id="hdr-nascimento">12/03/2026</span>
+    <span style="color:rgba(0,180,255,0.25)">·</span>
+    <span id="hdr-idade" style="color:var(--gold)"></span>
   </div>
-  <div class="hdr-galaxia">✦ PRIMEIRA GALÁXIA · CICLO 2026 ✦</div>
 
 </header>
 
@@ -3124,23 +2834,23 @@
 
 <nav>
   <button class="active" onclick="showTab('dashboard')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gV" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe566"/><stop offset="100%" stop-color="#c89010"/></linearGradient></defs><ellipse cx="26" cy="26" rx="8" ry="12" fill="none" stroke="url(#gV)" stroke-width="2.2"/><path d="M26 14 C24.5 11,22 8,23.5 5 C24.5 3,27.5 3,28.5 5 C30 8,27.5 11,26 14Z" fill="#ffe566" opacity="0.9"/><line x1="26" y1="26" x2="26" y2="40" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="22" y="38" width="8" height="5" rx="1.5" fill="#0a2040" stroke="rgba(0,180,255,0.5)" stroke-width="0.8"/><path d="M18 26 C13 22,8 18,5 12 C3 8,5 4,9 4 C13 4,17 9,19 15" fill="none" stroke="url(#gV)" stroke-width="1.8" stroke-linecap="round"/><path d="M34 26 C39 22,44 18,47 12 C49 8,47 4,43 4 C39 4,35 9,33 15" fill="none" stroke="url(#gV)" stroke-width="1.8" stroke-linecap="round"/><path d="M18 26 C13 30,8 34,5 40 C3 44,5 48,9 48 C13 48,17 43,19 37" fill="none" stroke="url(#gV)" stroke-width="1.8" stroke-linecap="round"/><path d="M34 26 C39 30,44 34,47 40 C49 44,47 48,43 48 C39 48,35 43,33 37" fill="none" stroke="url(#gV)" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+    <span class="nav-icon">🌌</span>
     <span class="nav-label">Holocron</span>
   </button>
   <button onclick="showTab('mamadas')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><line x1="26" y1="3" x2="26" y2="36" stroke="#00d4ff" stroke-width="4" stroke-linecap="round"/><line x1="26" y1="3" x2="26" y2="36" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><rect x="19" y="36" width="14" height="9" rx="2.5" fill="#0d1f3c" stroke="rgba(0,180,255,0.6)" stroke-width="1.2"/><line x1="19" y1="40" x2="33" y2="40" stroke="rgba(0,180,255,0.4)" stroke-width="0.8"/><circle cx="26" cy="3" r="3" fill="white" opacity="0.8"/></svg></span>
+    <span class="nav-icon">🍼</span>
     <span class="nav-label">Energia</span>
   </button>
   <button onclick="showTab('agenda')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><path d="M26 46 Q6 36 6 22 C6 14 12 8 20 8 C23 8 26 10 26 10 C26 10 29 8 32 8 C40 8 46 14 46 22 Q46 36 26 46Z" fill="none" stroke="#39ff14" stroke-width="2.2"/><line x1="26" y1="18" x2="26" y2="34" stroke="#39ff14" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/><line x1="18" y1="26" x2="34" y2="26" stroke="#39ff14" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/></svg></span>
+    <span class="nav-icon">🩺</span>
     <span class="nav-label">Cura</span>
   </button>
   <button onclick="showTab('mesversario')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><polyline points="6,38 18,24 28,30 42,12" fill="none" stroke="#ffe066" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="12" r="4" fill="#ffe066" opacity="0.9"/><circle cx="18" cy="24" r="2.5" fill="#ffe066" opacity="0.6"/><circle cx="28" cy="30" r="2.5" fill="#ffe066" opacity="0.6"/><circle cx="6" cy="38" r="2.5" fill="#ffe066" opacity="0.6"/></svg></span>
+    <span class="nav-icon">📈</span>
     <span class="nav-label">Jornada</span>
   </button>
   <button onclick="showTab('vacinas')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg"><path d="M26 4 L46 12 L46 28 Q46 42 26 50 Q6 42 6 28 L6 12 Z" fill="none" stroke="#ff6b6b" stroke-width="2.2" stroke-linejoin="round"/><polygon points="26,16 28.5,23 36,23 30,27.5 32.5,35 26,30.5 19.5,35 22,27.5 16,23 23.5,23" fill="none" stroke="#ff6b6b" stroke-width="1.4" stroke-linejoin="round" opacity="0.7"/></svg></span>
+    <span class="nav-icon">🛡️</span>
     <span class="nav-label">Escudos</span>
   </button>
 </nav>
@@ -3161,23 +2871,19 @@
     </div>
 
     <div class="stats-grid">
-      <div class="stat-card" onclick="showTab('mamadas')">
-        <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35;margin-bottom:4px"><line x1="14" y1="2" x2="14" y2="18" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="10" y="18" width="8" height="5" rx="1.5" fill="#0a2040" stroke="rgba(0,180,255,0.5)" stroke-width="0.8"/><line x1="10" y1="20" x2="18" y2="20" stroke="rgba(0,180,255,0.3)" stroke-width="0.6"/></svg>
+      <div class="stat-card">
         <div class="stat-value" id="stat-mamadas">0</div>
         <div class="stat-label">recargas neste ciclo</div>
       </div>
-      <div class="stat-card" onclick="showTab('mamadas')">
-        <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35;margin-bottom:4px"><polygon points="14,2 17,11 26,11 19,17 22,26 14,20 6,26 9,17 2,11 11,11" fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <div class="stat-card">
         <div class="stat-value" id="stat-ml">0</div>
         <div class="stat-label">ml de energia vital</div>
       </div>
-      <div class="stat-card" onclick="showTab('agenda');setTimeout(()=>showSubTabMissoes('missivas'),80)">
-        <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35;margin-bottom:4px"><path d="M8 6 Q6 6 6 8 L6 22 Q6 24 8 24 L20 24 Q22 24 22 22 L22 8 Q22 6 20 6 Z" fill="none" stroke="#00d4ff" stroke-width="1.5"/><line x1="10" y1="11" x2="18" y2="11" stroke="#00d4ff" stroke-width="1" opacity="0.6"/><line x1="10" y1="14" x2="18" y2="14" stroke="#00d4ff" stroke-width="1" opacity="0.6"/><line x1="10" y1="17" x2="15" y2="17" stroke="#00d4ff" stroke-width="1" opacity="0.6"/></svg>
+      <div class="stat-card">
         <div class="stat-value" id="stat-duvidas">0</div>
         <div class="stat-label">missivas ao Curandeiro</div>
       </div>
-      <div class="stat-card" onclick="showTab('agenda')">
-        <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" style="opacity:0.35;margin-bottom:4px"><path d="M14 3 L24 7 L24 15 Q24 22 14 26 Q4 22 4 15 L4 7 Z" fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 14 L13 17 L18 11" stroke="#00d4ff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/></svg>
+      <div class="stat-card">
         <div class="stat-value" id="stat-agenda">0</div>
         <div class="stat-label">audiências da Ordem</div>
       </div>
@@ -3261,7 +2967,7 @@
 
       <div class="form-group">
         <label>Observações do Mestre</label>
-        <input type="text" id="m-obs" placeholder="ex: adormeceu antes de completar a recarga da Força...">
+        <input type="text" id="m-obs" placeholder="ex: o Padawan adormeceu durante a recarga da Força...">
       </div>
       <button class="btn btn-primary btn-full" onclick="salvarMamada()">⚡ Registrar Recarga</button>
     </div>
@@ -3398,7 +3104,7 @@
       <!-- Painel Repositório -->
       <div id="subpanel-repositorio" class="subpanel">
         <div class="repo-search-bar">
-          <input type="text" id="repo-busca" placeholder="🔍  Buscar nos arquivos do Holocron do Saber..." oninput="renderRepositorio()">
+          <input type="text" id="repo-busca" placeholder="🔍  Buscar nos arquivos do Holocron..." oninput="renderRepositorio()">
         </div>
         <div id="lista-repositorio"></div>
       </div>
@@ -3480,7 +3186,7 @@
         <button class="btn btn-primary btn-full" onclick="salvarMedicacao()">⚗️ Ativar Elixir</button>
       </div>
 
-      <div class="section-title" style="margin-top:4px">⚗️ Elixires em Uso · Ordem Médica</div>
+      <div class="section-title" style="margin-top:4px">⚗️ Elixires Ativos</div>
       <div id="lista-medicacao"></div>
     </div>
 
@@ -4124,8 +3830,8 @@ const GUARDIOES_KEY = 'arthur_guardioes_offline';
 const EMOJIS_DISPONIVEIS = ['🧔','👩','👨','👱','🧕','👴','👵','🧑','🧒','👦','👧','🧔‍♀️','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','🧑‍🚀','🧙','🧝','🦸','🧑‍⚕️','🧑‍🏫','⚔️','🛸','🌟','💫'];
 
 const GUARDIOES_DEFAULT = {
-  joao:   { nome: 'João',   emoji: '⚔️', papel: 'Mestre Jedi · Pai do Padawan Arthur' },
-  nadyne: { nome: 'Nadyne', emoji: '🌟', papel: 'Mestra Jedi · Mãe do Padawan Arthur' },
+  joao:   { nome: 'João',   emoji: '🧔', papel: 'Guardião da Força · Pai do Padawan' },
+  nadyne: { nome: 'Nadyne', emoji: '👩', papel: 'Guardiã da Força · Mãe do Padawan'  },
 };
 
 function loadGuardioes() {
@@ -4153,13 +3859,7 @@ function renderListaGuardioes() {
   if (!lista) return;
   lista.innerHTML = Object.entries(GUARDIOES).map(([id, g]) => `
     <button class="btn-guardian" onclick="escolherGuardiao('${id}')">
-      <div class="guardian-avatar">
-        ${g.foto ? `<img src="${g.foto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>` :
-          g.id === 'joao' ? `<svg viewBox="0 0 40 40" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="rgba(0,20,60,0.8)" stroke="rgba(0,180,255,0.3)" stroke-width="1"/><text x="20" y="26" text-anchor="middle" font-size="20" fill="rgba(0,180,255,0.8)">🧔</text></svg>` :
-          g.id === 'nadyne' ? `<svg viewBox="0 0 40 40" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="rgba(50,0,60,0.8)" stroke="rgba(180,80,255,0.3)" stroke-width="1"/><text x="20" y="26" text-anchor="middle" font-size="20" fill="rgba(200,100,255,0.9)">👩</text></svg>` :
-          `<svg viewBox="0 0 40 40" width="36" height="36" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="rgba(0,30,20,0.8)" stroke="rgba(57,255,20,0.3)" stroke-width="1"/><text x="20" y="26" text-anchor="middle" font-size="20">${g.emoji}</text></svg>`
-        }
-      </div>
+      <div class="guardian-avatar">${g.emoji}</div>
       <div style="flex:1;text-align:left">
         <div class="guardian-info-name">${g.nome}</div>
         <div class="guardian-info-role">${g.papel}</div>
@@ -5155,15 +4855,9 @@ function salvarMamada() {
     ml_formula = vf ? parseInt(vf) : null;
   }
 
-  // Auto-calcular ml total para misto se não preenchido manualmente
-  let mlTotal = ml ? parseInt(ml) : null;
-  if (tipo === 'misto' && !mlTotal && (ml_peito || ml_formula)) {
-    mlTotal = (ml_peito || 0) + (ml_formula || 0);
-  }
-
   db.mamadas.push({
     id: Date.now(), data, hora, tipo,
-    ml: mlTotal,
+    ml: ml ? parseInt(ml) : null,
     ml_peito, ml_formula,
     obs, autor: usuarioAtual
   });
@@ -5280,11 +4974,7 @@ function salvarEdicaoMamada() {
     m.ml_formula = null;
   }
   const mlVal = document.getElementById('edit-m-ml').value;
-  m.ml = mlVal ? parseInt(mlVal) : null;
-  // Auto-calcular ml total para misto
-  if (m.tipo === 'misto' && !m.ml && (m.ml_peito || m.ml_formula)) {
-    m.ml = (m.ml_peito || 0) + (m.ml_formula || 0);
-  }
+  m.ml    = mlVal ? parseInt(mlVal) : null;
   m.obs   = document.getElementById('edit-m-obs').value.trim();
   saveData(db);
   fecharModalEditarMamada();
@@ -5308,15 +4998,7 @@ function renderMamadas() {
 
   const el = document.getElementById('lista-mamadas');
   if (!list.length) {
-    el.innerHTML = `<div class="empty">
-      <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.3;margin-bottom:10px">
-        <line x1="26" y1="4" x2="26" y2="34" stroke="#00d4ff" stroke-width="3.5" stroke-linecap="round"/>
-        <rect x="19" y="34" width="14" height="8" rx="3" fill="#0a2040" stroke="rgba(0,180,255,0.4)" stroke-width="1.2"/>
-        <line x1="19" y1="38" x2="33" y2="38" stroke="rgba(0,180,255,0.3)" stroke-width="1"/>
-        <circle cx="26" cy="4" r="2.5" fill="rgba(255,255,255,0.7)"/>
-      </svg>
-      <p>Nenhuma recarga registrada<br>nas crônicas da Ordem</p>
-    </div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🍼</div><p>Nenhuma recarga registrada nas crônicas</p></div>`;
     return;
   }
 
@@ -5325,13 +5007,11 @@ function renderMamadas() {
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
           <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱 Fonte Natural' : m.tipo === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação da Força'}</span>
-          ${m.tipo === 'misto' ? `
-            <span style="font-size:0.7rem;color:var(--text-dim);display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap">
+          ${m.tipo === 'misto' && (m.ml_peito || m.ml_formula) ? `
+            <span style="font-size:0.7rem;color:var(--text-dim)">
               ${m.ml_peito   ? `<span style="color:#7ab3d4">🤱 ${m.ml_peito}ml</span>` : ''}
-              ${m.ml_peito && m.ml_formula ? '<span style="color:var(--text-dim)">+</span>' : ''}
+              ${m.ml_peito && m.ml_formula ? '<span style="color:var(--text-dim)"> + </span>' : ''}
               ${m.ml_formula ? `<span style="color:#b0d4f0">🥛 ${m.ml_formula}ml</span>` : ''}
-              ${(!m.ml_peito && !m.ml_formula && m.ml) ? `<span style="color:var(--gold);font-family:'Orbitron',monospace;font-size:0.72rem">${m.ml}ml</span>` : ''}
-              ${(m.ml_peito || m.ml_formula) ? `<span style="color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:0.72rem">=&nbsp;${(parseInt(m.ml_peito)||0)+(parseInt(m.ml_formula)||0)}ml</span>` : ''}
             </span>
           ` : m.ml ? `<span style="color:var(--blue-neon);font-family:'Orbitron',monospace;font-size:0.75rem">${m.ml}ml</span>` : ''}
         </div>
@@ -5437,7 +5117,7 @@ function renderDuvidas() {
 
   const el = document.getElementById('lista-duvidas');
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><svg width="48" height="48" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:10px"><path d="M8 40 L44 8" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="34" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="22" cy="26" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="32" cy="18" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5"/><line x1="8" y1="44" x2="44" y2="44" stroke="rgba(0,180,255,0.3)" stroke-width="1" stroke-dasharray="3 3"/></svg><p>${f === 'pendentes' ? 'Nenhuma missiva aguarda resposta do Curandeiro' : f === 'respondidas' ? 'Nenhuma missiva foi iluminada ainda' : 'Nenhuma missiva nas crônicas'}</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📜</div><p>${f === 'pendentes' ? 'Nenhuma missiva aguarda resposta do Curandeiro' : f === 'respondidas' ? 'Nenhuma missiva foi iluminada ainda' : 'Nenhuma missiva nas crônicas'}</p></div>`;
     return;
   }
 
@@ -5600,7 +5280,7 @@ function salvarEvento() {
   if (document.getElementById('prof-card')) document.getElementById('prof-card').style.display = 'none';
   renderAgenda();
   renderDashboard();
-  showToast('🗺️ Audiência inscrita nas Crônicas da Ordem!');
+  showToast('🗺️ Audiência registrada nas crônicas!');
 }
 
 function deleteEvento(id) {
@@ -5623,7 +5303,7 @@ function renderAgenda() {
 
   const el = document.getElementById('lista-agenda');
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><svg width="48" height="48" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:10px"><path d="M8 40 L44 8" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="34" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="22" cy="26" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="32" cy="18" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5"/><line x1="8" y1="44" x2="44" y2="44" stroke="rgba(0,180,255,0.3)" stroke-width="1" stroke-dasharray="3 3"/></svg><p>${f === 'proximos' ? 'A Ordem aguarda · nenhuma missão na agenda' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma audiência registrada'}</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><p>${f === 'proximos' ? 'A Ordem aguarda — nenhuma audiência registrada' : f === 'passados' ? 'Nenhuma missão concluída nas crônicas' : 'Nenhuma audiência registrada'}</p></div>`;
     return;
   }
 
@@ -5706,7 +5386,7 @@ function renderDashboard() {
   const recentes = ordenarMamadas(db.mamadas).slice(0, 3);
   const fr = document.getElementById('feed-recente');
   if (!recentes.length) {
-    fr.innerHTML = `<div class="empty" style="padding:20px"><svg width="40" height="40" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:8px"><line x1="26" y1="4" x2="26" y2="34" stroke="#00d4ff" stroke-width="3.5" stroke-linecap="round"/><rect x="19" y="34" width="14" height="8" rx="3" fill="#0a2040" stroke="rgba(0,180,255,0.4)" stroke-width="1.2"/><circle cx="26" cy="4" r="2.5" fill="rgba(255,255,255,0.6)"/></svg><div class="empty-icon" style="display:none">🍼</div><p>Nenhuma recarga registrada nas crônicas</p></div>`;
+    fr.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🍼</div><p>Nenhuma recarga registrada nas crônicas</p></div>`;
   } else {
     fr.innerHTML = recentes.map(m => `
       <div class="feed-item ${m.tipo}" style="margin-bottom:6px">
@@ -5721,13 +5401,7 @@ function renderDashboard() {
   const proximos = db.eventos.filter(e => e.data >= hoje).slice(0, 3);
   const fa = document.getElementById('feed-agenda');
   if (!proximos.length) {
-    fa.innerHTML = `<div class="empty" style="padding:20px">
-      <svg width="40" height="40" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.3;margin-bottom:8px">
-        <path d="M26 4 L44 14 L44 30 Q44 44 26 50 Q8 44 8 30 L8 14 Z" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M18 26 L23 31 L34 20" stroke="#00d4ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-      </svg>
-      <p>A Ordem aguarda · nenhuma missão na agenda</p>
-    </div>`;
+    fa.innerHTML = `<div class="empty" style="padding:20px"><div class="empty-icon">🗺️</div><p>A Ordem aguarda — nenhuma audiência registrada</p></div>`;
   } else {
     fa.innerHTML = proximos.map(e => `
       <div class="evento-item" style="margin-bottom:6px">
@@ -5799,7 +5473,7 @@ function renderMesversario() {
   const el = document.getElementById('lista-mesversario');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><svg width="48" height="48" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:10px"><circle cx="26" cy="26" r="22" fill="none" stroke="#ffe066" stroke-width="1.5"/><circle cx="26" cy="26" r="14" fill="none" stroke="#ffe066" stroke-width="0.8" stroke-dasharray="3 5"/><polygon points="26,10 28.5,19 38,19 30.5,24.5 33,34 26,28.5 19,34 21.5,24.5 14,19 23.5,19" fill="none" stroke="#ffe066" stroke-width="1.5" stroke-linejoin="round"/></svg><div class="empty-icon" style="display:none">🌙</div><p>Nenhuma órbita gravada nas crônicas da Força</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🌙</div><p>Nenhuma órbita gravada nas crônicas da Força</p></div>`;
     return;
   }
 
@@ -5973,7 +5647,7 @@ function renderCrescimento() {
   const el = document.getElementById('lista-crescimento');
   if (!el) return;
   if (!crescData.length) {
-    el.innerHTML = `<div class="empty"><svg width="48" height="48" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:10px"><path d="M8 40 L44 8" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="34" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="22" cy="26" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/><circle cx="32" cy="18" r="4" fill="none" stroke="#00d4ff" stroke-width="1.5"/><line x1="8" y1="44" x2="44" y2="44" stroke="rgba(0,180,255,0.3)" stroke-width="1" stroke-dasharray="3 3"/></svg><div class="empty-icon" style="display:none">📏</div><p>Nenhuma medida registrada — aguarde a primeira Audiência com a Curandeira Jedi</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📏</div><p>Nenhuma medida registrada — aguarde a primeira Audiência com a Curandeira Jedi</p></div>`;
     return;
   }
   const nomeMes = m => m === 0 ? '🌌 Chegada à Galáxia' : m === 12 ? '✨ 1ª Volta ao Sol' : `🌙 ${m}ª Órbita`;
@@ -7055,7 +6729,7 @@ function renderMedicacao() {
   const el = document.getElementById('lista-medicacao');
   if (!el) return;
   if (!medicacoes.length) {
-    el.innerHTML = `<div class="empty"><svg width="48" height="48" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="opacity:0.28;margin-bottom:10px"><ellipse cx="26" cy="26" rx="8" ry="18" fill="none" stroke="#00d4ff" stroke-width="2" transform="rotate(-35 26 26)"/><line x1="14" y1="20" x2="38" y2="32" stroke="#00d4ff" stroke-width="1.5" opacity="0.5" transform="rotate(-35 26 26)"/></svg><div class="empty-icon" style="display:none">💊</div><p>Nenhum elixir registrado nas crônicas</p></div>`;
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💊</div><p>Nenhum elixir registrado nas crônicas</p></div>`;
     return;
   }
   el.innerHTML = medicacoes.map(m => `
@@ -8063,21 +7737,14 @@ function renderRelatorio() {
   const ordenadas  = ordenarMamadas(mamadasDia); // mais recentes primeiro
 
   // Calcular totais
-  const totalMamadas  = mamadasDia.length;
-  const totalMl       = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
-  // ml por tipo puro
-  const mlPeito       = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + mlReal(m), 0);
-  const mlFormula     = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + mlReal(m), 0);
-  const mlMisto       = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + mlReal(m), 0);
-  // Detalhamento do misto: extrair ml_peito e ml_formula de cada combo
-  const mlMistoPeito   = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_peito)  ||0), 0);
-  const mlMistoFormula = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (parseInt(m.ml_formula)||0), 0);
-  // Totais consolidados por fonte (peito puro + parte peito dos combos)
-  const mlTotalPeito   = mlPeito + mlMistoPeito;
-  const mlTotalFormula = mlFormula + mlMistoFormula;
-  const nPeito         = mamadasDia.filter(m => m.tipo === 'peito').length;
-  const nFormula       = mamadasDia.filter(m => m.tipo === 'formula').length;
-  const nMisto         = mamadasDia.filter(m => m.tipo === 'misto').length;
+  const totalMamadas = mamadasDia.length;
+  const totalMl      = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
+  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + mlReal(m), 0);
+  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + mlReal(m), 0);
+  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + mlReal(m), 0);
+  const nPeito       = mamadasDia.filter(m => m.tipo === 'peito').length;
+  const nFormula     = mamadasDia.filter(m => m.tipo === 'formula').length;
+  const nMisto       = mamadasDia.filter(m => m.tipo === 'misto').length;
 
   // Intervalo médio entre mamadas
   let intervaloMedio = '—';
@@ -8131,8 +7798,8 @@ function renderRelatorio() {
 
     <!-- Por tipo -->
     <div class="rel-section-title">⚡ Distribuição por Fonte</div>
-    ${(mlTotalPeito > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${mlTotalPeito} ml${mlMistoPeito > 0 ? '<span style="font-size:0.62rem;opacity:0.6;margin-left:4px">(incl. ${mlMistoPeito}ml de combos)</span>' : ''}</span></div>` : ''}
-    ${(mlTotalFormula > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula Alquímica</span><span class="rel-stat-value">${mlTotalFormula} ml${mlMistoFormula > 0 ? '<span style="font-size:0.62rem;opacity:0.6;margin-left:4px">(incl. ${mlMistoFormula}ml de combos)</span>' : ''}</span></div>` : ''}
+    ${(nPeito > 0 || mlMistoPeito > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${nPeito}× ${mlPeito > 0 ? '· ' + mlPeito + ' ml' : ''}${mlMistoPeito > 0 ? '<span style="font-size:0.62rem;opacity:0.6"> (incl. ' + mlMistoPeito + 'ml de combos)</span>' : ''}</span></div>` : ''}
+    ${(nFormula > 0 || mlMistoFormula > 0) ? `<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula Alquímica</span><span class="rel-stat-value">${nFormula}× ${mlFormula > 0 ? '· ' + mlFormula + ' ml' : ''}${mlMistoFormula > 0 ? '<span style="font-size:0.62rem;opacity:0.6"> (incl. ' + mlMistoFormula + 'ml de combos)</span>' : ''}</span></div>` : ''}
     ${nMisto   > 0 ? `<div class="rel-stat-row"><span class="rel-stat-label">✨ Combinação da Força</span><span class="rel-stat-value">${nMisto}× ${mlMisto > 0 ? '· ' + mlMisto + ' ml total' : ''}</span></div>` : ''}
 
     <!-- Horários -->
