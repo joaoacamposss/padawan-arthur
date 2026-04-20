@@ -4516,41 +4516,53 @@ window.addEventListener('offline', () => mostrarStatusConexao(false));
 const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
-  try {
-    const snap = await DOC_REF.get();
-    if (snap.exists) {
-      const { _ultimaAtualizacao, ...dados } = snap.data();
-      // Só sobrescreve cache local se Firebase tem dados reais
-      const temDados = (dados.mamadas||[]).length > 0
-                    || (dados.duvidas||[]).length > 0
-                    || (dados.eventos||[]).length > 0
-                    || (dados.mesversario||[]).length > 0;
-      if (temDados) {
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
+  // Tentar até 3 vezes com delay entre tentativas
+  for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    try {
+      if (!DOC_REF) throw new Error('DOC_REF nao inicializado');
+      const snap = await DOC_REF.get();
+
+      if (snap.exists) {
+        const raw   = snap.data();
+        const { _ultimaAtualizacao, ...dados } = raw;
+        const n = (dados.mamadas||[]).length + (dados.eventos||[]).length
+                + (dados.duvidas||[]).length + (dados.mesversario||[]).length;
+
+        if (n > 0) {
+          // Firebase tem dados reais — salvar e retornar
+          localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
+          return dados;
+        }
+        // Firebase retornou doc vazio — verificar cache local
+        const lsRaw = localStorage.getItem(LOCAL_KEY);
+        if (lsRaw) {
+          try {
+            const lsDados = JSON.parse(lsRaw);
+            const nLocal  = (lsDados.mamadas||[]).length + (lsDados.eventos||[]).length;
+            if (nLocal > 0) return lsDados;
+          } catch(ep) {}
+        }
+        // Firebase vazio E cache local vazio — aguardar e tentar de novo
+        if (tentativa < 3) {
+          await new Promise(r => setTimeout(r, 1500 * tentativa));
+          continue;
+        }
         return dados;
       }
-      // Firebase retornou vazio — checar se cache local tem dados reais
-      const cacheLocal = localStorage.getItem(LOCAL_KEY);
-      if (cacheLocal) {
-        try {
-          const parsed = JSON.parse(cacheLocal);
-          if ((parsed.mamadas||[]).length > 0 || (parsed.eventos||[]).length > 0) {
-            return parsed; // cache local tem dados, Firebase está com delay
-          }
-        } catch(e2) {}
+
+    } catch(e) {
+      // Firebase falhou — cache local
+      const lsRaw = localStorage.getItem(LOCAL_KEY);
+      if (lsRaw) { try { return JSON.parse(lsRaw); } catch(ep) {} }
+      if (tentativa < 3) {
+        await new Promise(r => setTimeout(r, 1500 * tentativa));
+        continue;
       }
-      return dados;
     }
-    // Documento não existe no Firebase — tentar cache local
-    const cacheVazio = localStorage.getItem(LOCAL_KEY);
-    if (cacheVazio) { try { return JSON.parse(cacheVazio); } catch(e2) {} }
-  } catch(e) {
-    // Firebase falhou — cache local
-    try {
-      const cache = localStorage.getItem(LOCAL_KEY);
-      if (cache) return JSON.parse(cache);
-    } catch(e2) {}
   }
+  // Última tentativa: cache local
+  const lsRaw = localStorage.getItem(LOCAL_KEY);
+  if (lsRaw) { try { return JSON.parse(lsRaw); } catch(e) {} }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
 
