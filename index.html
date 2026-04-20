@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+  <!-- Cache-Control: forçar browser a sempre buscar do servidor -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,7 +29,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
+<title>Padawan Arthur · Ordem Jedi</title>
 
 <!-- SPLASH: CSS crítico inline — renderiza instantaneamente sem esperar fontes ou Firebase -->
 <style>
@@ -2872,6 +2876,18 @@
     <span class="nav-label">Escudos</span>
   </button>
 </nav>
+
+<script>
+// ── DIAGNÓSTICO ──
+console.log('[Padawan] Build: 2026-04-20-v2 carregado');
+(function(){
+  var ls = localStorage.getItem('diario_arthur_offline');
+  console.log('[Padawan] localStorage:', ls ? (JSON.parse(ls).mamadas||[]).length+'mamadas' : 'VAZIO');
+  window.addEventListener('load', function(){
+    console.log('[Padawan] Firebase SDK:', typeof firebase !== 'undefined' ? 'OK' : 'AUSENTE');
+  });
+})();
+</script>
 
 <main>
 
