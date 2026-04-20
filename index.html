@@ -3795,28 +3795,44 @@ if (!IS_CAPACITOR) {
   // Service Worker inline para offline
   if ('serviceWorker' in navigator) {
     const swCode = `
-const CACHE = 'padawan-arthur-v2';
-const FONTS = ['https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap'];
+const CACHE = 'padawan-arthur-1776667815';
+const FONTS = ['https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&family=Share+Tech+Mono&display=swap'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FONTS)).catch(()=>{}));
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
+  // Apagar TODOS os caches antigos imediatamente
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
   self.clients.claim();
 });
 self.addEventListener('fetch', e => {
-  if (e.request.url.includes('fonts.g') || e.request.url.includes('fonts.gstatic')) {
+  const url = e.request.url;
+  // Nunca interceptar Firebase, gstatic ou APIs externas
+  if (url.includes('firestore') || url.includes('firebase') ||
+      url.includes('googleapis.com/firestore') ||
+      url.includes('gstatic.com/firebasejs') ||
+      !url.startsWith('http')) return;
+  // Fontes: cache-first
+  if (url.includes('fonts.g') || url.includes('fonts.gstatic')) {
     e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
       caches.open(CACHE).then(c => c.put(e.request, res.clone()));
       return res;
     })));
     return;
   }
+  // Tudo mais: network-first (nunca servir HTML cacheado)
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });`;
     const swBlob = new Blob([swCode], {type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    // Forçar unregister de SWs antigos antes de registrar novo
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      Promise.all(regs.map(r => r.unregister())).then(() => {
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+      });
+    }).catch(() => {
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    });
   }
 } // fim if (!IS_CAPACITOR)
 
@@ -4453,6 +4469,13 @@ function initFirebaseRefs() {
     });
   }
   const fs   = firebase.firestore();
+  // Configurações para melhor compatibilidade em GitHub Pages / iOS Safari
+  try {
+    fs.settings({
+      experimentalForceLongPolling: true,
+      merge: true
+    });
+  } catch(e) {} // Ignorar se já configurado
   DOC_REF        = fs.collection('diario').doc('arthur');
   VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
   EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
@@ -4542,13 +4565,26 @@ async function loadData() {
     const snap = await DOC_REF.get();
     if (snap.exists) {
       const { _ultimaAtualizacao, ...dados } = snap.data();
-      // Salva cache local sem o metadado de atualização
       localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
       return dados;
     }
+    // Doc existe mas vazio — tentar cache local
+    const cacheEmpty = localStorage.getItem(LOCAL_KEY);
+    if (cacheEmpty) {
+      try { return JSON.parse(cacheEmpty); } catch(e2) {}
+    }
   } catch(e) {
-    const cache = localStorage.getItem(LOCAL_KEY);
-    if (cache) return JSON.parse(cache);
+    // Firebase falhou (offline, CORS, etc) — usar cache local
+    console.warn('[Padawan] Firebase offline, usando cache local:', e.message || e);
+    try {
+      const cache = localStorage.getItem(LOCAL_KEY);
+      if (cache) {
+        const parsed = JSON.parse(cache);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch(e2) {
+      console.warn('[Padawan] Cache local corrompido:', e2);
+    }
   }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
