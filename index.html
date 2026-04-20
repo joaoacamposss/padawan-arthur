@@ -4307,12 +4307,25 @@ function renderAgenda() {
 }
 
 // ── DASHBOARD ──
+
+// ── Helper ml — soma peito+formula para misto ──
+function mlReal(m) {
+  if (m.tipo === 'misto') {
+    const p = parseInt(m.ml_peito)  || 0;
+    const f = parseInt(m.ml_formula)|| 0;
+    if (p + f > 0) return p + f;
+    return parseInt(m.ml) || 0;
+  }
+  if (m.tipo === 'peito')   return parseInt(m.ml_peito)   || parseInt(m.ml) || 0;
+  if (m.tipo === 'formula') return parseInt(m.ml_formula) || parseInt(m.ml) || 0;
+  return parseInt(m.ml) || 0;
+}
 function renderDashboard() {
   const hoje = todayISO();
 
   // Stats
   const mamadasHoje = db.mamadas.filter(m => m.data === hoje);
-  const mlHoje = mamadasHoje.reduce((s, m) => s + (m.ml || 0), 0);
+  const mlHoje = mamadasHoje.reduce((s, m) => s + mlReal(m), 0);
   const duvidaPend = db.duvidas.filter(d => !d.respondida).length;
   const proxEv = db.eventos.filter(e => e.data >= hoje).length;
 
@@ -6677,10 +6690,10 @@ function renderRelatorio() {
 
   // Calcular totais
   const totalMamadas = mamadasDia.length;
-  const totalMl      = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
-  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + (m.ml||0), 0);
-  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + (m.ml||0), 0);
-  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + (m.ml||0), 0);
+  const totalMl      = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
+  const mlPeito      = mamadasDia.filter(m => m.tipo === 'peito').reduce((s,m) => s + mlReal(m), 0);
+  const mlFormula    = mamadasDia.filter(m => m.tipo === 'formula').reduce((s,m) => s + mlReal(m), 0);
+  const mlMisto      = mamadasDia.filter(m => m.tipo === 'misto').reduce((s,m) => s + mlReal(m), 0);
   const nPeito       = mamadasDia.filter(m => m.tipo === 'peito').length;
   const nFormula     = mamadasDia.filter(m => m.tipo === 'formula').length;
   const nMisto       = mamadasDia.filter(m => m.tipo === 'misto').length;
@@ -6774,7 +6787,7 @@ function copiarRelatorio() {
 
   const mamadasDia = (db.mamadas || []).filter(m => m.data === dataISO);
   const ordenadas  = ordenarMamadas(mamadasDia);
-  const totalMl    = mamadasDia.reduce((s, m) => s + (m.ml || 0), 0);
+  const totalMl    = mamadasDia.reduce((s, m) => s + mlReal(m), 0);
   const nPeito     = mamadasDia.filter(m => m.tipo === 'peito').length;
   const nFormula   = mamadasDia.filter(m => m.tipo === 'formula').length;
   const nMisto     = mamadasDia.filter(m => m.tipo === 'misto').length;
