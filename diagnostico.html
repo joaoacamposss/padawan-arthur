@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Diagnóstico Firebase — Padawan Arthur</title>
+<style>
+  body { font-family: monospace; background: #000; color: #0f0; padding: 16px; font-size: 14px; }
+  .ok  { color: #0f0; } .erro { color: #f00; } .warn { color: #ff0; } .info { color: #0ff; }
+  pre  { background: #111; padding: 8px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  h2   { color: #fff; border-bottom: 1px solid #333; padding-bottom: 4px; }
+  .step { margin: 12px 0; padding: 10px; border: 1px solid #333; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h2>🔍 Diagnóstico Firebase · Padawan Arthur</h2>
+<div id="log"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+const log = document.getElementById('log');
+
+function addLog(msg, type='info') {
+  const d = document.createElement('div');
+  d.className = 'step';
+  d.innerHTML = '<span class="' + type + '">' + msg + '</span>';
+  log.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function addPre(label, data) {
+  const d = document.createElement('div');
+  d.className = 'step';
+  d.innerHTML = '<span class="warn">' + label + '</span><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+  log.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function run() {
+  addLog('▶ Iniciando diagnóstico...', 'info');
+  addLog('URL: ' + window.location.href, 'info');
+  addLog('UserAgent: ' + navigator.userAgent.slice(0, 80), 'info');
+  
+  // 1. localStorage
+  addLog('1️⃣ Verificando localStorage...', 'warn');
+  const ls = localStorage.getItem('diario_arthur_offline');
+  if (ls) {
+    try {
+      const parsed = JSON.parse(ls);
+      addLog('✅ localStorage TEM dados:', 'ok');
+      addPre('localStorage', {
+        mamadas: (parsed.mamadas||[]).length,
+        duvidas: (parsed.duvidas||[]).length,
+        eventos: (parsed.eventos||[]).length,
+        mesversario: (parsed.mesversario||[]).length,
+        ultima_mamada: (parsed.mamadas||[])[0] || null
+      });
+    } catch(e) {
+      addLog('❌ localStorage corrompido: ' + e.message, 'erro');
+    }
+  } else {
+    addLog('⚠️ localStorage VAZIO — sem dados em cache local', 'warn');
+  }
+
+  // 2. Firebase init
+  addLog('2️⃣ Inicializando Firebase...', 'warn');
+  try {
+    firebase.initializeApp({
+      apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
+      authDomain:        "padawan-arthur.firebaseapp.com",
+      projectId:         "padawan-arthur",
+      storageBucket:     "padawan-arthur.firebasestorage.app",
+      messagingSenderId: "38758983138",
+      appId:             "1:38758983138:web:ca0bf0a011971cbf62c5bb"
+    });
+    addLog('✅ Firebase inicializado com sucesso', 'ok');
+  } catch(e) {
+    addLog('❌ Firebase init ERRO: ' + e.message, 'erro');
+    return;
+  }
+
+  // 3. Firebase Auth anônimo
+  addLog('3️⃣ Tentando autenticação anônima...', 'warn');
+  try {
+    const auth = firebase.auth();
+    const user = await auth.signInAnonymously();
+    addLog('✅ Auth anônimo OK — uid: ' + user.user.uid, 'ok');
+  } catch(e) {
+    addLog('⚠️ Auth anônimo falhou (pode ser normal): ' + e.message, 'warn');
+  }
+
+  // 4. Firestore sem configurações extras
+  addLog('4️⃣ Conectando ao Firestore (padrão)...', 'warn');
+  let fs;
+  try {
+    fs = firebase.firestore();
+    addLog('✅ Firestore instanciado', 'ok');
+  } catch(e) {
+    addLog('❌ Firestore ERRO: ' + e.message, 'erro');
+    return;
+  }
+
+  // 5. Tentar LER o documento principal
+  addLog('5️⃣ Lendo /diario/arthur...', 'warn');
+  try {
+    const snap = await fs.collection('diario').doc('arthur').get();
+    if (snap.exists) {
+      const data = snap.data();
+      addLog('✅ Documento EXISTS! Dados:', 'ok');
+      addPre('Firebase /diario/arthur', {
+        tem_mamadas: !!(data.mamadas),
+        n_mamadas:   (data.mamadas||[]).length,
+        n_duvidas:   (data.duvidas||[]).length,
+        n_eventos:   (data.eventos||[]).length,
+        ultima_atualizacao: data._ultimaAtualizacao || null,
+        campos: Object.keys(data)
+      });
+      // Salvar no localStorage
+      const { _ultimaAtualizacao, ...dados } = data;
+      localStorage.setItem('diario_arthur_offline', JSON.stringify(dados));
+      addLog('✅ Dados salvos no localStorage!', 'ok');
+      addLog('🎉 TUDO OK — volte para o app principal e faça hard refresh', 'ok');
+    } else {
+      addLog('❌ Documento NÃO EXISTE em /diario/arthur', 'erro');
+      addLog('Os dados podem estar em outro caminho ou foram deletados', 'warn');
+      // Listar documentos
+      addLog('Tentando listar coleção /diario...', 'warn');
+      try {
+        const col = await fs.collection('diario').get();
+        addLog('Documentos em /diario: ' + col.docs.map(d=>d.id).join(', '), 'info');
+      } catch(e2) {
+        addLog('Não foi possível listar: ' + e2.message, 'erro');
+      }
+    }
+  } catch(e) {
+    addLog('❌ Erro ao ler Firestore: ' + e.code + ' — ' + e.message, 'erro');
+    if (e.code === 'permission-denied') {
+      addLog('🔒 REGRAS DO FIRESTORE bloqueando! Precisa atualizar as regras para: allow read, write: if true;', 'erro');
+    }
+    if (e.code === 'unavailable') {
+      addLog('📡 Firebase INDISPONÍVEL — problema de rede ou SDK', 'erro');
+    }
+    // Tentar com longPolling
+    addLog('Tentando com experimentalForceLongPolling...', 'warn');
+    try {
+      const fs2 = firebase.firestore();
+      try { fs2.settings({ experimentalForceLongPolling: true, merge: true }); } catch(se) {}
+      const snap2 = await fs2.collection('diario').doc('arthur').get();
+      if (snap2.exists) {
+        addLog('✅ LongPolling funcionou! Tem ' + (snap2.data().mamadas||[]).length + ' mamadas', 'ok');
+      } else {
+        addLog('❌ LongPolling: documento não existe', 'erro');
+      }
+    } catch(e2) {
+      addLog('❌ LongPolling também falhou: ' + e2.message, 'erro');
+    }
+  }
+
+  // 6. Verificar regras verificando escrita
+  addLog('6️⃣ Verificando permissões de escrita...', 'warn');
+  try {
+    await fs.collection('diario').doc('_diagnostico_test').set({ ts: Date.now(), test: true });
+    addLog('✅ Escrita OK — regras permitem write', 'ok');
+    await fs.collection('diario').doc('_diagnostico_test').delete();
+  } catch(e) {
+    addLog('❌ Escrita bloqueada: ' + e.code + ' — ' + e.message, 'erro');
+  }
+
+  addLog('✅ Diagnóstico completo', 'ok');
+}
+
+run().catch(e => {
+  document.getElementById('log').innerHTML += '<div class="step"><span class="erro">ERRO FATAL: ' + e + '</span></div>';
+});
+</script>
+</body>
+</html>
