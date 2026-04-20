@@ -4235,16 +4235,27 @@ function fazerLogin(id) {
   document.getElementById('tela-login').style.display = 'none';
   atualizarBadge();
   iniciarAutoLock();
-  // Carrega dados e inicia sync em tempo real
-  loadData().then(d => {
-    db = d;
-    renderAll();
-    iniciarSyncTempoReal();
-    setTimeout(() => verificarNovidades(id), 1000);
-    setTimeout(() => initPresence(id), 1500);
-    // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
-    setTimeout(() => mostrarBannerFaceID(id), 2000);
-  });
+
+  // Carregar localStorage imediatamente (sem esperar Firebase)
+  try {
+    const lsRaw = localStorage.getItem(LOCAL_KEY);
+    if (lsRaw) {
+      const lsDados = JSON.parse(lsRaw);
+      const temDados = (lsDados.mamadas||[]).length + (lsDados.eventos||[]).length
+                     + (lsDados.duvidas||[]).length + (lsDados.mesversario||[]).length;
+      if (temDados > 0) {
+        db = lsDados;
+        renderAll();
+      }
+    }
+  } catch(e) {}
+
+  // Iniciar sync em tempo real — onSnapshot vai atualizar db quando Firebase responder
+  iniciarSyncTempoReal();
+
+  setTimeout(() => verificarNovidades(id), 1000);
+  setTimeout(() => initPresence(id), 1500);
+  setTimeout(() => mostrarBannerFaceID(id), 2000);
   // Sync crescimento do Firebase
   try {
     EXTRAS_REF.get().then(snap => {
@@ -4591,21 +4602,31 @@ async function saveData(data) {
 
 // Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
 function iniciarSyncTempoReal() {
+  if (!DOC_REF) return;
   DOC_REF.onSnapshot(snap => {
     if (!snap.exists) return;
     const novos = snap.data();
-    // Remove metadado antes de comparar — _ultimaAtualizacao não é dado do app
-    const { _ultimaAtualizacao: _a, ...dadosNovos } = novos;
-    const { _ultimaAtualizacao: _b, ...dadosLocais } = db;
-    const local  = JSON.stringify(dadosLocais);
-    const remoto = JSON.stringify(dadosNovos);
-    // Só atualiza se os dados reais são diferentes (evita loop por _ultimaAtualizacao)
-    if (local !== remoto) {
-      db = dadosNovos;
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosNovos));
-      if (usuarioAtual) renderAll();
+    const { _ultimaAtualizacao: _ignore, ...dadosFirebase } = novos;
+
+    // Contar dados no Firebase
+    const nFb = (dadosFirebase.mamadas    ||[]).length
+              + (dadosFirebase.duvidas    ||[]).length
+              + (dadosFirebase.eventos    ||[]).length
+              + (dadosFirebase.mesversario||[]).length;
+
+    if (nFb === 0) {
+      // Firebase retornou vazio — não sobrescrever dados locais
+      return;
     }
-  }, err => console.warn('Sync error:', err));
+
+    // Firebase tem dados — atualizar db e salvar no localStorage
+    db = dadosFirebase;
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosFirebase)); } catch(e) {}
+
+    // Renderizar se usuário estiver logado
+    if (usuarioAtual) renderAll();
+
+  }, err => { /* Firebase offline — dados já carregados do localStorage */ });
 }
 
 // Carregamento async dos dados
@@ -5369,11 +5390,17 @@ function renderAgenda() {
 // ── HELPER ml real de uma mamada (resolve bug misto) ──
 function mlReal(m) {
   if (m.tipo === 'misto') {
-    // Combinação: somar ml_peito + ml_formula se existirem
     const p = m.ml_peito   ? parseInt(m.ml_peito)   : 0;
     const f = m.ml_formula ? parseInt(m.ml_formula) : 0;
     if (p + f > 0) return p + f;
-    // Fallback: campo ml total se os detalhes não foram preenchidos
+    return m.ml ? parseInt(m.ml) : 0;
+  }
+  if (m.tipo === 'peito') {
+    if (m.ml_peito)   return parseInt(m.ml_peito);
+    return m.ml ? parseInt(m.ml) : 0;
+  }
+  if (m.tipo === 'formula') {
+    if (m.ml_formula) return parseInt(m.ml_formula);
     return m.ml ? parseInt(m.ml) : 0;
   }
   return m.ml ? parseInt(m.ml) : 0;
