@@ -1758,6 +1758,82 @@
   .sab-badge-comportamento { background:rgba(0,80,60,0.4);color:#60e0c0;border:1px solid rgba(0,200,160,0.3); }
   .sab-badge-seguranca { background:rgba(120,40,0,0.4);color:#ffaa60;border:1px solid rgba(255,150,0,0.3); }
   .sab-badge-rotina    { background:rgba(0,50,80,0.4);color:#60c0e0;border:1px solid rgba(0,160,200,0.3); }
+
+  /* ── SABEDORIA FAQ ── */
+  .sab-faq-card {
+    padding:14px 16px;margin-bottom:10px;
+    background:rgba(0,15,40,0.7);border:1px solid rgba(0,180,255,0.15);
+    border-radius:12px;transition:border-color 0.15s;
+  }
+  .sab-faq-meta { display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px; }
+  .sab-faq-titulo { font-size:0.92rem;font-weight:700;color:var(--white);line-height:1.3;margin-bottom:6px; }
+  .sab-faq-resumo { font-size:0.72rem;color:rgba(122,179,212,0.7);line-height:1.4;margin-bottom:8px; }
+  .sab-faq-actions { display:flex;align-items:center;justify-content:space-between; }
+  .sab-saberMais {
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:0.65rem;color:var(--blue-neon);font-family:'Orbitron',monospace;
+    letter-spacing:0.08em;cursor:pointer;border:none;background:none;padding:0;
+  }
+  .sab-saberMais .chev { display:inline-block;transition:transform 0.25s; }
+  .sab-saberMais.aberto .chev { transform:rotate(180deg); }
+  .sab-faq-corpo {
+    display:none;margin-top:12px;padding-top:12px;
+    border-top:1px solid rgba(0,180,255,0.12);
+    font-size:0.75rem;color:rgba(200,225,240,0.85);line-height:1.7;
+  }
+  .sab-faq-corpo.aberto { display:block; }
+  .sab-faq-fonte { margin-top:10px;font-size:0.6rem;color:rgba(0,180,255,0.5);font-family:'Orbitron',monospace; }
+  .sab-urgencia-alta { border-left:3px solid rgba(255,100,100,0.6); }
+
+  /* ── ORÁCULO FAQ ── */
+  .oraculo-faq-item {
+    margin-bottom:10px;
+    background:rgba(30,0,60,0.5);
+    border:1px solid rgba(180,100,255,0.2);
+    border-radius:12px;
+    overflow:hidden;
+    transition:border-color 0.2s;
+  }
+  .oraculo-faq-item:last-child { margin-bottom:0; }
+  .oraculo-faq-pergunta {
+    display:flex;align-items:flex-start;gap:10px;
+    padding:12px 14px;cursor:pointer;
+  }
+  .oraculo-faq-pergunta:active { background:rgba(180,100,255,0.1); }
+  .oraculo-faq-icon { font-size:1.1rem;flex-shrink:0;margin-top:1px; }
+  .oraculo-faq-texto {
+    flex:1;font-size:0.85rem;color:#e8d4ff;
+    font-weight:600;line-height:1.4;
+  }
+  .oraculo-faq-chev {
+    font-size:0.7rem;color:rgba(180,100,255,0.6);
+    flex-shrink:0;transition:transform 0.25s;margin-top:2px;
+  }
+  .oraculo-faq-item.aberto .oraculo-faq-chev { transform:rotate(180deg); }
+  .oraculo-faq-resposta {
+    display:none;
+    padding:0 14px 12px 38px;
+    font-size:0.78rem;color:rgba(220,200,255,0.85);
+    line-height:1.7;border-top:1px solid rgba(180,100,255,0.12);
+    padding-top:10px;
+  }
+  .oraculo-faq-resposta.aberta { display:block; }
+  .oraculo-faq-saberMais {
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 12px;margin-top:8px;
+    font-size:0.62rem;font-family:'Orbitron',monospace;
+    letter-spacing:0.07em;color:#d4a8ff;cursor:pointer;
+    background:rgba(100,0,180,0.2);border:1px solid rgba(180,100,255,0.3);
+    border-radius:20px;transition:background 0.15s;
+  }
+  .oraculo-faq-saberMais:active { background:rgba(100,0,180,0.4); }
+  /* Loading FAQ */
+  .oraculo-faq-loading {
+    padding:12px 14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .oraculo-faq-loading .oraculo-faq-icon { animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 </style>
 </head>
 <body>
@@ -2532,7 +2608,7 @@
       <div id="oraculo-cfg" style="display:none"></div>
       <div id="oraculo-key-status" style="display:none"></div>
       <div id="oraculo-input-area" style="">
-      <div id="oraculo-chat" style="max-height:50vh;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;padding:4px 0"></div>
+      <div id="oraculo-chat" style="max-height:55vh;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;padding:4px 0"></div>
       <div class="card" style="padding:10px">
         <div style="display:flex;gap:8px;align-items:flex-end">
           <textarea id="oraculo-input" placeholder="Pergunte ao Oráculo... ex: 'Arthur está dormindo muito, é normal?'" style="flex:1;min-height:60px;resize:none;font-size:15px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#e8f4fd" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarOraculo();}"></textarea>
@@ -7301,25 +7377,79 @@ function contextArthur() {
 - Dúvidas em aberto: ${duvidAbertas}`;
 }
 
+// Cada par pergunta/resposta vira um item FAQ
+let _oraculoFaqPendente = null; // guarda o item FAQ aguardando resposta
+
 function addOraculoMsg(role, texto) {
   const chat = document.getElementById('oraculo-chat');
-  const div  = document.createElement('div');
-  div.className = 'oraculo-msg ' + (role==='user' ? 'oraculo-user' : 'oraculo-ai');
-  // Formatar markdown simples
-  div.innerHTML = texto
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g,'<em>$1</em>')
-    .replace(/\n/g,'<br>');
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+
+  if (role === 'user') {
+    // Criar item FAQ completo (pergunta + botão + resposta vazia)
+    const id = 'oraculo-faq-' + Date.now();
+    const item = document.createElement('div');
+    item.className = 'oraculo-faq-item';
+    item.id = id;
+    item.innerHTML = `
+      <div class="oraculo-faq-pergunta" onclick="toggleOraculoFaq('${id}')">
+        <span class="oraculo-faq-icon">👤</span>
+        <span class="oraculo-faq-texto">${texto.replace(/</g,'&lt;')}</span>
+        <span class="oraculo-faq-chev">▼</span>
+      </div>
+      <div class="oraculo-faq-resposta" id="${id}-resp" style="display:none"></div>`;
+    chat.appendChild(item);
+    _oraculoFaqPendente = id;
+    chat.scrollTop = chat.scrollHeight;
+
+  } else {
+    // Resposta do assistente: preencher o item FAQ pendente
+    const fmtTexto = texto
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g,'<em>$1</em>')
+      .replace(/\n/g,'<br>');
+
+    if (_oraculoFaqPendente) {
+      const respEl = document.getElementById(_oraculoFaqPendente + '-resp');
+      if (respEl) {
+        respEl.innerHTML = fmtTexto +
+          `<div><button class="oraculo-faq-saberMais" onclick="toggleOraculoFaq('${_oraculoFaqPendente}')">
+            🔮 Fechar <span style="font-size:0.7rem">▲</span>
+          </button></div>`;
+      }
+      // Não abrir automaticamente — usuário escolhe quando ler
+      _oraculoFaqPendente = null;
+    } else {
+      // Fallback: mensagem solta (ex: saudação inicial)
+      const div = document.createElement('div');
+      div.className = 'oraculo-faq-item';
+      div.innerHTML = `<div style="padding:12px 14px;font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.6">${fmtTexto}</div>`;
+      chat.appendChild(div);
+    }
+    chat.scrollTop = chat.scrollHeight;
+  }
+}
+
+function toggleOraculoFaq(id) {
+  const item = document.getElementById(id);
+  const resp = document.getElementById(id + '-resp');
+  if (!item || !resp) return;
+  const abrindo = !item.classList.contains('aberto');
+  item.classList.toggle('aberto');
+  if (abrindo) {
+    resp.style.display = 'block';
+    // Atualizar botão
+    const btn = resp.querySelector('.oraculo-faq-saberMais');
+    if (btn) btn.innerHTML = '🔮 Fechar <span style="font-size:0.7rem">▲</span>';
+  } else {
+    resp.style.display = 'none';
+  }
 }
 
 function addOraculoLoading() {
   const chat = document.getElementById('oraculo-chat');
   const div  = document.createElement('div');
-  div.className = 'oraculo-loading';
   div.id = 'oraculo-loading';
-  div.innerHTML = '<div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>';
+  div.className = 'oraculo-faq-item';
+  div.innerHTML = '<div class="oraculo-faq-loading"><span class="oraculo-faq-icon">🔮</span><div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div></div>';
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
@@ -7625,6 +7755,225 @@ const SABEDORIA_DB = [
     resumo: 'A partir dos 6 meses: como introduzir alimentos com segurança seguindo o BLW ou papinha.',
     fonte: 'SBP / MS Brasil',
     corpo: `**Quando:** A partir dos 6 meses completos, junto com o leite materno (que continua até 2 anos ou mais).\n\n**Sinais de prontidão:** Sentar com apoio, boca abre quando vê colher, interesse pelo alimento dos adultos.\n\n**O que oferecer:**\n• Cereais (arroz, aveia), tubérculos (batata, mandioca, inhame)\n• Legumes e verduras\n• Proteínas (carne, frango, ovo bem cozido, feijão)\n• Frutas\n\n**O que evitar no 1º ano:** Mel (botulismo), leite de vaca como bebida principal, sal adicionado, açúcar, alimentos ultraprocessados.\n\n**BLW vs. papinha:** Ambas as abordagens são válidas. BLW favorece autonomia; papinha é mais controlável no início.\n\n📋 **Fonte:** SBP · Guia Alimentar para Crianças MS 2019`
+  },
+
+  // ─── SAÚDE ─────────────────────────────────────────────
+  {
+    id:'sau-4', cat:'saude', icon:'🌡️', urgencia:'alta',
+    faixaEtaria:'0-3m', tempoLeitura:3,
+    titulo: 'Febre no Bebê Menor de 3 Meses: Sempre é Urgente',
+    resumo: 'Qualquer temperatura ≥ 38°C em bebê com menos de 3 meses exige avaliação imediata. Sem exceção.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Por que é urgente?** Bebês menores de 3 meses têm sistema imune imaturo. Febre pode ser sinal de infecção grave (sepse, meningite, infecção urinária) que progride rapidamente.\n\n**Quando medir?** Via retal é o padrão-ouro. Axilar (aceitável): temperatura ≥ 37,5°C já merece atenção.\n\n**O que fazer:**\n🚨 ≥ 38°C → Ir direto à emergência, mesmo que o bebê pareça bem\n• Não dar antitérmico antes de ser avaliado (mascara o diagnóstico)\n• Levar cartão de vacinas e anotar a hora que a febre começou\n\n**Hipotermia também é alerta:** temperatura < 36°C em RN também requer avaliação imediata.\n\n📋 **Fonte:** SBP – Guia de Urgência Pediátrica 2023 · MS Brasil`
+  },
+  {
+    id:'sau-5', cat:'saude', icon:'🫃', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:3,
+    titulo: 'Refluxo Gastroesofágico no Lactente: Normal vs Patológico',
+    resumo: 'Quase todos os bebês regurgitam. Quando é fisiológico e quando precisa de tratamento?',
+    fonte: 'SBP / NASPGHAN',
+    corpo: `**Regurgitação fisiológica:** Muito comum — até 70% dos bebês com 3–4 meses. O esfíncter esofágico inferior ainda é imaturo. Melhora espontaneamente até os 12–18 meses.\n\n**Sinais de que é APENAS regurgitação normal:**\n• Bebê feliz, ganhando peso bem ("happy spitter")\n• Vômito sem esforço, leite coalhado ou não\n• Sem choro excessivo associado\n\n**Quando é DRGE (patológica):**\n• Ganho de peso insuficiente\n• Choro/irritabilidade intensa e persistente\n• Recusa alimentar\n• Arqueamento do dorso durante a mamada\n• Apneias ou engasgos frequentes\n\n**Medidas posturais que ajudam:**\n• Posição vertical por 20–30 min após mamadas\n• Fracionar as mamadas (menos volume, mais vezes)\n• Evitar roupas apertadas\n\n**Não fazer:** não engrossar a fórmula sem orientação médica; não deitar em prono (risco de SMSL).\n\n📋 **Fonte:** SBP · NASPGHAN/ESPGHAN Guidelines 2018`
+  },
+  {
+    id:'sau-6', cat:'saude', icon:'💩', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Fezes do Bebê: O que é Normal e o que Preocupa',
+    resumo: 'Cor, frequência e consistência das fezes variam muito nos primeiros meses. Saiba o que é normal.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Frequência normal:**\n• RN amamentado: até 10x/dia (cada mamada pode gerar evacuação) — ou 1x a cada 7–10 dias (ambos normais!)\n• RN de fórmula: 1–4x/dia em geral\n• A partir de 6 semanas, pode naturalmente espaçar\n\n**Cores normais:**\n• Amarelo mostarda (amamentado)\n• Bege/marrom claro (fórmula)\n• Verde: pode ser normal (oxigenação) ou ingestão excessiva de leite anterior\n\n**Cores que EXIGEM avaliação:**\n• 🚨 Branca/cinza (acolica) → problema hepático grave\n• 🚨 Vermelha (sangue vivo) → fissura anal, colite\n• 🚨 Preta/melena → sangramento digestivo alto\n\n**Constipação real:** fezes duras (tipo caroço), choro intensa ao evacuar. Em amamentados é rara — quase sempre a "prisão de ventre" é normal.\n\n📋 **Fonte:** SBP · Guia do Recém-Nascido MS 2022`
+  },
+
+  // ─── SONO ──────────────────────────────────────────────
+  {
+    id:'sono-4', cat:'sono', icon:'🔄', urgencia:'normal',
+    faixaEtaria:'3-6m', tempoLeitura:2,
+    titulo: 'Regressão do Sono: O que Acontece aos 4 Meses?',
+    resumo: 'Bebê que dormia bem começa a acordar muito? A regressão dos 4 meses é real e tem explicação biológica.',
+    fonte: 'SBP / AAP',
+    corpo: `**O que é?** Entre 3,5–5 meses, o sono do bebê amadurece — ele passa a ter ciclos mais parecidos com adultos (sono leve → profundo → leve). Isso gera mais despertares conscientes entre os ciclos.\n\n**Por que acontece?** Antes, o bebê "colapsava" do sono ativo para o profundo sem perceber. Agora, ao acordar levemente entre ciclos, não sabe adormecer sozinho e chama os pais.\n\n**É passageiro?** Sim — tipicamente 2–6 semanas. Não é uma fase permanente.\n\n**O que ajuda:**\n• Manter rotina consistente (ritual do sono)\n• Oferecer a cama com sono mas acordado quando possível\n• Responder ao choro, mas gradualmente reduzir a ajuda para adormecer\n• Aumentar tempo de vigília entre sonecas (janela de sono mais longa)\n\n**O que não ajuda:** retroceder bruscamente (ex: dormir em prono, quando o bebê já rolava). A segurança é sempre prioridade.\n\n📋 **Fonte:** SBP · AAP Sleep Guidelines 2022`
+  },
+  {
+    id:'sono-5', cat:'sono', icon:'🛏️', urgencia:'normal',
+    faixaEtaria:'0-12m', tempoLeitura:3,
+    titulo: 'Co-sleeping vs Berço: O que Dizem as Evidências',
+    resumo: 'Compartilhar a cama ou usar o berço? Entenda os riscos, benefícios e o que a SBP recomenda.',
+    fonte: 'SBP / AAP',
+    corpo: `**Recomendação oficial:** A SBP e AAP recomendam que o bebê durma no mesmo quarto (room-sharing) mas em superfície própria e segura — não na mesma cama dos pais (bed-sharing).\n\n**Por que o quarto compartilhado é benéfico?** Associado a redução de até 50% do risco de SMSL. Facilita amamentação noturna.\n\n**Riscos do co-sleeping (mesma cama):**\n• Sufocação (colchão mole, edredom, travesseiros)\n• Aprisionamento entre o colchão e a parede/grade\n• Risco muito maior se pais fumam, usam álcool ou medicamentos sedativos\n\n**Superfície segura (bedside bassinet):**\n• Berço de encaixe ao lado da cama ("side-car") é boa alternativa — combina praticidade da amamentação com segurança do berço\n• O bebê dorme na sua superfície, mas próximo aos pais\n\n**Se adormecer amamentando:** não é incomum. A AAP considera o sofá mais perigoso que a cama — se adormecer mamando, mover o bebê para o berço assim que possível.\n\n📋 **Fonte:** SBP – Nota de Alerta Sono Seguro 2023 · AAP 2022`
+  },
+
+  // ─── NUTRIÇÃO ──────────────────────────────────────────
+  {
+    id:'nut-6', cat:'nutricao', icon:'💊', urgencia:'normal',
+    faixaEtaria:'0-12m', tempoLeitura:2,
+    titulo: 'Vitamina D e Ferro: Quando e Como Suplementar',
+    resumo: 'A SBP recomenda suplementação de vitamina D para todos os bebês e ferro a partir de certa idade.',
+    fonte: 'SBP 2022',
+    corpo: `**Vitamina D:**\n• Para quem? TODOS os lactentes amamentados e de fórmula (se < 1L/dia)\n• Quando começar? Nos primeiros dias de vida\n• Dose: 400 UI/dia nos primeiros 12 meses; 600 UI/dia após\n• Exposição solar: não substitui a suplementação (risco de queimadura e SMSL em prono)\n\n**Ferro:**\n• Amamentados a termo: suplementação preventiva 1 mg/kg/dia a partir dos 6 meses\n• Prematuros e baixo peso: iniciar mais cedo (30 dias) — conforme orientação médica\n• Fórmula infantil: geralmente já é enriquecida com ferro adequado\n• Por que é importante? Deficiência de ferro impacta o desenvolvimento neurológico permanentemente\n\n**Ômega-3 (DHA):**\n• Importante para desenvolvimento cerebral e visual\n• Mãe que amamenta deve consumir peixe rico em ômega-3 2x/semana\n• Suplementação para o bebê: conforme avaliação pediátrica individual\n\n📋 **Fonte:** SBP – Nota de Alerta Suplementação 2022 · MS Brasil`
+  },
+  {
+    id:'nut-7', cat:'nutricao', icon:'💧', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Água e Chá para o Bebê: Quando Pode Oferecer?',
+    resumo: 'Bebês menores de 6 meses não precisam de água nem chá. Saiba por quê e o que acontece se oferecer.',
+    fonte: 'OMS / SBP / MS Brasil',
+    corpo: `**Antes dos 6 meses (com AME):** NENHUM líquido além do leite materno — nem água, nem chá, nem suco. O leite materno já tem 87% de água e supre toda a hidratação necessária.\n\n**Por que não dar água?**\n• Ocupa espaço no estômago, reduzindo a ingestão de leite (que contém nutrientes)\n• Risco de hiponatremia (diluição do sódio) — pode ser grave\n• Interfere com a produção de leite materno (menor demanda = menor produção)\n\n**Por que não dar chá?**\n• Não tem nenhum benefício comprovado para cólica (simeticona também não tem)\n• Risco de contaminação microbiológica\n• Pode criar aversão a alimentos por contato precoce com sabores diferentes\n\n**A partir dos 6 meses:** oferecer água filtrada junto com os alimentos complementares, em copinho.\n\n📋 **Fonte:** OMS 2023 · SBP · Guia Alimentar MS 2019`
+  },
+
+  // ─── DESENVOLVIMENTO ───────────────────────────────────
+  {
+    id:'dev-3', cat:'desenvolvimento', icon:'💪', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Tummy Time: Por que é Essencial e Como Fazer',
+    resumo: 'Barriga para baixo, acordado e supervisionado — fundamental para o desenvolvimento motor.',
+    fonte: 'SBP / AAP',
+    corpo: `**O que é?** Tempo em que o bebê fica deitado de bruços (prono) enquanto está acordado e supervisionado por um adulto.\n\n**Por que é importante?**\n• Fortalece a musculatura do pescoço, ombros e core\n• Previne a plagiocefalia posicional (cabeça achatada)\n• Base para o desenvolvimento de: rolar, sentar, engatinhar\n• Estimulação sensorial e proprioceptiva\n\n**Como começar:**\n• RN: 2–3x/dia por 3–5 minutos (ou desde a alta da maternidade)\n• Aumentar gradualmente para 30–60 min/dia total até os 3 meses\n• Sempre acordado e com adulto presente — NUNCA dormir em prono\n\n**Se o bebê chorar:** é normal no início! Reduza o tempo e tente de novo. Algumas estratégias: rosto a rosto (olho no olho), brinquedos à frente, ou colocar sobre o peito do cuidador.\n\n**Plagiocefalia:** se perceber achatamento, mencionar ao pediatra — pode indicar fisioterapia.\n\n📋 **Fonte:** SBP · AAP Healthy Children 2023`
+  },
+  {
+    id:'dev-4', cat:'desenvolvimento', icon:'👁️', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Visão do Recém-Nascido: O que Ele Enxerga?',
+    resumo: 'O bebê enxerga muito menos que adultos. Entender o desenvolvimento visual ajuda a estimular corretamente.',
+    fonte: 'SBP / ABN',
+    corpo: `**Ao nascer:**\n• Foca objetos a 20–30 cm (distância do rosto durante amamentação — não é coincidência!)\n• Prefere contraste alto (preto e branco) e rostos humanos\n• Não distingue bem cores ainda — visão em preto, branco e tons escuros\n\n**1 mês:** segue movimento horizontalmente (estimulação com objetos lentamente movidos)\n\n**2 meses:** começa a focar em objetos mais distantes; coloração inicia (vermelho e azul)\n\n**3 meses:** coordenação olho-mão começa; consegue seguir objetos 180°\n\n**Sinais de alerta (buscar avaliação):**\n• Não fixa olhar em rosto aos 2 meses\n• Não segue objeto com os olhos aos 3 meses\n• "Olho branco" (leucocoria) — avaliação urgente (possível catarata ou retinoblastoma)\n• Desvio ocular constante após 3 meses\n\n**Teste do reflexo vermelho:** realizado pelo pediatra na maternidade e nas consultas — rastreia problemas graves de visão.\n\n📋 **Fonte:** SBP · ABN (Academia Brasileira de Neurologia)`
+  },
+
+  // ─── COMPORTAMENTO ─────────────────────────────────────
+  {
+    id:'comp-3', cat:'comportamento', icon:'📈', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Growth Spurts: Picos de Crescimento e Crises de Amamentação',
+    resumo: 'Bebê com fome constante, choro intenso por 1–3 dias? Pode ser um growth spurt. Saiba o que fazer.',
+    fonte: 'SBP / OMS',
+    corpo: `**O que são?** Períodos de aumento rápido do crescimento em que o bebê aumenta muito a demanda por leite. São temporários — geralmente duram 24–72 horas.\n\n**Quando ocorrem tipicamente:** 2–3 semanas, 6 semanas, 3 meses, 6 meses. Mas podem variar.\n\n**Sinais:**\n• Quer mamar muito mais que o habitual\n• Parece nunca satisfeito\n• Mais choroso e irritado\n• Acorda mais à noite\n\n**O que fazer:**\n• Amamentar em livre demanda — quanto mais sugar, mais leite é produzido\n• Não interpretar como "leite acabou" — é o bebê sinalizando para aumentar a produção\n• Oferecer o seio sempre que pedir\n• Se complementar com fórmula sem orientação, pode comprometer a produção\n\n**Depois do growth spurt:** o bebê "descansa" (dorme mais) e a situação normaliza.\n\n📋 **Fonte:** SBP · OMS · Kelly Mom (referência internacional em amamentação)`
+  },
+  {
+    id:'comp-4', cat:'comportamento', icon:'🧘', urgencia:'normal',
+    faixaEtaria:'0-12m', tempoLeitura:3,
+    titulo: 'Saúde Mental dos Pais: Depressão Pós-Parto e Burnout Parental',
+    resumo: 'Sentir-se exausto, triste ou sobrecarregado não é fraqueza. É urgente cuidar da saúde mental parental.',
+    fonte: 'SBP / ABP / MS Brasil',
+    corpo: `**Baby blues vs Depressão Pós-Parto:**\n• Baby blues: tristeza, choro, instabilidade emocional nos primeiros 3–7 dias. Atinge 80% das mães. Passageiro.\n• DPP: sintomas mais intensos e prolongados (> 2 semanas). Atinge 10–15% das mães — e também pais.\n\n**Sinais de DPP:**\n• Tristeza persistente, choro sem motivo\n• Dificuldade de criar vínculo com o bebê\n• Pensamentos intrusivos sobre machucar o bebê (diferentes de intenção real)\n• Ansiedade intensa, pânico\n• Insônia mesmo quando o bebê dorme\n• Perda de prazer em tudo\n\n**Burnout parental:** esgotamento extremo pelo acúmulo de cuidado. Sem DPP, mas igualmente sério.\n\n**O que fazer:**\n• Buscar ajuda profissional (psicólogo, psiquiatra) — tratável!\n• Falar com o pediatra: ele rastreia a DPP nas consultas\n• Aceitar ajuda de família/amigos\n• O bebê precisa de pais bem — cuidar de si é cuidar do bebê\n\n📋 **Fonte:** SBP · ABP · MS Brasil · Nota de Alerta DPP 2023`
+  },
+
+  // ─── ROTINA ────────────────────────────────────────────
+  {
+    id:'rot-3', cat:'rotina', icon:'🍬', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Chupeta: Quando Oferecer, Benefícios e Riscos',
+    resumo: 'A SBP tem posição atualizada sobre chupeta. Saiba quando ela pode ajudar e quando prejudica.',
+    fonte: 'SBP 2022',
+    corpo: `**Benefícios comprovados:**\n• Redução do risco de SMSL — especialmente quando oferecida após amamentação estabelecida\n• Satisfação da necessidade de sucção não-nutritiva\n• Efeito analgésico em procedimentos (junto com sacarose)\n\n**Quando oferecer:**\n• Após amamentação bem estabelecida (4–6 semanas) — evitar antes para não prejudicar a pega\n• Só quando o bebê está sonolento/dormindo — não usar para "tampar" o choro\n\n**Quando não usar:**\n• Antes de 4–6 semanas se houver dificuldade na amamentação\n• Para substituir alimentação ou conforto emocional\n\n**Riscos do uso prolongado (> 2 anos):**\n• Alterações na oclusão dentária (mordida aberta)\n• Aumento de otite média\n• Pode prejudicar o desenvolvimento da fala\n\n**Desmame:** introduzir gradualmente após 6–12 meses; eliminar completamente antes dos 2 anos.\n\n📋 **Fonte:** SBP – Nota Científica Chupeta 2022`
+  },
+  {
+    id:'rot-4', cat:'rotina', icon:'🤲', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Massagem Infantil: Benefícios e Como Fazer',
+    resumo: 'A massagem no bebê tem evidência científica para bem-estar, sono e ganho de peso. Aprenda a técnica.',
+    fonte: 'SBP / IAIM',
+    corpo: `**Benefícios comprovados:**\n• Melhora do ganho de peso (especialmente em prematuros)\n• Redução do choro e cólica\n• Melhora na qualidade do sono\n• Fortalecimento do vínculo afetivo\n• Estímulo ao sistema nervoso e circulatório\n\n**Quando fazer:**\n• Bebê acordado, tranquilo (não logo após mamar nem quando com fome ou sonolento)\n• Ideal: 30–45 min após a mamada\n• 1x ao dia, preferencial no horário noturno (parte da rotina do sono)\n\n**Técnica básica (IAIM):**\n1. Pedido de permissão: mostrar as mãos com óleo e observar a resposta do bebê\n2. Óleo vegetal morno (coco, amêndoa ou oliva) — sem fragrância nos primeiros meses\n3. Movimentos lentos, firmes e suaves nas pernas (de cima para baixo)\n4. Circular no abdômen (sentido horário — ajuda na digestão)\n5. Dorso: movimentos de cima para baixo\n\n📋 **Fonte:** SBP · IAIM (International Association of Infant Massage)`
+  },
+
+  // ─── SEGURANÇA ─────────────────────────────────────────
+  {
+    id:'seg-3', cat:'seguranca', icon:'⚡', urgencia:'alta',
+    faixaEtaria:'0-12m', tempoLeitura:2,
+    titulo: 'Engasgo no Bebê: O que Fazer (Manobra de Heimlich Infantil)',
+    resumo: 'Saber o que fazer em caso de engasgo pode salvar a vida do seu filho. Aprenda a manobra correta.',
+    fonte: 'SBP / CFM / INEM',
+    corpo: `**Diferença entre engasgo leve e grave:**\n• Leve: bebê tossindo forte, chorando — NÃO INTERVENHA. A tosse é mais eficaz que qualquer manobra. Apenas observe.\n• Grave: sem tosse, sem choro, face azulada, não consegue respirar → AGIR IMEDIATAMENTE\n\n**Manobra para bebê < 1 ano (não use Heimlich abdominal):**\n\n1. **5 tapas nas costas:** segure o bebê de bruços no seu braço (barriga para baixo), cabeça mais baixa que o tronco. Dê 5 tapas firmes entre as omoplatas com a palma da mão.\n\n2. **5 compressões torácicas:** vire o bebê de costas no seu braço. Dê 5 compressões rápidas no centro do peito (dois dedos no esterno).\n\n3. Repita o ciclo até o objeto sair ou o bebê perder a consciência.\n\n4. Se inconsciente → iniciar RCP (ressuscitação cardiopulmonar) e chamar SAMU (192).\n\n📋 **Fonte:** SBP · CFM · INEM Portugal · American Red Cross`
+  },
+  // ─── SONO ──────────────────────────────────────────────
+  {
+    id:'sono-6', cat:'sono', icon:'☀️', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Sonecas Diurnas: Quantas e por Quanto Tempo?',
+    resumo: 'Bebês dormem muito de dia — e precisam disso. Entenda o padrão de sonecas por faixa etária.',
+    fonte: 'SBP / AAP / NSF',
+    corpo: `**Por que as sonecas são essenciais?** O sono diurno do lactente não é capricho — é parte fundamental do desenvolvimento neurológico. O cérebro consolida aprendizados durante o sono.\n\n**Padrão típico por faixa etária:**\n• RN (0–2 meses): 4–5 sonecas/dia, 30–120 min cada. Total: 14–17h/dia\n• 3–4 meses: 3–4 sonecas/dia. Total: 14–16h/dia\n• 5–6 meses: 2–3 sonecas/dia. Total: 12–15h/dia\n• 6–8 meses: 2 sonecas (manhã e tarde). Total: 12–15h/dia\n\n**"Janela de sono" (wake window):** tempo que o bebê aguenta acordado entre sonecas sem ficar excessivamente cansado.\n• 0–2 meses: 45–75 min\n• 3 meses: 1h–1h30\n• 4–5 meses: 1h30–2h\n\n**Sinal de cansaço:** bocejo, esfregar olhos, olhar fixo, irritabilidade → é hora de dormir.\n\n**Soneca curta (< 20 min):** não atingiu sono profundo. O bebê pode acordar irritado — tente recolocar para dormir.\n\n📋 **Fonte:** SBP · AAP · National Sleep Foundation 2023`
+  },
+  {
+    id:'sono-7', cat:'sono', icon:'🌙', urgencia:'normal',
+    faixaEtaria:'3-12m', tempoLeitura:2,
+    titulo: 'Despertar Noturno: Normal vs Problema — Como Distinguir',
+    resumo: 'Todo bebê acorda à noite. O que define se é normal e quando merece atenção?',
+    fonte: 'SBP / AAP',
+    corpo: `**Fato:** Todo ser humano (incluindo adultos) tem microdespertares entre ciclos de sono. Em bebês, a diferença é que eles ainda não sabem voltar a dormir sozinhos.\n\n**Normal:**\n• RN: acordar a cada 2–4h para mamar\n• 3–4 meses: 2–4 despertares por noite\n• 6 meses: alguns bebês já dormem 6h seguidas; outros ainda acordam 2–3x\n• Variação individual é muito grande — não há regra absoluta\n\n**Quando considerar avaliação:**\n• Mais de 5–6 despertares/noite após os 6 meses, todo dia\n• Bebê não consegue adormecer SEM a presença do cuidador após 6 meses\n• Despertares com choro intenso, difícil de consolar (investigar dor, DRGE)\n• Ronco intenso ou pausas na respiração → avaliação de apneia obstrutiva\n\n**Associação ao sono:** ao adormecer sempre no seio/colo, o bebê associa esse estímulo ao adormecer. Ao despertar entre ciclos, precisará da mesma condição para voltar a dormir.\n\n📋 **Fonte:** SBP · AAP Sleep Guidelines 2022`
+  },
+
+  // ─── NUTRIÇÃO ──────────────────────────────────────────
+  {
+    id:'nut-8', cat:'nutricao', icon:'🥦', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'O que a Mãe Come Afeta o Leite Materno?',
+    resumo: 'Mitos e verdades sobre alimentação materna durante a amamentação — o que realmente importa.',
+    fonte: 'SBP / OMS / FEBRASGO',
+    corpo: `**Mito: "preciso fazer dieta especial para amamentar"**\nNão. O organismo materno prioriza a composição do leite mesmo com dieta variada. O leite materno é nutricionalmente adequado mesmo com dieta modesta.\n\n**O que a mãe come PODE afetar:**\n• Sabor do leite: bebês expostos a sabores variados (alho, especiarias) durante a amamentação aceitam melhor alimentos novos na introdução alimentar\n• Vitamina D e B12: mães com deficiência podem passar isso ao bebê → suplementação é recomendada\n• Cafeína: passa para o leite (menor quantidade). Até 2 xícaras/dia é seguro para a maioria\n• Álcool: passa para o leite. Eliminar ou aguardar 2h após consumo por dose antes de amamentar\n\n**Alimentos a evitar por mito (não precisam ser retirados):**\n• Laranja, chocolate, feijão, repolho, cebola — não causam cólica comprovadamente\n\n**Evitar de verdade:** álcool em excesso, tabaco, peixes de alto teor de mercúrio (tubarão, cação, peixe-espada)\n\n📋 **Fonte:** SBP · OMS 2023 · FEBRASGO`
+  },
+
+  // ─── SAÚDE ─────────────────────────────────────────────
+  {
+    id:'sau-7', cat:'saude', icon:'🫧', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Candidíase Oral (Sapinho): Identificar e Tratar',
+    resumo: 'Manchas brancas na boca do bebê — como saber se é sapinho ou só resíduo de leite.',
+    fonte: 'SBP',
+    corpo: `**O que é?** Infecção por Candida albicans (fungo normal da flora). Muito comum em RNs — sistema imune ainda imaturo.\n\n**Como identificar:**\n• Manchas brancas na língua, bochechas internas, gengivas e palato\n• Diferença do leite: o sapinho NÃO sai com gaze/pano úmido; o leite sim\n• Bebê pode mostrar desconforto ao mamar, irritabilidade\n\n**Tratamento:**\n• Nistatina suspensão oral (Micostatin) — prescrita pelo pediatra\n• Aplicar nas lesões após cada mamada, 4x/dia por 7–14 dias\n• Tratar o seio materno concomitantemente (creme antifúngico) para evitar reinfecção\n\n**Fatores que favorecem:**\n• Antibióticos (alteram microbiota)\n• Bicos e chupetas mal esterilizados\n• Canal do parto (transmissão da mãe)\n\n**Quando retornar ao pediatra:** sem melhora em 48h, bebê recusando completamente a mamar.\n\n📋 **Fonte:** SBP · Manual de Neonatologia MS 2022`
+  },
+  {
+    id:'sau-8', cat:'saude', icon:'🌡️', urgencia:'normal',
+    faixaEtaria:'0-12m', tempoLeitura:2,
+    titulo: 'Antitérmicos no Bebê: Quando e Como Usar Corretamente',
+    resumo: 'Paracetamol ou ibuprofeno? Quando dar e quando não dar. Doses certas para bebês.',
+    fonte: 'SBP 2024 / ANVISA',
+    corpo: `**Quando NÃO dar antitérmico:**\n• Bebê < 3 meses → ir direto à emergência, não automedicar\n• Febre sem desconforto em bebê bem hidratado → febre em si não é perigosa, é defesa imune\n\n**Paracetamol:**\n• A partir de: nascimento (com orientação médica) / uso livre a partir do 1° mês\n• Dose: 10–15 mg/kg/dose a cada 6h\n• Apresentação gotas (200mg/ml): confirmar concentração — ANVISA alterou para 100mg/ml em algumas marcas\n• Máximo 5 doses/dia; intervalo mínimo 4–6h\n\n**Ibuprofeno:**\n• Somente a partir de 6 meses\n• Dose: 5–10 mg/kg/dose a cada 6–8h\n• Preferir com alimento (evita irritação gástrica)\n\n**Regra prática:** tratar o BEBÊ, não o número. Um bebê com 38,5°C brincando e bem hidratado precisa de menos intervenção do que um com 38°C prostrado.\n\n**Não fazer:** alternar automaticamente paracetamol e ibuprofeno sem orientação médica.\n\n📋 **Fonte:** SBP Diretriz Dores 2024 · ANVISA · MS Brasil`
+  },
+
+  // ─── DESENVOLVIMENTO ───────────────────────────────────
+  {
+    id:'dev-5', cat:'desenvolvimento', icon:'😊', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Sorriso Social: Quando Esperar e Por que é tão Importante',
+    resumo: 'O primeiro sorriso do bebê em resposta a você é um marco neurológico fundamental — não apenas fofo.',
+    fonte: 'SBP / Denver II',
+    corpo: `**O que é sorriso social?** Diferente do sorriso reflexo do RN (que ocorre durante o sono ou em resposta a estímulos físicos), o sorriso social é uma resposta intencional ao rosto e voz do cuidador.\n\n**Quando ocorre:** tipicamente entre 6–8 semanas de vida (5–7 semanas em alguns bebês). Raramente antes das 5 semanas.\n\n**Por que é importante?**\n• Marca o início da comunicação social intencional\n• Indica que o sistema visual e o processamento emocional estão se desenvolvendo\n• Base para o desenvolvimento da linguagem e vínculos\n• É um dos marcos mais confiáveis de desenvolvimento neurológico nessa faixa\n\n**Como estimular:**\n• Contato visual próximo (20–30 cm) durante mamadas\n• Falar, cantar e sorrir para o bebê com frequência\n• Expressões faciais exageradas (bebês adoram)\n\n**Sinal de alerta:** ausência de sorriso social responsivo aos 3 meses → mencionar ao pediatra. Pode indicar necessidade de avaliação do desenvolvimento.\n\n📋 **Fonte:** SBP · Denver Developmental Screening · DSM-5`
+  },
+  {
+    id:'dev-6', cat:'desenvolvimento', icon:'🗣️', urgencia:'normal',
+    faixaEtaria:'0-6m', tempoLeitura:2,
+    titulo: 'Linguagem nos Primeiros Meses: Mais do que Palavras',
+    resumo: 'A linguagem começa muito antes das primeiras palavras. Como o bebê se comunica de 0 a 6 meses.',
+    fonte: 'SBP / ABN',
+    corpo: `**A linguagem não começa quando o bebê fala — começa quando ele nasce.**\n\n**0–2 meses:**\n• Choro diferenciado (fome, dor, cansaço) — forma primária de comunicação\n• Responde à voz humana (orienta cabeça)\n• Emite sons guturais ("eee", "aaah")\n\n**2–4 meses:**\n• Gorjeios e arrulhos (sons de vogais prolongados)\n• Vocalizações em "turnos" — responde quando falamos e espera nossa vez\n• Reconhece a voz dos cuidadores\n\n**4–6 meses:**\n• Balbucio (início de consoantes + vogais: "baba", "gaga")\n• Rit de prazer e gargalhada\n• Explora diferentes volumes e tons de voz\n\n**Como estimular:**\n• Conversar SEMPRE durante os cuidados (banho, troca, mamada)\n• Ler livros de imagens em voz alta\n• Responder às vocalizações como se fossem conversa real\n• Cantar — melodia é processada mesmo antes da linguagem\n\n**Sinais de alerta:** sem nenhum vocalize diferente do choro aos 2 meses; não orienta para sons aos 3 meses → avaliação\n\n📋 **Fonte:** SBP · ABN · Denver II`
+  },
+
+  // ─── COMPORTAMENTO ─────────────────────────────────────
+  {
+    id:'comp-5', cat:'comportamento', icon:'🕐', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Período da Tarde e Choro do Final do Dia: O "Pico das 18h"',
+    resumo: 'Muitos bebês ficam inconsoláveis no final da tarde. Por que isso acontece e o que fazer.',
+    fonte: 'SBP / Brazelton',
+    corpo: `**O que é?** Um padrão muito comum em que bebês saudáveis ficam irritados e difíceis de consolar entre 17h e 22h, especialmente entre 3–12 semanas.\n\n**Por que acontece?**\n• Acúmulo de estimulação sensorial do dia — o sistema nervoso imaturo "transborda"\n• Ritmo circadiano ainda em ajuste (cortisol elevado à tarde)\n• Interferência da fadiga dos cuidadores — bebês percebem ansiedade\n• Pode coincidir com aumento da demanda por leite no final do dia\n\n**Estratégias que ajudam:**\n• Reduzir estimulação: ambiente mais escuro, quieto, menos manipulação\n• Movimento rítmico: carregar, balanço suave, passeio de carro\n• Som branco: aspirador, rádio fora de estação, aplicativo\n• "5 Ss" de Karp: sugar, som branco, balanço, posição de lado/barriga, envolver\n• Banho morno pode ajudar ALGUNS bebês (outros ficam mais acordados)\n\n**Importante:** não é culpa dos pais. Não significa que o leite "acabou". É uma fase.\n\n📋 **Fonte:** SBP · T. Berry Brazelton · Harvey Karp (Happiest Baby)`
+  },
+
+  // ─── ROTINA ────────────────────────────────────────────
+  {
+    id:'rot-5', cat:'rotina', icon:'🧴', urgencia:'normal',
+    faixaEtaria:'0-3m', tempoLeitura:2,
+    titulo: 'Coto Umbilical: Cuidados até a Queda',
+    resumo: 'Como limpar, o que evitar e quando consultar. O umbigo do bebê cai entre 7–21 dias.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Quando cai?** Entre 7 e 21 dias (média: 10–14 dias). Pode demorar mais em alguns bebês — normal até 4 semanas.\n\n**Cuidados recomendados (MS Brasil 2022):**\n• Álcool 70% a cada troca de fralda — limpar a base com gaze umedecida\n• Dobrar a fralda abaixo do umbigo para manter seco e com ventilação\n• Deixar exposto ao ar quando possível\n\n**O que NÃO fazer:**\n• Não cobrir com curativo, faixa ou band-aid\n• Não mergulhar o bebê em banheira até a queda (banho de esponja)\n• Não puxar o coto antes da hora — a queda natural não dói\n\n**Sinais normais:**\n• Pequeno sangramento ao cair (manchinha vermelha) — normal\n• Odor leve — normal\n\n**Buscar o pediatra se:**\n• Vermelhidão que se alastra para a pele ao redor (onfalite)\n• Pus ou secreção purulenta\n• Febre associada\n• Sangramento persistente\n• Coto não caiu após 4 semanas\n\n📋 **Fonte:** SBP · Manual do RN MS 2022`
+  },
+
+  // ─── SEGURANÇA ─────────────────────────────────────────
+  {
+    id:'seg-4', cat:'seguranca', icon:'🌡️', urgencia:'normal',
+    faixaEtaria:'0-12m', tempoLeitura:2,
+    titulo: 'Superaquecimento do Bebê: Risco Ignorado',
+    resumo: 'Bebê bem agasalhado nem sempre é bebê protegido. O superaquecimento é fator de risco para SMSL.',
+    fonte: 'SBP / AAP',
+    corpo: `**Por que preocupa?** O superaquecimento é identificado como fator de risco independente para SMSL. Bebês têm dificuldade em regular a própria temperatura.\n\n**Temperatura ideal do quarto:** 18–22°C (20°C é considerada ótima)\n\n**Regra prática de roupa:** o bebê deve usar uma camada a mais que o adulto se sente confortável.\n\n**Sinais de superaquecimento:**\n• Pele avermelhada, quente e suada\n• Respiração rápida\n• Agitação ou sonolência excessiva\n• Nuca úmida\n\n**Erros comuns:**\n• Colocar touca dentro de casa (a cabeça é a principal via de regulação da temperatura)\n• Cobertores fofos ou edredons no berço\n• Aquecedor muito perto do berço\n• Múltiplas camadas de roupa em casa aquecida\n\n**Saco de dormir (sleep sack):** excelente opção — substitui cobertores de forma segura, mantém temperatura adequada sem risco de cobertura do rosto.\n\n📋 **Fonte:** SBP · AAP SUID Prevention Guidelines 2022`
   }
 ];
 
@@ -7645,12 +7994,17 @@ function buscarSabedoria(termo) {
 
 function toggleSabedoriaArtigo(id) {
   const corpo = document.getElementById('sab-corpo-' + id);
+  const btn   = document.getElementById('sab-btn-' + id);
   if (!corpo) return;
+  const abrindo = !corpo.classList.contains('aberto');
   corpo.classList.toggle('aberto');
-  const btn = document.getElementById('sab-btn-' + id);
-  if (btn) btn.textContent = corpo.classList.contains('aberto') ? 'FECHAR ↑' : 'ABRIR →';
+  if (btn) {
+    btn.classList.toggle('aberto', abrindo);
+    btn.innerHTML = abrindo
+      ? 'FECHAR <span class="chev" style="display:inline-block;transform:rotate(180deg)">▼</span>'
+      : 'SABER MAIS <span class="chev">▼</span>';
+  }
 }
-
 function renderSabFase() {
   const el = document.getElementById('sab-fase-card');
   if (!el) return;
@@ -7674,9 +8028,7 @@ function renderSabedoria() {
   if (!el) return;
 
   let lista = SABEDORIA_DB;
-  if (sabedoriaFiltroAtual !== 'todos') {
-    lista = lista.filter(a => a.cat === sabedoriaFiltroAtual);
-  }
+  if (sabedoriaFiltroAtual !== 'todos') lista = lista.filter(a => a.cat === sabedoriaFiltroAtual);
   if (sabedoriaBuscaAtual) {
     const b = sabedoriaBuscaAtual;
     lista = lista.filter(a =>
@@ -7685,53 +8037,51 @@ function renderSabedoria() {
       (a.corpo||'').toLowerCase().includes(b)
     );
   }
-
   if (!lista.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><p>Nenhum artigo encontrado para essa busca.</p></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><p>Nenhum artigo encontrado.</p></div>';
     return;
   }
 
   const catMap = {
-    sono:           ['😴', 'SONO', 'sab-badge-sono'],
-    nutricao:       ['🍼', 'NUTRIÇÃO', 'sab-badge-nutricao'],
-    desenvolvimento:['✨', 'DESENVOLV.', 'sab-badge-desenvolvimento'],
-    saude:          ['🩺', 'SAÚDE', 'sab-badge-saude'],
-    comportamento:  ['🧠', 'COMPORT.', 'sab-badge-comportamento'],
-    seguranca:      ['🛡️', 'SEGURANÇA', 'sab-badge-seguranca'],
-    rotina:         ['🗓', 'ROTINA', 'sab-badge-rotina'],
+    sono:['😴','SONO','sab-badge-sono'],
+    nutricao:['🍼','NUTRIÇÃO','sab-badge-nutricao'],
+    desenvolvimento:['✨','DESENVOLV.','sab-badge-desenvolvimento'],
+    saude:['🩺','SAÚDE','sab-badge-saude'],
+    comportamento:['🧠','COMPORT.','sab-badge-comportamento'],
+    seguranca:['🛡️','SEGURANÇA','sab-badge-seguranca'],
+    rotina:['🗓','ROTINA','sab-badge-rotina'],
   };
 
   el.innerHTML = lista.map(a => {
     const [icon, label, cls] = catMap[a.cat] || ['📌', a.cat.toUpperCase(), ''];
     const faixa = a.faixaEtaria || '';
     const tempo = a.tempoLeitura ? `⏱ ${a.tempoLeitura}min` : '';
+    const urgente = a.urgencia === 'alta';
     const corpoHtml = (a.corpo||'')
       .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
       .replace(/\n/g,'<br>');
     return `
-      <div class="sab-artigo2" onclick="toggleSabedoriaArtigo('${a.id}')">
-        <div class="sab-artigo2-top">
+      <div class="sab-faq-card${urgente ? ' sab-urgencia-alta' : ''}">
+        <div class="sab-faq-meta">
           <span class="sab-badge2 ${cls}">${icon} ${label}</span>
           ${faixa ? `<span class="sab-faixa">${faixa}</span>` : ''}
+          ${urgente ? '<span style="font-size:0.58rem;color:rgba(255,100,100,0.8);font-family:Orbitron,monospace">🚨 URGENTE</span>' : ''}
           ${tempo ? `<span class="sab-tempo">${tempo}</span>` : ''}
         </div>
-        <div class="sab-artigo2-titulo">${a.titulo}</div>
-        <div class="sab-artigo2-resumo">${a.resumo}</div>
-        <div class="sab-abrir" id="sab-btn-${a.id}">ABRIR →</div>
-        <div class="sab-corpo2" id="sab-corpo-${a.id}">
+        <div class="sab-faq-titulo">${a.titulo}</div>
+        <div class="sab-faq-resumo">${a.resumo}</div>
+        <div class="sab-faq-actions">
+          <button class="sab-saberMais" id="sab-btn-${a.id}" onclick="toggleSabedoriaArtigo('${a.id}')">
+            SABER MAIS <span class="chev">▼</span>
+          </button>
+          <span style="font-size:0.58rem;color:rgba(0,180,255,0.3);font-family:'Orbitron',monospace">${a.fonte||''}</span>
+        </div>
+        <div class="sab-faq-corpo" id="sab-corpo-${a.id}">
           ${corpoHtml}
-          ${a.fonte ? `<div style="margin-top:10px;font-size:0.62rem;color:rgba(0,180,255,0.5);font-family:'Orbitron',monospace;letter-spacing:0.06em">📡 FONTE: ${a.fonte}</div>` : ''}
+          ${a.fonte ? `<div class="sab-faq-fonte">📡 FONTE: ${a.fonte}</div>` : ''}
         </div>
       </div>`;
   }).join('');
-}
-
-function toggleSabedoriaArtigo(id) {
-  const corpo = document.getElementById('sab-corpo-' + id);
-  if (!corpo) return;
-  corpo.classList.toggle('aberto');
-  const btn = document.getElementById('sab-btn-' + id);
-  if (btn) btn.textContent = corpo.classList.contains('aberto') ? 'FECHAR ↑' : 'ABRIR →';
 }
 
 function renderAll() {
@@ -7745,6 +8095,7 @@ function renderAll() {
   renderCrescimento();
 }
 
+initMedForm();
 </script>
 
 <!-- MODAL CONFIGURAR ORÁCULO -->
@@ -7757,15 +8108,12 @@ function renderAll() {
         <div style="font-size:0.62rem;color:rgba(212,168,255,0.6);margin-top:2px">Configuração via Cloudflare Worker</div>
       </div>
     </div>
-    <div id="oraculo-config-status-banner" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:8px;font-size:0.72rem;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#7fff60">
-      ✅ Oráculo ativo
-    </div>
-    <!-- Instruções passo a passo -->
+    <div id="oraculo-config-status-banner" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:8px;font-size:0.72rem;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#7fff60">✅ Oráculo ativo</div>
     <div style="font-size:0.7rem;color:rgba(212,168,255,0.8);line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
       <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);margin-bottom:6px;letter-spacing:0.08em">📋 COMO CONFIGURAR</div>
       <div>1. Acesse <strong style="color:#d4a8ff">workers.cloudflare.com</strong> → conta gratuita</div>
       <div>2. Crie um Worker → cole o código disponibilizado</div>
-      <div>3. Adicione variável de ambiente: <strong style="color:#d4a8ff">ANTHROPIC_API_KEY</strong></div>
+      <div>3. Adicione variável: <strong style="color:#d4a8ff">ANTHROPIC_API_KEY</strong></div>
       <div>4. Cole a URL do Worker abaixo e ative</div>
     </div>
     <div class="form-group" style="margin-bottom:10px">
