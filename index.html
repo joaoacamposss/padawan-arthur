@@ -1660,6 +1660,104 @@
     .card:hover { border-color: rgba(0,180,255,0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
     .btn-guardian:hover { transform: none; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
   }
+
+  /* ── SABEDORIA GALÁCTICA v2 ── */
+  .sab-header-card {
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;margin-bottom:10px;
+    background:linear-gradient(145deg,rgba(0,30,80,0.7),rgba(0,10,40,0.9));
+    border:1px solid rgba(0,180,255,0.25);border-radius:14px;
+  }
+  .sab-fase-card {
+    padding:10px 14px;margin-bottom:10px;
+    background:linear-gradient(135deg,rgba(0,20,60,0.7),rgba(0,40,100,0.5));
+    border:1px solid rgba(0,180,255,0.2);border-radius:12px;
+    font-size:0.78rem;
+  }
+  .sab-fase-label {
+    font-family:'Orbitron',monospace;font-size:0.58rem;
+    color:rgba(0,180,255,0.6);letter-spacing:0.1em;margin-bottom:4px;
+  }
+  .sab-fase-valor { color:var(--white);font-size:0.82rem; }
+  .sab-fase-valor strong { color:var(--gold); }
+  .sab-busca-card {
+    padding:12px 14px;margin-bottom:12px;
+    background:rgba(0,15,40,0.6);border:1px solid rgba(0,180,255,0.15);border-radius:12px;
+  }
+  .sab-busca-titulo {
+    font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--blue-neon);
+    letter-spacing:0.12em;margin-bottom:8px;
+  }
+  .sab-input {
+    width:100%;padding:10px 12px;font-size:14px;
+    background:rgba(0,10,30,0.7);border:1px solid rgba(0,180,255,0.2);
+    border-radius:10px;color:var(--white);margin-bottom:10px;
+  }
+  .sab-input::placeholder { color:rgba(122,179,212,0.5); }
+  .sab-cats-wrap {
+    display:flex;gap:6px;flex-wrap:wrap;
+  }
+  .sab-cat2 {
+    display:flex;align-items:center;gap:5px;
+    padding:6px 12px;border-radius:20px;font-size:0.65rem;
+    font-family:'Orbitron',monospace;letter-spacing:0.06em;
+    border:1px solid rgba(0,180,255,0.2);
+    background:rgba(0,20,60,0.5);color:rgba(122,179,212,0.8);
+    cursor:pointer;transition:all 0.15s;white-space:nowrap;
+  }
+  .sab-cat2.active {
+    background:rgba(0,60,150,0.5);border-color:rgba(0,180,255,0.5);
+    color:var(--blue-neon);
+  }
+  .sab-artigo2 {
+    padding:14px 16px;margin-bottom:10px;
+    background:rgba(0,15,40,0.7);border:1px solid rgba(0,180,255,0.15);
+    border-radius:12px;cursor:pointer;transition:border-color 0.15s;
+  }
+  .sab-artigo2:active { border-color:rgba(0,180,255,0.4); }
+  .sab-artigo2-top {
+    display:flex;align-items:center;gap:6px;margin-bottom:8px;
+  }
+  .sab-badge2 {
+    display:inline-flex;align-items:center;gap:4px;
+    padding:3px 9px;border-radius:12px;font-size:0.6rem;
+    font-family:'Orbitron',monospace;letter-spacing:0.06em;font-weight:700;
+  }
+  .sab-faixa {
+    font-size:0.6rem;color:rgba(122,179,212,0.6);
+    font-family:'Orbitron',monospace;
+  }
+  .sab-tempo {
+    margin-left:auto;font-size:0.6rem;color:rgba(122,179,212,0.5);
+    font-family:'Orbitron',monospace;
+  }
+  .sab-artigo2-titulo {
+    font-size:0.92rem;font-weight:700;color:var(--white);
+    line-height:1.3;margin-bottom:5px;
+  }
+  .sab-artigo2-resumo {
+    font-size:0.73rem;color:rgba(122,179,212,0.7);
+    line-height:1.4;margin-bottom:8px;
+  }
+  .sab-abrir {
+    font-size:0.65rem;color:var(--blue-neon);font-family:'Orbitron',monospace;
+    letter-spacing:0.08em;cursor:pointer;
+  }
+  /* Corpo expandido */
+  .sab-corpo2 {
+    display:none;margin-top:10px;padding-top:10px;
+    border-top:1px solid rgba(0,180,255,0.12);
+    font-size:0.75rem;color:rgba(200,225,240,0.8);line-height:1.6;
+  }
+  .sab-corpo2.aberto { display:block; }
+  /* Cores por categoria */
+  .sab-badge-sono      { background:rgba(80,0,160,0.4);color:#c0a0ff;border:1px solid rgba(180,100,255,0.3); }
+  .sab-badge-nutricao  { background:rgba(0,80,0,0.4);color:#80e060;border:1px solid rgba(80,200,80,0.3); }
+  .sab-badge-desenvolvimento { background:rgba(120,80,0,0.4);color:#ffd060;border:1px solid rgba(255,190,0,0.3); }
+  .sab-badge-saude     { background:rgba(0,60,120,0.4);color:#60c0ff;border:1px solid rgba(0,180,255,0.3); }
+  .sab-badge-comportamento { background:rgba(0,80,60,0.4);color:#60e0c0;border:1px solid rgba(0,200,160,0.3); }
+  .sab-badge-seguranca { background:rgba(120,40,0,0.4);color:#ffaa60;border:1px solid rgba(255,150,0,0.3); }
+  .sab-badge-rotina    { background:rgba(0,50,80,0.4);color:#60c0e0;border:1px solid rgba(0,160,200,0.3); }
 </style>
 </head>
 <body>
@@ -1821,6 +1919,9 @@
     <button onclick="abrirGlossario()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--white);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">📖</span> Glossário Galáctico
     </button>
+    <button onclick="fecharMenuGuardiao();abrirModalOraculoConfig()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(212,168,255,0.9);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(80,0,160,0.3)'" onmouseout="this.style.background='none'">
+      <span style="font-size:1.2rem">🔮</span> Configurar Oráculo
+    </button>
     <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">☁️</span> Sincronizar dados locais
     </button>
@@ -1974,6 +2075,81 @@
     </div>
 
     <div id="lista-mamadas"></div>
+  </div>
+  <!-- ESTOQUE DE LEITE MATERNO -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="section-title">🧊 Banco Galáctico de Leite</div>
+    <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:12px;line-height:1.5">
+      Registre extrações e controle o estoque de leite materno disponível.
+    </div>
+
+    <!-- Painel de estoque atual -->
+    <div id="estoque-resumo" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px"></div>
+
+    <!-- Sub-tabs -->
+    <div class="sub-tabs" style="margin-bottom:12px">
+      <button class="sub-tab active" id="etab-extrair" onclick="showEstoqueTab('extrair',this)">💉 Nova Extração</button>
+      <button class="sub-tab" id="etab-usar" onclick="showEstoqueTab('usar',this)">🍼 Usar Estoque</button>
+      <button class="sub-tab" id="etab-lista" onclick="showEstoqueTab('lista',this)">📋 Inventário</button>
+    </div>
+
+    <!-- Extrair -->
+    <div id="epanel-extrair" class="subpanel active">
+      <div class="row-2">
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="ext-data">
+        </div>
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time" id="ext-hora">
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="form-group">
+          <label>Volume extraído (ml)</label>
+          <input type="number" id="ext-ml" placeholder="ex: 120" min="0" max="500">
+        </div>
+        <div class="form-group">
+          <label>Armazenamento</label>
+          <select id="ext-tipo">
+            <option value="geladeira">❄️ Geladeira (48h)</option>
+            <option value="congelador">🧊 Congelador (15 dias)</option>
+            <option value="freezer">🌡️ Freezer (3 meses)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <input type="text" id="ext-obs" placeholder="ex: seio esquerdo, pós-mamada...">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="salvarExtracao()">💾 Registrar Extração</button>
+    </div>
+
+    <!-- Usar estoque -->
+    <div id="epanel-usar" class="subpanel">
+      <div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:10px">Registre o uso de leite do banco para uma mamada.</div>
+      <div class="row-2">
+        <div class="form-group">
+          <label>Data uso</label>
+          <input type="date" id="uso-data">
+        </div>
+        <div class="form-group">
+          <label>Volume usado (ml)</label>
+          <input type="number" id="uso-ml" placeholder="ex: 80" min="0" max="500">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Obs</label>
+        <input type="text" id="uso-obs" placeholder="ex: oferecido na mamadeira">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="registrarUsoEstoque()">✅ Registrar Uso</button>
+    </div>
+
+    <!-- Inventário -->
+    <div id="epanel-lista" class="subpanel">
+      <div id="lista-estoque"></div>
+    </div>
   </div>
 
   <div id="tab-agenda" class="tab-panel">
@@ -2186,6 +2362,8 @@
     <div class="orbitas-subtabs">
       <button class="orbitas-stab active" id="ostab-marcos" onclick="showOrbitasTab('marcos',this)">🌙 Marcos</button>
       <button class="orbitas-stab" id="ostab-crescimento" onclick="showOrbitasTab('crescimento',this)">📏 Crescimento</button>
+      <button class="orbitas-stab" id="ostab-oraculo" onclick="showOrbitasTab('oraculo',this)">🔮 Oráculo</button>
+      <button class="orbitas-stab" id="ostab-sabedoria" onclick="showOrbitasTab('sabedoria',this)">📚 Sabedoria</button>
     </div>
 
     <!-- SUB-ABA: MARCOS -->
@@ -2317,6 +2495,75 @@
     </div>
   </div>
 
+    <!-- SUB-ABA: ORÁCULO -->
+    <div id="orbitas-panel-oraculo" class="orbitas-panel" style="display:none">
+      <div class="card" style="margin-bottom:10px;background:linear-gradient(145deg,rgba(60,0,100,0.4),rgba(20,0,50,0.6));border-color:rgba(180,100,255,0.3)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:1.6rem">🔮</span>
+          <div>
+            <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#d4a8ff;letter-spacing:0.1em">ORÁCULO JEDI</div>
+            <div style="font-size:0.65rem;color:rgba(212,168,255,0.6);margin-top:2px">IA Pediátrica · Powered by Claude</div>
+          </div>
+        </div>
+        <div style="font-size:0.7rem;color:rgba(212,168,255,0.7);line-height:1.5;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
+          ⚠️ <strong style="color:#ffe066">Aviso:</strong> O Oráculo oferece orientações gerais baseadas nas diretrizes da SBP. <strong>Não substitui consulta pediátrica.</strong>
+        </div>
+      </div>
+      <div id="oraculo-cfg" style="display:none"></div>
+      <div id="oraculo-key-status" style="display:none"></div>
+      <div id="oraculo-input-area" style="">
+      <div id="oraculo-chat" style="max-height:50vh;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;padding:4px 0"></div>
+      <div class="card" style="padding:10px">
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <textarea id="oraculo-input" placeholder="Pergunte ao Oráculo... ex: 'Arthur está dormindo muito, é normal?'" style="flex:1;min-height:60px;resize:none;font-size:15px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#e8f4fd" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarOraculo();}"></textarea>
+          <button onclick="enviarOraculo()" id="btn-oraculo-enviar" style="background:linear-gradient(135deg,rgba(100,0,180,0.7),rgba(60,0,120,0.8));border:1px solid rgba(180,100,255,0.4);color:#d4a8ff;border-radius:10px;padding:10px 14px;font-size:1.1rem;cursor:pointer;flex-shrink:0;min-height:60px">🔮</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button onclick="perguntaRapidaOraculo(this)" data-q="Quais marcos de desenvolvimento são esperados para a idade do Arthur?" style="font-size:0.62rem;padding:4px 8px;border-radius:12px;border:1px solid rgba(180,100,255,0.25);background:rgba(60,0,100,0.3);color:rgba(212,168,255,0.8);cursor:pointer">📅 Desenvolvimento</button>
+          <button onclick="perguntaRapidaOraculo(this)" data-q="Com base nas mamadas de hoje, a alimentação do Arthur está adequada?" style="font-size:0.62rem;padding:4px 8px;border-radius:12px;border:1px solid rgba(180,100,255,0.25);background:rgba(60,0,100,0.3);color:rgba(212,168,255,0.8);cursor:pointer">🍼 Nutrição</button>
+          <button onclick="perguntaRapidaOraculo(this)" data-q="Quais sinais de alerta devo observar no Arthur agora?" style="font-size:0.62rem;padding:4px 8px;border-radius:12px;border:1px solid rgba(180,100,255,0.25);background:rgba(60,0,100,0.3);color:rgba(212,168,255,0.8);cursor:pointer">⚠️ Alertas</button>
+          <button onclick="perguntaRapidaOraculo(this)" data-q="Como deve ser o sono do Arthur nessa fase?" style="font-size:0.62rem;padding:4px 8px;border-radius:12px;border:1px solid rgba(180,100,255,0.25);background:rgba(60,0,100,0.3);color:rgba(212,168,255,0.8);cursor:pointer">😴 Sono</button>
+          <button onclick="limparOraculo()" style="font-size:0.62rem;padding:4px 8px;border-radius:12px;border:1px solid rgba(255,100,100,0.25);background:rgba(100,0,0,0.2);color:rgba(255,150,150,0.8);cursor:pointer">🗑 Limpar</button>
+        </div>
+      </div>
+      </div><!-- fim oraculo-input-area -->
+    </div>
+
+    <!-- SUB-ABA: SABEDORIA GALÁCTICA -->
+    <div id="orbitas-panel-sabedoria" class="orbitas-panel" style="display:none">
+
+      <!-- Header -->
+      <div class="sab-header-card">
+        <span style="font-size:1.5rem">📚</span>
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--blue-neon);letter-spacing:0.1em">SABEDORIA GALÁCTICA</div>
+          <div style="font-size:0.65rem;color:var(--text-dim);margin-top:3px">Artigos pediátricos · FAQ · curados por especialistas</div>
+        </div>
+      </div>
+
+      <!-- Fase atual do Arthur -->
+      <div id="sab-fase-card" class="sab-fase-card"></div>
+
+      <!-- Busca -->
+      <div class="sab-busca-card">
+        <div class="sab-busca-titulo">🔍 BUSCAR</div>
+        <input type="text" id="sabedoria-busca" class="sab-input" placeholder="Buscar por tema (ex: cólica, sono, febre)..." oninput="buscarSabedoria(this.value)">
+        <div class="sab-cats-wrap">
+          <button class="sab-cat2 active" onclick="filtrarSabedoria('todos',this)"><span>📋</span> TODAS</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('sono',this)"><span>😴</span> SONO</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('nutricao',this)"><span>🍼</span> NUTRIÇÃO</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('desenvolvimento',this)"><span>✨</span> DESENVOLVIMENTO</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('saude',this)"><span>🩺</span> SAÚDE</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('comportamento',this)"><span>🧠</span> COMPORTAMENTO</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('seguranca',this)"><span>🛡️</span> SEGURANÇA</button>
+          <button class="sab-cat2" onclick="filtrarSabedoria('rotina',this)"><span>🗓</span> ROTINA</button>
+        </div>
+      </div>
+
+      <!-- Lista de artigos -->
+      <div id="lista-sabedoria"></div>
+
+    </div>
   <!-- ESCUDOS DO PADAWAN (VACINAS) -->
   <div id="tab-vacinas" class="tab-panel">
     <div class="card" style="margin-bottom:12px">
@@ -3423,6 +3670,8 @@ function removerSplash() {
 
 function iniciarApp() {
   initFirebaseRefs();
+  initEstoqueForm();
+  renderEstoqueResumo();
 
   loadGuardioes();
   loadFotos();
@@ -4513,8 +4762,10 @@ function showOrbitasTab(tab, btn) {
   if (tab === 'crescimento') {
     initCrescForm();
     renderCrescimento();
-    setTimeout(renderGraficoCrescimento, 50); // aguarda layout
+    setTimeout(renderGraficoCrescimento, 50);
   }
+  if (tab === 'oraculo')   initOraculo();
+  if (tab === 'sabedoria') { renderSabedoria(); }
 }
 
 function setCrescMetrica(m, btn) {
@@ -6829,422 +7080,618 @@ function copiarRelatorio() {
   }
 }
 
-function renderAll() {
-  renderMamadas();
-  renderDuvidas();
-  renderAgenda();
-  renderDashboard();
-  renderMesversario();
-  renderVacinas();
-  renderMedicacao();
-  renderCrescimento();
+
+// ── ESTOQUE DE LEITE MATERNO ──
+const ESTOQUE_KEY = 'arthur_estoque_leite_v1';
+let estoqueLeite = [];
+
+function loadEstoque() {
+  try { estoqueLeite = JSON.parse(localStorage.getItem(ESTOQUE_KEY)) || []; } catch(e) { estoqueLeite = []; }
 }
 
-initMedForm();
-</script>
+function saveEstoque() {
+  localStorage.setItem(ESTOQUE_KEY, JSON.stringify(estoqueLeite));
+  // Sync Firebase
+  try { if (EXTRAS_REF) EXTRAS_REF.set({ crescimento: crescData, estoque: estoqueLeite }, { merge: true }); } catch(e) {}
+}
 
-<!-- ══════════════════════════════════════════════
-     MODAL GLOSSÁRIO GALÁCTICO
-     z-index: 999999 — mais alto de todo o app
-     position: fixed diretamente no body
-     NUNCA dentro de header, nav ou qualquer container
-     ══════════════════════════════════════════════ -->
-<div id="modal-glossario" style="
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:999999;
-  background:rgba(2,11,24,0.97);
-  flex-direction:column;
-  overflow:hidden;
-">
+function initEstoqueForm() {
+  const hoje = new Date();
+  const y=hoje.getFullYear(), m=String(hoje.getMonth()+1).padStart(2,'0'), d=String(hoje.getDate()).padStart(2,'0');
+  const h=String(hoje.getHours()).padStart(2,'0'), min=String(hoje.getMinutes()).padStart(2,'0');
+  document.getElementById('ext-data').value = `${y}-${m}-${d}`;
+  document.getElementById('ext-hora').value = `${h}:${min}`;
+  document.getElementById('uso-data').value = `${y}-${m}-${d}`;
+}
 
-  <!-- HEADER DO GLOSSÁRIO -->
-  <div style="
-    background:linear-gradient(180deg,rgba(0,20,50,0.98) 0%,rgba(2,11,24,0.95) 100%);
-    border-bottom:1px solid rgba(0,180,255,0.2);
-    padding:env(safe-area-inset-top,0) 0 0;
-    flex-shrink:0;
-  ">
-    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
-      <div style="font-size:1.4rem">📖</div>
+function showEstoqueTab(id, btn) {
+  document.querySelectorAll('.subpanel[id^="epanel-"]').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('[id^="etab-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('epanel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'lista') renderEstoque();
+}
+
+function salvarExtracao() {
+  const data  = document.getElementById('ext-data').value;
+  const hora  = document.getElementById('ext-hora').value;
+  const ml    = parseInt(document.getElementById('ext-ml').value);
+  const tipo  = document.getElementById('ext-tipo').value;
+  const obs   = document.getElementById('ext-obs').value.trim();
+
+  if (!data || !ml || ml <= 0) { alert('⚠️ Defina data e volume extraído!'); return; }
+
+  // Validade automática
+  const dataObj = new Date(data + 'T' + hora);
+  const horas = { geladeira: 48, congelador: 15*24, freezer: 90*24 };
+  const validade = new Date(dataObj.getTime() + horas[tipo] * 3600000);
+  const vY=validade.getFullYear(), vM=String(validade.getMonth()+1).padStart(2,'0'), vD=String(validade.getDate()).padStart(2,'0');
+
+  estoqueLeite.push({
+    id: Date.now(), data, hora, ml, tipo, obs,
+    validade: `${vY}-${vM}-${vD}`,
+    usado: false, autor: usuarioAtual
+  });
+  estoqueLeite.sort((a,b) => (b.data+b.hora).localeCompare(a.data+a.hora));
+  saveEstoque();
+  document.getElementById('ext-ml').value = '';
+  document.getElementById('ext-obs').value = '';
+  renderEstoqueResumo();
+  showToast('🧊 Extração registrada no Banco Galáctico!');
+}
+
+function registrarUsoEstoque() {
+  const data = document.getElementById('uso-data').value;
+  const ml   = parseInt(document.getElementById('uso-ml').value);
+  const obs  = document.getElementById('uso-obs').value.trim();
+
+  if (!data || !ml || ml <= 0) { alert('⚠️ Defina data e volume usado!'); return; }
+
+  // Descontar do estoque mais antigo (FIFO)
+  let restante = ml;
+  for (const item of estoqueLeite) {
+    if (item.usado || item.ml <= 0) continue;
+    if (item.ml <= restante) {
+      restante -= item.ml; item.ml = 0; item.usado = true;
+    } else {
+      item.ml -= restante; restante = 0; break;
+    }
+    if (restante === 0) break;
+  }
+
+  // Registrar evento de uso
+  estoqueLeite.push({
+    id: Date.now(), data, hora: new Date().toTimeString().slice(0,5),
+    ml: -ml, tipo: 'uso', obs: obs || 'Leite do banco utilizado',
+    usado: true, autor: usuarioAtual
+  });
+  saveEstoque();
+  document.getElementById('uso-ml').value = '';
+  document.getElementById('uso-obs').value = '';
+  renderEstoqueResumo();
+  showToast('🍼 Uso de estoque registrado!');
+}
+
+function renderEstoqueResumo() {
+  const el = document.getElementById('estoque-resumo');
+  if (!el) return;
+  const hoje = todayISO();
+  const disponiveis = estoqueLeite.filter(i => !i.usado && i.ml > 0 && i.tipo !== 'uso' && i.validade >= hoje);
+  const totalMl = disponiveis.reduce((s,i) => s+i.ml, 0);
+  const vencidos = estoqueLeite.filter(i => !i.usado && i.ml > 0 && i.tipo !== 'uso' && i.validade < hoje).length;
+  const extracoesHoje = estoqueLeite.filter(i => i.data === hoje && i.tipo !== 'uso' && !i.usado).length;
+
+  el.innerHTML = `
+    <div class="estoque-card">
+      <div class="estoque-val">${totalMl}</div>
+      <div class="estoque-label">ml disponíveis</div>
+    </div>
+    <div class="estoque-card">
+      <div class="estoque-val">${disponiveis.length}</div>
+      <div class="estoque-label">unidades no banco</div>
+    </div>
+    <div class="estoque-card">
+      <div class="estoque-val" style="color:${vencidos>0?'#ff6b6b':'var(--green-saber)'}">${vencidos}</div>
+      <div class="estoque-label">vencidos</div>
+    </div>
+    <div class="estoque-card">
+      <div class="estoque-val">${extracoesHoje}</div>
+      <div class="estoque-label">extrações hoje</div>
+    </div>`;
+}
+
+function renderEstoque() {
+  const el = document.getElementById('lista-estoque');
+  if (!el) return;
+  const hoje = todayISO();
+  const tipoLabel = { geladeira:'❄️ Geladeira', congelador:'🧊 Congelador', freezer:'🌡️ Freezer', uso:'🍼 Uso' };
+  const itens = estoqueLeite.filter(i => i.tipo !== 'uso').slice(0, 30);
+  if (!itens.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🧊</div><p>Nenhuma extração registrada</p></div>';
+    return;
+  }
+  el.innerHTML = itens.map(i => {
+    const vencido = i.validade < hoje;
+    const statusColor = i.usado ? 'var(--text-dim)' : vencido ? '#ff6b6b' : 'var(--green-saber)';
+    const statusTxt   = i.usado ? '✓ usado' : vencido ? '⚠️ vencido' : `✓ válido até ${i.validade}`;
+    return `<div class="estoque-item ${i.usado?'usado':''}">
       <div style="flex:1">
-        <div style="font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:#e8f4fd;letter-spacing:0.08em">GLOSSÁRIO GALÁCTICO</div>
-        <div style="font-size:0.65rem;color:#7ab3d4;margin-top:1px">Termos Jedi · Equivalentes do Mundo Comum</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span>${tipoLabel[i.tipo]||i.tipo}</span>
+          <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--blue-neon)">${i.ml}ml</span>
+        </div>
+        <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">${i.data} ${i.hora}</div>
+        ${i.obs?`<div style="font-size:0.68rem;color:rgba(122,179,212,0.6)">${i.obs}</div>`:''}
+        <div style="font-size:0.62rem;color:${statusColor};margin-top:2px">${statusTxt}</div>
       </div>
-      <button onclick="fecharGlossario()" style="
-        background:rgba(0,50,100,0.5);
-        border:1px solid rgba(0,180,255,0.25);
-        border-radius:8px;
-        color:#7ab3d4;
-        font-size:1.1rem;
-        width:36px;height:36px;
-        cursor:pointer;
-        display:flex;align-items:center;justify-content:center;
-        flex-shrink:0;
-      ">✕</button>
-    </div>
+      ${!i.usado?`<button onclick="descartarEstoque(${i.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:0.85rem;padding:4px">🗑</button>`:''}
+    </div>`;
+  }).join('');
+}
 
-    <!-- BUSCA -->
-    <div style="padding:0 16px 14px;position:relative">
-      <span style="position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5">🔍</span>
-      <input
-        type="text"
-        id="gloss-busca"
-        placeholder="Buscar termo Jedi ou palavra comum..."
-        oninput="filtrarGlossario()"
-        style="
-          width:100%;
-          background:rgba(0,20,50,0.8);
-          border:1px solid rgba(0,180,255,0.25);
-          border-radius:10px;
-          color:#e8f4fd;
-          font-size:16px;
-          font-family:'Exo 2',sans-serif;
-          padding:10px 14px 10px 42px;
-          outline:none;
-          -webkit-appearance:none;
-        "
-      >
-    </div>
+function descartarEstoque(id) {
+  const item = estoqueLeite.find(i => i.id === id);
+  if (item) { item.usado = true; item.ml = 0; saveEstoque(); renderEstoque(); renderEstoqueResumo(); showToast('🗑 Item descartado do banco'); }
+}
 
-    <!-- FILTROS -->
-    <div id="gloss-filtros" style="
-      display:flex;gap:6px;
-      overflow-x:auto;
-      scrollbar-width:none;
-      padding:0 16px 12px;
-      -webkit-overflow-scrolling:touch;
-    ">
-      <button class="gf-btn gf-ativo" onclick="setGlossFiltro('todos',this)">Todos</button>
-      <button class="gf-btn" onclick="setGlossFiltro('nav',this)">🌌 Navegação</button>
-      <button class="gf-btn" onclick="setGlossFiltro('form',this)">📝 Formulários</button>
-      <button class="gf-btn" onclick="setGlossFiltro('acao',this)">⚡ Ações</button>
-      <button class="gf-btn" onclick="setGlossFiltro('status',this)">📊 Status</button>
-      <button class="gf-btn" onclick="setGlossFiltro('pessoa',this)">👤 Pessoas</button>
-      <button class="gf-btn" onclick="setGlossFiltro('sistema',this)">⚙️ Sistema</button>
-    </div>
+loadEstoque();
 
-    <!-- CONTADOR -->
-    <div id="gloss-contador" style="
-      font-size:0.62rem;
-      color:#7ab3d4;
-      font-family:'Orbitron',monospace;
-      letter-spacing:0.06em;
-      padding:0 16px 10px;
-      text-align:right;
-    "></div>
-  </div>
 
-  <!-- LISTA SCROLLÁVEL -->
-  <div id="gloss-lista" style="
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    padding:12px 16px calc(16px + env(safe-area-inset-bottom,0));
-  "></div>
-</div>
+// ── ORÁCULO JEDI — IA Pediátrica ──
+let oraculoHistorico = [];
+let oraculoCarregando = false;
+let ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
 
-<style>
-  /* Modal glossário visível como flex */
-  #modal-glossario.aberto { display:flex !important; }
+function contextArthur() {
+  const hoje = todayISO();
+  const nasc = '2026-03-12';
+  const agora = new Date();
+  const nascObj = new Date(nasc + 'T00:00:00');
+  const diasVida = Math.floor((agora - nascObj) / 86400000);
+  const semanas  = Math.floor(diasVida / 7);
+  const mesesVida= Math.floor(diasVida / 30.44);
 
-  /* Filtros do glossário */
-  .gf-btn {
-    flex-shrink:0;
-    padding:5px 12px;
-    border-radius:20px;
-    border:1px solid rgba(0,180,255,0.2);
-    background:transparent;
-    color:#7ab3d4;
-    font-size:0.68rem;
-    font-family:'Exo 2',sans-serif;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:all 0.15s;
-    min-height:32px;
-    touch-action:manipulation;
+  const mamadasHoje = (db.mamadas||[]).filter(m=>m.data===hoje);
+  const mlHoje = mamadasHoje.reduce((s,m)=>s+mlReal(m),0);
+  const ultima = (db.mamadas||[]).length > 0 ? db.mamadas[0] : null;
+  const pesoAtual = crescData.length > 0 ? crescData[crescData.length-1] : null;
+  const eventosProx = (db.eventos||[]).filter(e=>e.data>=hoje).slice(0,3);
+  const duvidAbertas = (db.duvidas||[]).filter(d=>!d.respondida).length;
+
+  return `DADOS DO PADAWAN ARTHUR:
+- Nascimento: ${nasc}
+- Idade atual: ${diasVida} dias (${semanas} semanas / ${mesesVida} meses)
+- Mamadas hoje: ${mamadasHoje.length} (${mlHoje}ml total)
+- Última mamada: ${ultima ? `${ultima.data} ${ultima.hora} — ${ultima.tipo}${ultima.ml?' '+ultima.ml+'ml':''}` : 'nenhuma registrada'}
+- Peso/medidas mais recentes: ${pesoAtual ? `${pesoAtual.peso||'?'}kg / ${pesoAtual.altura||'?'}cm (${pesoAtual.mes}º mês)` : 'não registrado'}
+- Consultas futuras: ${eventosProx.length > 0 ? eventosProx.map(e=>e.titulo+' em '+e.data).join('; ') : 'nenhuma agendada'}
+- Dúvidas em aberto: ${duvidAbertas}`;
+}
+
+function addOraculoMsg(role, texto) {
+  const chat = document.getElementById('oraculo-chat');
+  const div  = document.createElement('div');
+  div.className = 'oraculo-msg ' + (role==='user' ? 'oraculo-user' : 'oraculo-ai');
+  // Formatar markdown simples
+  div.innerHTML = texto
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n/g,'<br>');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addOraculoLoading() {
+  const chat = document.getElementById('oraculo-chat');
+  const div  = document.createElement('div');
+  div.className = 'oraculo-loading';
+  div.id = 'oraculo-loading';
+  div.innerHTML = '<div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeOraculoLoading() {
+  const el = document.getElementById('oraculo-loading');
+  if (el) el.remove();
+}
+
+async function enviarOraculo() {
+  if (oraculoCarregando) return;
+  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
+  if (!ORACULO_API_KEY) {
+    document.getElementById('oraculo-cfg').style.display = 'block';
+    document.getElementById('oraculo-input-area').style.display = 'none';
+    addOraculoMsg('assistant','⚙️ Configure sua chave da API Claude no campo acima para usar o Oráculo Jedi.');
+    return;
   }
-  .gf-btn.gf-ativo {
-    background:rgba(0,180,255,0.15);
-    border-color:#00d4ff;
-    color:#00d4ff;
-  }
+  const input = document.getElementById('oraculo-input');
+  const pergunta = input.value.trim();
+  if (!pergunta) return;
 
-  /* Item do glossário */
-  .gi {
-    background:rgba(6,15,34,0.9);
-    border:1px solid rgba(0,180,255,0.14);
-    border-radius:10px;
-    padding:11px 14px;
-    margin-bottom:7px;
-    display:grid;
-    grid-template-columns:1fr 24px 1fr;
-    align-items:center;
-    gap:8px;
-  }
-  .gi-jedi {
-    font-weight:700;
-    color:#00d4ff;
-    font-size:0.85rem;
-    line-height:1.3;
-    word-break:break-word;
-  }
-  .gi-seta { color:rgba(0,180,255,0.3); text-align:center; font-size:0.9rem; }
-  .gi-comum { font-size:0.82rem; color:#e8f4fd; line-height:1.3; word-break:break-word; }
-  .gi-obs   { font-size:0.68rem; color:#7ab3d4; margin-top:2px; font-style:italic; }
-  .gi-cat   {
-    display:inline-block;
-    font-size:0.55rem;
-    padding:1px 6px;
-    border-radius:6px;
-    font-family:'Orbitron',monospace;
-    letter-spacing:0.04em;
-    margin-bottom:3px;
-  }
-  .gc-nav    { background:rgba(0,180,255,0.12); color:#00d4ff; border:1px solid rgba(0,180,255,0.2); }
-  .gc-form   { background:rgba(180,130,0,0.12); color:#ffe066; border:1px solid rgba(180,130,0,0.2); }
-  .gc-acao   { background:rgba(57,255,20,0.08); color:#7fff60; border:1px solid rgba(57,255,20,0.15); }
-  .gc-status { background:rgba(185,127,255,0.1); color:#b97fff; border:1px solid rgba(185,127,255,0.2); }
-  .gc-pessoa { background:rgba(255,110,180,0.1); color:#ff9ed5; border:1px solid rgba(255,110,180,0.2); }
-  .gc-sistema{ background:rgba(0,50,100,0.4); color:#7ab3d4; border:1px solid rgba(0,180,255,0.12); }
+  input.value = '';
+  input.disabled = true;
+  document.getElementById('btn-oraculo-enviar').disabled = true;
+  oraculoCarregando = true;
 
-  .gi-secao {
-    font-family:'Orbitron',monospace;
-    font-size:0.62rem;
-    color:#ffe066;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    padding:8px 0 6px;
-    border-bottom:1px solid rgba(255,220,0,0.12);
-    margin-bottom:8px;
-    margin-top:4px;
-  }
-  .gi-secao:first-child { margin-top:0; }
+  // Mostrar mensagem do usuário
+  addOraculoMsg('user', pergunta);
+  oraculoHistorico.push({ role: 'user', content: pergunta });
+  addOraculoLoading();
 
-  @media (max-width:480px) {
-    .gi { grid-template-columns:1fr; gap:4px; }
-    .gi-seta { display:none; }
-    .gi-comum::before { content:'↳ '; color:#7ab3d4; }
-  }
-</style>
+  try {
+    const contexto = contextArthur();
+    const systemPrompt = `Você é o Oráculo Jedi, um assistente pediátrico baseado nas diretrizes da Sociedade Brasileira de Pediatria (SBP), Ministério da Saúde do Brasil e OMS.
 
-<script>
-// ── GLOSSÁRIO — DADOS ──
-const GLOSS_DADOS = [
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🌌 Holocron',                  comum:'Dashboard / Início',                     obs:'Tela principal com resumo do dia' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🍼 Nutrição',                  comum:'Alimentação / Amamentação',               obs:'Aba de registro de mamadas' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📜 Missivas',                  comum:'Dúvidas para o pediatra',                 obs:'Perguntas e respostas do médico' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🗺️ Missões',                   comum:'Agenda / Compromissos',                   obs:'Consultas, exames e vacinas agendadas' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🌙 Órbitas',                   comum:'Mesversário / Meses de vida',             obs:'Marcos e conquistas por mês' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'🛡️ Escudos',                   comum:'Vacinas / Carteira de vacinação',         obs:'Checklist do calendário vacinal' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'⚗️ Elixires',                  comum:'Medicação / Remédios',                    obs:'Registro de medicamentos administrados' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📚 Holocron do Saber',         comum:'Base de conhecimento / Repositório',     obs:'Respostas do pediatra organizadas por tema' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos', jedi:'📜 Missivas ao Mestre',        comum:'Perguntas pendentes ao pediatra',         obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Galáctico',             comum:'Data',                                    obs:'Campo de data em qualquer formulário' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Hora-Padrão',                 comum:'Hora / Horário',                          obs:'Campo de hora em qualquer formulário' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🤱 Fonte Natural',            comum:'Peito / Aleitamento materno',             obs:'Tipo de mamada' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🥛 Fórmula Alquímica',        comum:'Fórmula infantil / Leite em pó',          obs:'Tipo de mamada' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'✨ Combinação da Força',      comum:'Misto / Peito + fórmula',                obs:'Tipo de mamada combinado' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Recarga de Energia',          comum:'Mamada / Alimentação',                    obs:'Registro de uma mamada' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Dosagem da Força',            comum:'Dose do remédio',                         obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Essência Alquímica',          comum:'Princípio ativo / Substância ativa',      obs:'Nome genérico do medicamento' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ritmo de Administração',      comum:'Frequência / De quanto em quanto tempo',  obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Inicial',               comum:'Data de início',                          obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Ciclo Final',                 comum:'Data de fim / Término',                   obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Nome do Elixir',              comum:'Nome do remédio',                         obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Prescrito pelo Curandeiro',   comum:'Indicado por / Médico responsável',       obs:'' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'🏠 Iniciativa dos Guardiões', comum:'Automedicação',                           obs:'Remédio dado sem prescrição médica' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Coordenadas / Observações',   comum:'Local / Endereço',                        obs:'Campo de localização na agenda' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Órbita Galáctica',            comum:'Mês de vida',                             obs:'Ex: 1ª Órbita = 1 mês de vida' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'✨ 1ª Volta ao Sol',          comum:'Aniversário de 1 ano',                    obs:'12ª órbita — grande celebração' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Domínio da Força',            comum:'Categoria / Assunto',                     obs:'Classificação das dúvidas' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Classe da Missão',            comum:'Tipo de compromisso',                     obs:'Consulta, exame, vacina etc.' },
-  { cat:'form',   sec:'📝 Campos e Formulários', jedi:'Detalhes para as Crônicas',   comum:'Observações / Descrição',                 obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Registrar Recarga',        comum:'Registrar mamada',                        obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🚀 Registrar Audiência',        comum:'Salvar compromisso / Agendar',            obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚗️ Ativar Elixir',           comum:'Registrar medicação',                     obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🛡️ Gravar Escudo',           comum:'Adicionar vacina',                        obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'💫 Enviar Missiva',          comum:'Enviar dúvida para o pediatra',           obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'💾 Gravar no Holocron',      comum:'Salvar resposta do médico',               obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🌙 Gravar nas Crônicas',     comum:'Salvar marco do mesversário',             obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Criar Guardião',          comum:'Criar novo usuário / perfil',             obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'⚡ Destruir',                comum:'Excluir / Apagar definitivamente',        obs:'Confirmação de exclusão' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Recuar para a Luz',          comum:'Cancelar',                                obs:'Cancela a exclusão' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'Abortar',                    comum:'Fechar / Cancelar',                       obs:'Fecha modal sem salvar' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📅 Calendário',              comum:'Adicionar ao Calendário Apple',           obs:'Exporta evento como .ics' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'🔮 Próximas Audiências',                comum:'Próximos compromissos',                   obs:'Filtro de agenda' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'📜 Concluídas',              comum:'Compromissos passados',                   obs:'Filtro de agenda' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',        jedi:'✅ Iluminadas',              comum:'Dúvidas respondidas',                     obs:'Filtro de missivas' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚡ Recarga registrada nas crônicas!', comum:'Mamada salva!',                 obs:'Confirmação' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'🗺️ Missão registrada nas crônicas!', comum:'Compromisso salvo!',             obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚗️ Elixir ativado nas crônicas da Força!', comum:'Medicação registrada!',   obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'🛡️ Novo escudo gravado nas crônicas!', comum:'Vacina adicionada!',          obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⏳ Aguardando Resposta',     comum:'Sem resposta ainda',                      obs:'Status de dúvida pendente' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'CONFIRMAR DESTRUIÇÃO',       comum:'Confirmar exclusão',                      obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'SABEDORIA DO CURANDEIRO',    comum:'Resposta do pediatra',                    obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚡ Força sincronizada com a nuvem', comum:'Dados salvos online / Conectado', obs:'' },
-  { cat:'status', sec:'📊 Status e Mensagens',    jedi:'⚠️ Sem conexão — dados locais temporários', comum:'Sem internet',           obs:'App salva localmente e sincroniza depois' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Guardião(ã) da Força',       comum:'Responsável / Pai ou Mãe',               obs:'Perfil de usuário no app' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Pai do Padawan',             comum:'Pai',                                     obs:'João' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Mãe do Padawan',             comum:'Mãe',                                     obs:'Nadyne' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Curandeiro(a) Jedi',         comum:'Médico(a) / Pediatra',                   obs:'' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Padawan Arthur',             comum:'Arthur / O bebê',                         obs:'' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Código da Força',            comum:'Senha / PIN de acesso',                  obs:'PIN de 6 dígitos' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'Emblema do Guardião',        comum:'Emoji do perfil / Avatar',               obs:'' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🏥 Audiência com Curandeiro', comum:'Consulta médica',                       obs:'Tipo de missão' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'💉 Ritual de Proteção',      comum:'Vacina / Vacinação',                     obs:'Tipo de missão' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🔬 Análise pela Força',      comum:'Exame médico / Laboratorial',            obs:'Tipo de missão' },
-  { cat:'pessoa', sec:'👤 Pessoas e Perfis',      jedi:'🔄 Retorno ao Templo',       comum:'Retorno médico',                          obs:'Tipo de missão' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Crônicas da Ordem Jedi',     comum:'Histórico / Registros do app',            obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Escudos de Proteção',        comum:'Vacinas / Imunização',                   obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Rituais concluídos',         comum:'Vacinas tomadas',                         obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Escudos ativados',           comum:'Vacinas aplicadas / Progresso vacinal',  obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Chegada à Galáxia',          comum:'Ao nascer / Vacinas do nascimento',       obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Ciclo Lunar X — X Meses',    comum:'Vacinas de X meses de vida',             obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'⭐ Marco Jedi',              comum:'Marco de desenvolvimento',               obs:'Categoria do mesversário' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'🎁 Tributo da Galáxia',      comum:'Presente / Lembrança',                   obs:'Categoria do mesversário' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'📸 Arquivo Holográfico',     comum:'Foto / Registro fotográfico',            obs:'Categoria do mesversário' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'💬 Crônica Livre',           comum:'Nota livre / Observação',                obs:'Categoria do mesversário' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'🔄 Se necessário pela Força', comum:'Se necessário / SOS',                   obs:'Frequência de medicação' },
-  { cat:'sistema',sec:'⚙️ Sistema',               jedi:'Ritual concluído em',        comum:'Vacinado em / Data de aplicação',        obs:'' },
-  // ── CRESCIMENTO ──
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📏 Crescimento',              comum:'Curvas de crescimento / Gráfico de peso, altura e PC', obs:'Sub-aba dentro de Órbitas' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🌙 Marcos',                   comum:'Mesversário / Conquistas mensais',        obs:'Sub-aba dentro de Órbitas' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'⚖️ Peso',                     comum:'Peso em kg',                              obs:'Medida de crescimento' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'📐 Comprimento',              comum:'Comprimento / Altura em cm',              obs:'Medida de crescimento' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'🔵 Perímetro Cefálico',       comum:'Circunferência da cabeça em cm',          obs:'Sigla: PC' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Obs. da Consulta',            comum:'Observações da pediatra na consulta',     obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📏 Registrar Medidas nas Crônicas da Força', comum:'Salvar registro de crescimento',       obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Curvas OMS',                  comum:'Referência mundial de crescimento saudável (OMS)', obs:'Organização Mundial da Saúde' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P3 / P50 / P97',              comum:'Percentis de crescimento (P3=abaixo da média, P50=mediana, P97=acima da média)', obs:'P50 = metade das crianças' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'P15 / P85',                   comum:'Faixa de crescimento normal / Zona verde', obs:'Entre P15 e P85 é considerado crescimento adequado' },
-  { cat:'status', sec:'📊 Status e Mensagens',     jedi:'📏 Medidas gravadas nas crônicas do Padawan!', comum:'Registro de crescimento salvo!', obs:'' },
-  // ── RELATÓRIO ──
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📋 Relatório do Ciclo Galáctico', comum:'Relatório diário de nutrição',   obs:'Pop-up com resumo das mamadas do dia' },
-  // ── REESTRUTURAÇÃO v3 ──
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🍼 Fonte de Energia',             comum:'Aba Nutrição / Alimentação',     obs:'Preparada para sólidos (v2)' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🩺 Ordem da Cura',                comum:'Aba Saúde (agenda + missivas + elixires)', obs:'Antigo "Missões"' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'📈 Jornada do Padawan',           comum:'Aba Evolução (marcos + crescimento)', obs:'Antigo "Órbitas" — receberá sono e fraldas no v2' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'🗺️ Audiências',                  comum:'Sub-aba Agenda / Consultas',     obs:'Antigo "Missões" dentro de Ordem da Cura' },
-  { cat:'nav',    sec:'🌌 Navegação e Módulos',    jedi:'Audiências da Ordem',             comum:'Contador de consultas futuras no dashboard', obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'🚀 Registrar Audiência',          comum:'Salvar consulta / compromisso',  obs:'' },
-  { cat:'acao',   sec:'⚡ Botões e Ações',          jedi:'📋 Copiar Relatório',            comum:'Copiar resumo para área de transferência', obs:'Cole no WhatsApp, notas etc.' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Ciclo atual',                    comum:'Dia de hoje (00:00 a 23:59)',     obs:'Período usado para contar as mamadas do dia' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Recargas neste ciclo',           comum:'Mamadas hoje',                   obs:'Contador no dashboard' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'ml de energia vital',            comum:'Total de ml de leite hoje',      obs:'Contador no dashboard' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Missivas ao Curandeiro',         comum:'Dúvidas pendentes',              obs:'Contador no dashboard' },
-  { cat:'form',   sec:'📝 Campos e Formulários',   jedi:'Missões da Ordem',               comum:'Compromissos futuros',           obs:'Contador no dashboard' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Observações da Audiência',       comum:'Obs. da consulta médica',        obs:'Campo na aba crescimento' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Sabedoria da Audiência',         comum:'Resposta / observação do médico na consulta', obs:'' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Crônica Detalhada',              comum:'Lista completa de mamadas do dia', obs:'No relatório diário' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Distribuição por Fonte',         comum:'Quantas mamadas por tipo',       obs:'No relatório diário' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Cronologia das Recargas',        comum:'Horários das mamadas do dia',    obs:'No relatório diário' },
-  { cat:'sistema',sec:'⚙️ Sistema',                jedi:'Crônica da Ordem',               comum:'Observações / campo de texto livre', obs:'Label genérico de observações' },
+${contexto}
+
+INSTRUÇÕES:
+- Responda em português brasileiro, de forma clara, calorosa e acessível para pais
+- Baseie suas respostas nas diretrizes da SBP, MS Brasil e OMS
+- Use os dados do Arthur para personalizar a resposta quando relevante
+- SEMPRE que houver qualquer sinal de urgência ou dúvida médica, oriente a consultar o pediatra
+- Inclua SEMPRE ao final: "📋 Fonte: SBP / MS Brasil" quando aplicável
+- Seja objetivo mas completo
+- Use emojis moderadamente para tornar o texto mais amigável
+- NUNCA faça diagnósticos médicos. Apenas oriente e esclareça dúvidas gerais
+- Lembre sempre que não substitui consulta pediátrica em casos que demandem avaliação presencial`;
+
+    const messages = [
+      ...oraculoHistorico.slice(-8).map(m => ({ role: m.role, content: m.content }))
+    ];
+    // Garantir que último é do user
+    if (messages[messages.length-1]?.role !== 'user') {
+      messages.push({ role:'user', content: pergunta });
+    }
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ORACULO_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-request-source-header': 'padawan-arthur-pwa'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages
+      })
+    });
+
+    const data = await response.json();
+    removeOraculoLoading();
+
+    const resposta = data.content?.[0]?.text || 'O Oráculo não conseguiu responder agora. Tente novamente.';
+    addOraculoMsg('assistant', resposta);
+    oraculoHistorico.push({ role: 'assistant', content: resposta });
+
+    // Manter histórico curto
+    if (oraculoHistorico.length > 20) oraculoHistorico = oraculoHistorico.slice(-20);
+
+  } catch(e) {
+    removeOraculoLoading();
+    addOraculoMsg('assistant', '⚠️ O Oráculo está temporariamente indisponível. Verifique sua conexão e tente novamente.');
+  } finally {
+    input.disabled = false;
+    document.getElementById('btn-oraculo-enviar').disabled = false;
+    oraculoCarregando = false;
+    input.focus();
+  }
+}
+
+function perguntaRapidaOraculo(btn) {
+  const q = btn.getAttribute('data-q');
+  document.getElementById('oraculo-input').value = q;
+  enviarOraculo();
+}
+
+function limparOraculo() {
+  oraculoHistorico = [];
+  document.getElementById('oraculo-chat').innerHTML = '';
+}
+
+function salvarOraculoKey() {
+  // Mantido para compatibilidade — redireciona para o modal
+  abrirModalOraculoConfig();
+}
+
+function abrirModalOraculoConfig() {
+  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
+  const input = document.getElementById('oraculo-key-input');
+  if (input && ORACULO_API_KEY) input.value = ORACULO_API_KEY;
+  const banner = document.getElementById('oraculo-config-status-banner');
+  if (banner) banner.style.display = ORACULO_API_KEY ? 'block' : 'none';
+  const msg = document.getElementById('oraculo-config-msg');
+  if (msg) msg.textContent = '';
+  document.getElementById('modal-oraculo-config').style.display = 'flex';
+}
+
+function salvarOraculoKeyModal() {
+  const key = document.getElementById('oraculo-key-input').value.trim();
+  const msg = document.getElementById('oraculo-config-msg');
+  if (!key.startsWith('sk-ant')) {
+    msg.style.color = 'rgba(255,150,100,0.9)';
+    msg.textContent = '⚠️ Chave inválida — deve começar com sk-ant-';
+    return;
+  }
+  localStorage.setItem('oraculo_api_key', key);
+  ORACULO_API_KEY = key;
+  msg.style.color = 'rgba(57,255,20,0.9)';
+  msg.textContent = '✅ Chave salva com sucesso!';
+  const banner = document.getElementById('oraculo-config-status-banner');
+  if (banner) banner.style.display = 'block';
+  showToast('🔮 Oráculo Jedi ativado!');
+  setTimeout(() => {
+    document.getElementById('modal-oraculo-config').style.display = 'none';
+    // Inicializar chat se ainda vazio
+    if (document.getElementById('oraculo-chat') && !document.getElementById('oraculo-chat').children.length) {
+      addOraculoMsg('assistant', '🔮 **Oráculo Jedi ativado!**\n\nSou seu assistente pediátrico. Em que posso ajudar hoje, Guardião?');
+    }
+  }, 1200);
+}
+
+function initOraculo() {
+  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
+  const chat = document.getElementById('oraculo-chat');
+  if (chat && !chat.children.length) {
+    if (ORACULO_API_KEY) {
+      addOraculoMsg('assistant', '🔮 **Bem-vindo ao Oráculo Jedi!**\n\nSou seu assistente pediátrico baseado nas diretrizes da SBP e OMS. Posso orientar sobre o desenvolvimento do Arthur, nutrição, sono, sinais de alerta e muito mais.\n\nEm que posso ajudar hoje, Guardião?');
+    } else {
+      addOraculoMsg('assistant', '🔮 **Oráculo não configurado**\n\nPara usar o Oráculo Jedi, acesse o **menu do Guardião** (seu nome/foto no topo) → **Configurar Oráculo** → cole sua chave da API Claude.\n\n_A chave é salva apenas neste dispositivo._');
+    }
+  }
+}
+
+
+// ── SABEDORIA GALÁCTICA ──
+const SABEDORIA_DB = [
+  // ─── SONO ──────────────────────────────────────────────
+  {
+    id:'sono-1', cat:'sono', faixaEtaria:'0-3m', tempoLeitura:3, icon:'😴', urgencia:'alta',
+    titulo: 'Sono Seguro: Prevenção da Morte Súbita (SMSL)',
+    resumo: 'Ambiente seguro para dormir é essencial nos primeiros meses. Conheça as recomendações da SBP e AAP.',
+    fonte: 'SBP / AAP / MS Brasil',
+    corpo: `**Posição:** Sempre de costas (decúbito dorsal) até 1 ano de idade, mesmo quando o bebê já consegue virar sozinho.\n\n**Superfície:** Colchão firme, plano, sem almofadas, rolinho, protetor de berço, pelúcias ou cobertores fofos no berço.\n\n**Temperatura:** Ambiente confortável (20–22°C). Evite agasalhar demais.\n\n**Compartilhamento:** Evitar dormir na mesma cama (co-sleeping). O ideal é que o bebê durma no mesmo quarto, mas em superfície própria.\n\n**Chupeta:** Ofertar após amamentação estabelecida — associada à redução de SMSL.\n\n**Fumo:** Ambiente 100% livre de cigarro reduz o risco em até 50%.\n\n📋 **Fonte:** SBP (Nota de Alerta 2023) · AAP Safe Sleep Guidelines 2022`
+  },
+  {
+    id:'sono-2', cat:'sono', faixaEtaria:'0-3m', tempoLeitura:2, icon:'😴', urgencia:'normal',
+    titulo: 'Sono do Recém-Nascido: O que é Normal?',
+    resumo: 'RNs dormem 16–18h/dia em ciclos curtos. Entenda os padrões normais de 0 a 3 meses.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Total por dia:** 16–18 horas no RN, reduzindo para 14–16h aos 3 meses.\n\n**Ciclos curtos:** RNs têm ciclos de sono de ~50 min (adultos têm ~90 min). Despertares frequentes são fisiológicos.\n\n**Sono ativo vs. tranquilo:** O sono REM (ativo) ocupa até 50% do tempo do RN — movimentos, sorrisos e gemidos são normais.\n\n**Consolidação:** A maioria dos bebês começa a ter períodos mais longos à noite entre 3–6 meses. Não há prazo obrigatório.\n\n**Sinais de alerta:** Dificuldade extrema para despertar, respiração ruidosa persistente ou pausas na respiração.\n\n📋 **Fonte:** SBP · Guia de Desenvolvimento Infantil MS 2022`
+  },
+  {
+    id:'sono-3', cat:'sono', faixaEtaria:'0-3m', tempoLeitura:3, icon:'😴', urgencia:'normal',
+    titulo: 'Rotina do Sono: Como Criar Associações Saudáveis',
+    resumo: 'Rituais previsíveis ajudam o bebê a entender que é hora de dormir. Quando e como começar.',
+    fonte: 'SBP',
+    corpo: `**A partir de quando?** Pequenas rotinas podem começar já a partir dos 6–8 semanas, mas são mais eficazes após os 3–4 meses.\n\n**Elementos de um ritual:** Banho morno → massagem → amamentação/mamadeira → colo/cantiga → berço. Sequência simples e repetível.\n\n**Janela de sono:** Coloque o bebê no berço com sono mas ainda acordado quando possível — isso ensina auto-regulação ao longo do tempo.\n\n**Luz:** Luz baixa à noite, total à sesta — reforça o ritmo circadiano.\n\n**Não existe "método certo":** Métodos de treino de sono (quando indicados) devem ser discutidos com o pediatra após os 4–6 meses.\n\n📋 **Fonte:** SBP · Harvey Karp (Happiest Baby) · AAP`
+  },
+
+  // ─── NUTRIÇÃO ───────────────────────────────────────────
+  {
+    id:'nut-1', cat:'nutricao', icon:'🍼', urgencia:'alta',
+    titulo: 'Aleitamento Materno Exclusivo: Os Primeiros 6 Meses',
+    resumo: 'OMS e SBP recomendam AME até os 6 meses. Saiba por que e como manter a produção.',
+    fonte: 'OMS / SBP / MS Brasil',
+    corpo: `**Recomendação:** Aleitamento materno exclusivo (AME) até 6 meses completos — sem água, chás ou outros alimentos.\n\n**Por quê?** Leite materno contém tudo que o bebê precisa: anticorpos, gorduras para o cérebro, probióticos naturais e fatores de crescimento únicos.\n\n**Frequência:** Livre demanda — média de 8–12 mamadas/dia no RN. O bebê regula a quantidade que precisa.\n\n**Sinais de pega adequada:** Boca bem aberta, lábio inferior evertido, queixo tocando o seio, bochechas cheias (não encovadas).\n\n**Mantendo a produção:** Quanto mais mamar, mais produz. Evitar complementação sem indicação médica.\n\n**Sinais de ingestão adequada:** 6+ fraldas molhadas/dia, ganho de peso adequado, bebê tranquilo após mamar.\n\n📋 **Fonte:** OMS (2023) · SBP – Manual de Aleitamento Materno 2021 · MS Brasil`
+  },
+  {
+    id:'nut-2', cat:'nutricao', faixaEtaria:'0-12m', tempoLeitura:2, icon:'🍼', urgencia:'normal',
+    titulo: 'Leite Materno: Extração, Armazenamento e Validade',
+    resumo: 'Como extrair, armazenar e usar corretamente o leite materno para manter sua qualidade.',
+    fonte: 'Rede BLH/MS · SBP',
+    corpo: `**Extração:** Manual ou com bomba, de preferência pela manhã (quando a produção é maior). Higienizar as mãos antes.\n\n**Recipientes:** Frascos de vidro com tampa ou sacos próprios para leite materno esterilizados.\n\n**Validade:**\n• Temperatura ambiente (até 26°C): 4–6 horas\n• Geladeira (0–4°C): 3–5 dias\n• Congelador do freezer (abaixo de -18°C): 3 meses\n• Freezer exclusivo: até 6 meses\n\n**Descongelamento:** Na geladeira (lento) ou em banho-maria morno. Nunca no micro-ondas.\n\n**Após descongelar:** Usar em até 24h. Não recongelar.\n\n📋 **Fonte:** Rede BLH/FIOCRUZ · SBP 2022`
+  },
+  {
+    id:'nut-3', cat:'nutricao', faixaEtaria:'0-12m', tempoLeitura:2, icon:'🍼', urgencia:'normal',
+    titulo: 'Fórmula Infantil: Preparo Seguro e Cuidados',
+    resumo: 'Orientações para preparo correto da fórmula: diluição, temperatura da água e higiene.',
+    fonte: 'OMS / ANVISA / SBP',
+    corpo: `**Indicação:** Somente quando o aleitamento materno é impossível ou há contraindicação médica, sob orientação pediátrica.\n\n**Água:** Usar água filtrada e fervida (fervida por 1 min e resfriada a 70°C para reconstituir). Ou água mineral sem gás.\n\n**Diluição:** Seguir SEMPRE as instruções do fabricante — nem mais concentrada nem mais diluída.\n\n**Temperatura:** Morna ao oferecer. Testar no pulso.\n\n**Higiene:** Esterilizar mamadeiras e bicos até os 4 meses. Lavar com escova e detergente + ferver por 5 min.\n\n**Validade após preparo:** Usar imediatamente ou conservar em geladeira por no máximo 2 horas. Descartar o que sobrar.\n\n📋 **Fonte:** ANVISA RDC 43/2011 · OMS · SBP`
+  },
+
+  // ─── DESENVOLVIMENTO ────────────────────────────────────
+  {
+    id:'dev-1', cat:'desenvolvimento', icon:'📈', urgencia:'normal',
+    titulo: 'Marcos do Desenvolvimento: 0 a 3 Meses',
+    resumo: 'O que esperar nos primeiros 3 meses: motricidade, comunicação, social e cognitivo.',
+    fonte: 'SBP / Denver II / DSM-5',
+    corpo: `**Motor grosso:** Levanta a cabeça brevemente em prono (1 mês) → sustenta a cabeça por segundos (2 meses) → levanta a cabeça a 45° em prono (3 meses).\n\n**Motor fino:** Mãos fechadas → abre a mão e prende dedo (2 meses) → segura brevemente objetos (3 meses).\n\n**Linguagem:** Choro diferenciado (fome/dor) → balbucios (gorjeios) → "aaah" e "oooh" aos 2–3 meses.\n\n**Social/Cognitivo:** Foca rosto → sorriso social intencional (6–8 semanas) → segue objeto com os olhos (2–3 meses) → reconhece cuidadores.\n\n**Sinais de alerta (consultar pediatra):** Ausência de sorriso social aos 3 meses, não foca nos olhos, hipotonia marcada, assimetria nos movimentos.\n\n📋 **Fonte:** SBP · Denver Developmental Screening · DSM-5`
+  },
+  {
+    id:'dev-2', cat:'desenvolvimento', faixaEtaria:'0-3m', tempoLeitura:2, icon:'📈', urgencia:'normal',
+    titulo: 'Estimulação Sensorial nos Primeiros Meses',
+    resumo: 'Como estimular o desenvolvimento neurológico do bebê de forma simples e eficaz.',
+    fonte: 'SBP / ABN',
+    corpo: `**Visual:** Rostos são os estímulos mais poderosos. Objetos preto e branco ou coloridos a 20–30cm de distância. Móbile sobre o berço.\n\n**Auditivo:** Voz dos cuidadores, música suave, sons da natureza. Chamá-lo pelo nome. Contar histórias.\n\n**Tátil:** Massagem gentil (massoterapia) — demonstrou benefícios no ganho de peso e vínculo afetivo. Contato pele a pele (canguru).\n\n**Proprioceptivo (posição do corpo):** Tempo de barriga para baixo (tummy time) acordado e supervisionado — essencial para força do pescoço.\n\n**Frequência do tummy time:** Pelo menos 2–3x/dia por 3–5 min cada, aumentando progressivamente.\n\n📋 **Fonte:** SBP · ABN (Academia Brasileira de Neurologia)`
+  },
+
+  // ─── SAÚDE ───────────────────────────────────────────────
+  {
+    id:'sau-1', cat:'saude', icon:'🏥', urgencia:'alta',
+    titulo: 'Sinais de Alerta: Quando Ir à Emergência',
+    resumo: 'Sintomas que exigem avaliação médica imediata no bebê menor de 3 meses.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**IR IMEDIATAMENTE à emergência se:**\n\n🚨 Febre ≥ 38°C em bebê com menos de 3 meses (sem exceção)\n🚨 Dificuldade respiratória (batimento de asa de nariz, tiragem intercostal, gemido)\n🚨 Cianose (coloração azulada nos lábios ou extremidades)\n🚨 Recusa alimentar por mais de 8 horas\n🚨 Letargia extrema (não acorda com estímulo)\n🚨 Fontanela abaulada\n🚨 Convulsão\n🚨 Choro inconsolável por mais de 3 horas\n🚨 Vômitos em jato repetidos\n🚨 Sangue nas fezes\n\n📋 **Fonte:** SBP – Guia de Urgência Pediátrica · MS Brasil`
+  },
+  {
+    id:'sau-2', cat:'saude', faixaEtaria:'0-3m', tempoLeitura:3, icon:'🏥', urgencia:'normal',
+    titulo: 'Cólica do Lactente: Causas, Manejo e Quando Melhorar',
+    resumo: 'Cólica afeta até 20% dos bebês. Entenda o que é, o que não é, e como ajudar.',
+    fonte: 'SBP',
+    corpo: `**Definição (Critérios de Wessel):** Choro excessivo e inconsolável por >3h/dia, >3 dias/semana, por >3 semanas, em bebê saudável.\n\n**Pico:** Tipicamente entre 2–6 semanas, com melhora espontânea até os 3–4 meses.\n\n**Causas prováveis:** Imaturidade do sistema digestivo, microbiota intestinal em desenvolvimento, sensibilidade alimentar materna.\n\n**O que ajuda:**\n• Movimento rítmico suave (ninar, passeio no carro)\n• Sons brancos (ruído de aspirador, chuveiro)\n• Posição de barriga para baixo no colo\n• Reduzir estimulação no final do dia\n• Probiótico L. reuteri DSM 17938 (evidência moderada — consultar pediatra)\n\n**O que NÃO fazer:** Chás (risco de contaminação e deslocamento do leite), simeticona (sem evidência científica sólida).\n\n📋 **Fonte:** SBP · NASPGHAN 2021`
+  },
+  {
+    id:'sau-3', cat:'saude', faixaEtaria:'0-3m', tempoLeitura:2, icon:'🏥', urgencia:'normal',
+    titulo: 'Icterícia Neonatal: O que é e Quando Preocupar',
+    resumo: 'Amarelão é comum nos primeiros dias. Saiba quando é fisiológico e quando precisa de tratamento.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**O que é:** Acúmulo de bilirrubina causando coloração amarelada da pele e olhos.\n\n**Fisiológica:** Surge após 24h de vida, pico entre 3–5 dias, resolve em ~2 semanas. Muito comum em amamentados.\n\n**Patológica:** Surge antes de 24h, é intensa, não melhora ou piora — requer avaliação urgente.\n\n**Icterícia do leite materno:** Pode persistir até 3 meses — benigna, não requer interrupção da amamentação.\n\n**Tratamento:** Fototerapia quando bilirrubina atinge níveis de risco (baseados em idade gestacional e horas de vida).\n\n**Regra prática:** Se o amarelão chegar às pernas e pés, procurar o pediatra imediatamente.\n\n📋 **Fonte:** SBP – Norma de Atenção à Icterícia Neonatal 2021`
+  },
+
+  // ─── COMPORTAMENTO ───────────────────────────────────────
+  {
+    id:'comp-1', cat:'comportamento', icon:'🧠', urgencia:'normal',
+    titulo: 'Choro do Bebê: Decifrando os Sinais',
+    resumo: 'Tipos de choro e como responder. A importância de atender prontamente nos primeiros meses.',
+    fonte: 'SBP / Brazelton',
+    corpo: `**Tipos de choro:**\n• **Fome:** Rítmico, insistente, com movimentos de busca (rooting)\n• **Dor/Desconforto:** Agudo, intenso, de início súbito\n• **Sono:** Monótono, com esfregamento dos olhos\n• **Estimulação excessiva:** Contínuo no final do dia, difícil de consolar\n\n**Responder prontamente NÃO mimou o bebê:** Pesquisas mostram que bebês cujos choros são atendidos rapidamente nos primeiros meses desenvolvem mais segurança e independência.\n\n**Período roxa do choro (purple crying):** Entre 2–8 semanas, o choro atinge um pico normal — é uma fase, não um problema.\n\n**Se não conseguir consolar:** Coloque o bebê em local seguro e respire. Nunca balance violentamente.\n\n📋 **Fonte:** SBP · T. Berry Brazelton · Período PURPLE (NCSBS)`
+  },
+  {
+    id:'comp-2', cat:'comportamento', faixaEtaria:'0-12m', tempoLeitura:2, icon:'🧠', urgencia:'normal',
+    titulo: 'Vínculo e Apego: A Base do Desenvolvimento Emocional',
+    resumo: 'Como o vínculo afetivo nos primeiros meses molda o desenvolvimento emocional e cognitivo.',
+    fonte: 'SBP / OMS',
+    corpo: `**Apego seguro:** Formado quando o cuidador responde de forma consistente e sensível às necessidades do bebê. É a base da saúde mental ao longo da vida.\n\n**Como promover:**\n• Contato visual frequente durante cuidados\n• Falar com o bebê durante troca, banho, alimentação\n• Canguru — contato pele a pele precoce\n• Responder ao choro prontamente\n• Expressões faciais positivas\n\n**O papel do pai/parceiro:** O vínculo paterno tem impacto independente e significativo no desenvolvimento — não é "segunda opção".\n\n**Depressão pós-parto:** Dificulta o vínculo. Buscar apoio profissional sem culpa — é tratável e o bebê precisa de você bem.\n\n📋 **Fonte:** OMS · SBP · John Bowlby (Teoria do Apego)`
+  },
+
+  // ─── SEGURANÇA ───────────────────────────────────────────
+  {
+    id:'seg-1', cat:'seguranca', icon:'🛡️', urgencia:'alta',
+    titulo: 'Segurança no Transporte: Cadeirinha desde o Primeiro Dia',
+    resumo: 'Cadeirinha é obrigatória por lei e salva vidas. Saiba como instalar e usar corretamente.',
+    fonte: 'CONTRAN / DETRAN / SBP',
+    corpo: `**Lei:** Resolução CONTRAN nº 619/2016 — obrigatório cadeirinha para crianças até 7,5 anos ou 36kg.\n\n**Grupo 0/0+:** Para bebês até 13kg. Posição semi-deitada (ângulo de reclinação correto é crucial). De costas para o sentido de marcha.\n\n**Instalação:**\n• Banco traseiro sempre (banco do passageiro dianteiro é perigoso)\n• Cinto ou IsoFix segundo fabricante\n• Verificar que não balança mais de 2,5cm em qualquer direção\n\n**Erros comuns:** Roupas grossas sob o cinto (comprometem ajuste), cinto frouxo, ângulo errado.\n\n**NUNCA:** Carregar bebê no colo no carro, mesmo em trajetos curtos.\n\n📋 **Fonte:** CONTRAN Res. 619/2016 · DETRAN · SBP`
+  },
+  {
+    id:'seg-2', cat:'seguranca', faixaEtaria:'0-12m', tempoLeitura:3, icon:'🛡️', urgencia:'normal',
+    titulo: 'Segurança em Casa: Prevenção de Acidentes no 1º Ano',
+    resumo: 'Os acidentes são a principal causa de morte infantil evitável. Medidas simples salvam vidas.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Quedas:**\n• Nunca deixar sobre superfícies elevadas sem supervisão constante (trocador, sofá)\n• Berço com grades altas e travadas\n\n**Sufocamento:**\n• Nada de cobertores fofos, travesseiros ou pelúcias no berço\n• Cortar alimentos em pedaços pequenos após início da alimentação complementar\n• Guardar objetos pequenos fora do alcance\n\n**Queimaduras:**\n• Temperatura da água do banho: 37°C (testar com cotovelo)\n• Nunca aquecer mamadeira no micro-ondas (hotspots)\n\n**Produtos domésticos:** Medicamentos, produtos de limpeza e cosméticos em local trancado.\n\n**Afogamento:** Nunca deixar sozinho na banheira, mesmo por segundos.\n\n📋 **Fonte:** SBP – Guia de Prevenção de Acidentes · MS Brasil`
+  },
+
+  // ─── ROTINA ─────────────────────────────────────────────
+  {
+    id:'rot-1', cat:'rotina', icon:'⏰', urgencia:'normal',
+    titulo: 'Banho do Bebê: Temperatura, Frequência e Técnica',
+    resumo: 'Orientações práticas para um banho seguro, tranquilo e benéfico para o bebê.',
+    fonte: 'SBP',
+    corpo: `**Temperatura da água:** 36–37°C. Testar com cotovelo ou termômetro de banheira.\n\n**Frequência:** 1x/dia é suficiente — banhos excessivos ressecam a pele. Em dias frios, pode ser reduzido.\n\n**Produtos:** Sabonete neutro infantil em quantidade mínima. Evitar fragrâncias e álcool.\n\n**Coto umbilical:** Limpar com álcool 70% a cada troca de fralda até cair. Manter seco. Não cobrir.\n\n**Pele do RN:** Descamação e eritema tóxico (manchinhas) nos primeiros dias são normais.\n\n**Unhas:** Cortar após o banho (mais macias) com tesoura de ponta arredondada ou lixa.\n\n📋 **Fonte:** SBP · Manual do Recém-Nascido MS 2022`
+  },
+  {
+    id:'rot-2', cat:'rotina', faixaEtaria:'0-3m', tempoLeitura:2, icon:'⏰', urgencia:'normal',
+    titulo: 'Fraldas e Dermatite da Fralda: Prevenção e Tratamento',
+    resumo: 'Como prevenir e tratar o assadão — causa frequente de desconforto no bebê.',
+    fonte: 'SBP / SBD',
+    corpo: `**Prevenção:**\n• Trocar fralda frequentemente (a cada 2–3h ou imediatamente após evacuação)\n• Limpar com algodão e água ou lenço umedecido sem álcool/fragrância\n• Secar bem com toque (não esfregar)\n• Deixar sem fralda por períodos curtos (airing out)\n• Creme barreira (óxido de zinco) preventivo\n\n**Tratamento:**\n• Aumentar frequência das trocas\n• Creme com óxido de zinco mais espesso a cada troca\n• Evitar produtos com talco (risco de inalação)\n\n**Quando buscar o pediatra:** Lesões vesiculosas, sangramento, sem melhora em 3–4 dias, febre associada (pode ser candidíase).\n\n📋 **Fonte:** SBP · SBD (Sociedade Brasileira de Dermatologia)`
+  },
+
+  // ─── AMAMENTAÇÃO (nutricao) ──────────────────────────────
+  {
+    id:'nut-4', cat:'nutricao', icon:'🤱', urgencia:'normal',
+    titulo: 'Desafios da Amamentação: Fissura, Ingurgitamento e Mastite',
+    resumo: 'Problemas comuns que levam ao desmame precoce. Como identificar e resolver cada um.',
+    fonte: 'SBP / OMS',
+    corpo: `**Fissura mamilar:**\n• Causada por pega incorreta (a mais comum)\n• Solução: corrigir a pega (abrir a boca bem, incluir a aréola)\n• Passar leite materno e deixar secar\n• Lanolina pura se necessário\n\n**Ingurgitamento (seio muito cheio):**\n• Comum entre 3–5 dias pós-parto\n• Solução: mamar com mais frequência, ordenha manual leve antes de ofertar\n• Compressas frias entre as mamadas\n\n**Mastite:**\n• Inflamação (e às vezes infecção) da mama\n• Sintomas: área avermelhada e dolorosa + febre\n• Continuar amamentando (não prejudica o bebê)\n• Procurar o médico para avaliação de antibiótico\n\n📋 **Fonte:** SBP – Manual de Aleitamento Materno 2021 · OMS`
+  },
+  {
+    id:'nut-5', cat:'nutricao', faixaEtaria:'6m+', tempoLeitura:3, icon:'🥦', urgencia:'normal',
+    titulo: 'Alimentação Complementar: Quando e Como Começar',
+    resumo: 'A partir dos 6 meses: como introduzir alimentos com segurança seguindo o BLW ou papinha.',
+    fonte: 'SBP / MS Brasil',
+    corpo: `**Quando:** A partir dos 6 meses completos, junto com o leite materno (que continua até 2 anos ou mais).\n\n**Sinais de prontidão:** Sentar com apoio, boca abre quando vê colher, interesse pelo alimento dos adultos.\n\n**O que oferecer:**\n• Cereais (arroz, aveia), tubérculos (batata, mandioca, inhame)\n• Legumes e verduras\n• Proteínas (carne, frango, ovo bem cozido, feijão)\n• Frutas\n\n**O que evitar no 1º ano:** Mel (botulismo), leite de vaca como bebida principal, sal adicionado, açúcar, alimentos ultraprocessados.\n\n**BLW vs. papinha:** Ambas as abordagens são válidas. BLW favorece autonomia; papinha é mais controlável no início.\n\n📋 **Fonte:** SBP · Guia Alimentar para Crianças MS 2019`
+  }
 ];
 
-// ── GLOSSÁRIO — FUNÇÕES ──
-let _glossFiltro = 'todos';
+let sabedoriaFiltroAtual = 'todos';
+let sabedoriaBuscaAtual  = '';
 
-function abrirGlossario() {
-  fecharMenuGuardiao();
-  // Limpa busca
-  const inp = document.getElementById('gloss-busca');
-  if (inp) inp.value = '';
-  _glossFiltro = 'todos';
-  // Reseta botões filtro
-  document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('gf-ativo'));
-  const primBtn = document.querySelector('.gf-btn');
-  if (primBtn) primBtn.classList.add('gf-ativo');
-
-  renderGlossario();
-
-  // Abre o modal com z-index máximo garantido
-  const modal = document.getElementById('modal-glossario');
-  modal.style.zIndex = '999999';
-  modal.classList.add('aberto');
-
-  // Foca a busca após animação
-  setTimeout(() => { if (inp) inp.focus(); }, 200);
+function filtrarSabedoria(cat, btn) {
+  sabedoriaFiltroAtual = cat;
+  document.querySelectorAll('.sab-cat').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderSabedoria();
 }
 
-function fecharGlossario() {
-  const modal = document.getElementById('modal-glossario');
-  modal.classList.remove('aberto');
+function buscarSabedoria(termo) {
+  sabedoriaBuscaAtual = termo.toLowerCase().trim();
+  renderSabedoria();
 }
 
-function setGlossFiltro(cat, btn) {
-  _glossFiltro = cat;
-  document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('gf-ativo'));
-  btn.classList.add('gf-ativo');
-  renderGlossario();
+function toggleSabedoriaArtigo(id) {
+  const corpo = document.getElementById('sab-corpo-' + id);
+  if (!corpo) return;
+  corpo.classList.toggle('aberto');
+  const btn = document.getElementById('sab-btn-' + id);
+  if (btn) btn.textContent = corpo.classList.contains('aberto') ? 'FECHAR ↑' : 'ABRIR →';
 }
 
-function filtrarGlossario() {
-  renderGlossario();
+function renderSabFase() {
+  const el = document.getElementById('sab-fase-card');
+  if (!el) return;
+  const nasc = new Date('2026-03-12T00:00:00');
+  const hoje = new Date();
+  const meses = Math.floor((hoje - nasc) / (1000*60*60*24*30.44));
+  let fase = 'Recém-nascido', faixaLabel = '0-3m';
+  if      (meses < 3)  { fase = 'Recém-nascido';  faixaLabel = '0-3m'; }
+  else if (meses < 6)  { fase = '3 a 6 meses';    faixaLabel = '3-6m'; }
+  else if (meses < 9)  { fase = '6 a 9 meses';    faixaLabel = '6-9m'; }
+  else if (meses < 12) { fase = '9 a 12 meses';   faixaLabel = '9-12m'; }
+  else                 { fase = 'Acima de 1 ano';  faixaLabel = '12m+'; }
+  el.innerHTML = `
+    <div class="sab-fase-label">🌌 FASE ATUAL · ${faixaLabel}</div>
+    <div class="sab-fase-valor">Arthur está na fase <strong>${fase}</strong></div>`;
 }
 
-function renderGlossario() {
-  const busca   = (document.getElementById('gloss-busca')?.value || '').toLowerCase().trim();
-  const lista   = document.getElementById('gloss-lista');
-  const contador = document.getElementById('gloss-contador');
-  if (!lista) return;
+function renderSabedoria() {
+  renderSabFase();
+  const el = document.getElementById('lista-sabedoria');
+  if (!el) return;
 
-  // Filtra itens
-  const filtrados = GLOSS_DADOS.filter(item => {
-    const matchCat  = _glossFiltro === 'todos' || item.cat === _glossFiltro;
-    const matchBusca = !busca ||
-      item.jedi.toLowerCase().includes(busca) ||
-      item.comum.toLowerCase().includes(busca) ||
-      (item.obs||'').toLowerCase().includes(busca);
-    return matchCat && matchBusca;
-  });
-
-  if (contador) {
-    contador.textContent = busca
-      ? `${filtrados.length} resultado${filtrados.length !== 1 ? 's' : ''}`
-      : `${filtrados.length} termo${filtrados.length !== 1 ? 's' : ''}`;
+  let lista = SABEDORIA_DB;
+  if (sabedoriaFiltroAtual !== 'todos') {
+    lista = lista.filter(a => a.cat === sabedoriaFiltroAtual);
+  }
+  if (sabedoriaBuscaAtual) {
+    const b = sabedoriaBuscaAtual;
+    lista = lista.filter(a =>
+      a.titulo.toLowerCase().includes(b) ||
+      a.resumo.toLowerCase().includes(b) ||
+      (a.corpo||'').toLowerCase().includes(b)
+    );
   }
 
-  if (!filtrados.length) {
-    lista.innerHTML = `
-      <div style="text-align:center;padding:48px 20px;color:#7ab3d4">
-        <div style="font-size:2.5rem;margin-bottom:10px;opacity:0.4">🔭</div>
-        <p style="font-size:0.85rem">Nenhum termo encontrado nas crônicas</p>
-      </div>`;
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><p>Nenhum artigo encontrado para essa busca.</p></div>';
     return;
   }
 
-  // Agrupa por seção
-  const secoes = {};
-  filtrados.forEach(item => {
-    if (!secoes[item.sec]) secoes[item.sec] = [];
-    secoes[item.sec].push(item);
-  });
+  const catMap = {
+    sono:           ['😴', 'SONO', 'sab-badge-sono'],
+    nutricao:       ['🍼', 'NUTRIÇÃO', 'sab-badge-nutricao'],
+    desenvolvimento:['✨', 'DESENVOLV.', 'sab-badge-desenvolvimento'],
+    saude:          ['🩺', 'SAÚDE', 'sab-badge-saude'],
+    comportamento:  ['🧠', 'COMPORT.', 'sab-badge-comportamento'],
+    seguranca:      ['🛡️', 'SEGURANÇA', 'sab-badge-seguranca'],
+    rotina:         ['🗓', 'ROTINA', 'sab-badge-rotina'],
+  };
 
-  lista.innerHTML = Object.entries(secoes).map(([sec, itens]) => `
-    <div class="gi-secao">${sec}</div>
-    ${itens.map(item => `
-      <div class="gi">
-        <div>
-          <span class="gi-cat gc-${item.cat}">${GLOSS_CAT_LABEL[item.cat]}</span><br>
-          <span class="gi-jedi">${item.jedi}</span>
+  el.innerHTML = lista.map(a => {
+    const [icon, label, cls] = catMap[a.cat] || ['📌', a.cat.toUpperCase(), ''];
+    const faixa = a.faixaEtaria || '';
+    const tempo = a.tempoLeitura ? `⏱ ${a.tempoLeitura}min` : '';
+    const corpoHtml = (a.corpo||'')
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
+    return `
+      <div class="sab-artigo2" onclick="toggleSabedoriaArtigo('${a.id}')">
+        <div class="sab-artigo2-top">
+          <span class="sab-badge2 ${cls}">${icon} ${label}</span>
+          ${faixa ? `<span class="sab-faixa">${faixa}</span>` : ''}
+          ${tempo ? `<span class="sab-tempo">${tempo}</span>` : ''}
         </div>
-        <div class="gi-seta">→</div>
-        <div>
-          <span class="gi-comum">${item.comum}</span>
-          ${item.obs ? `<div class="gi-obs">${item.obs}</div>` : ''}
+        <div class="sab-artigo2-titulo">${a.titulo}</div>
+        <div class="sab-artigo2-resumo">${a.resumo}</div>
+        <div class="sab-abrir" id="sab-btn-${a.id}">ABRIR →</div>
+        <div class="sab-corpo2" id="sab-corpo-${a.id}">
+          ${corpoHtml}
+          ${a.fonte ? `<div style="margin-top:10px;font-size:0.62rem;color:rgba(0,180,255,0.5);font-family:'Orbitron',monospace;letter-spacing:0.06em">📡 FONTE: ${a.fonte}</div>` : ''}
         </div>
-      </div>
-    `).join('')}
-  `).join('');
+      </div>`;
+  }).join('');
 }
 
-const GLOSS_CAT_LABEL = {
-  nav:'Navegação', form:'Formulário', acao:'Ação',
-  status:'Status', pessoa:'Pessoas', sistema:'Sistema'
-};
-</script>
-
-</body>
-</html>
