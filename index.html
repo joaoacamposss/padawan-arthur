@@ -7381,11 +7381,10 @@ INSTRUÇÕES:
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': ORACULO_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-request-source-header': 'padawan-arthur-pwa'
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         system: systemPrompt,
         messages
@@ -7404,7 +7403,13 @@ INSTRUÇÕES:
 
   } catch(e) {
     removeOraculoLoading();
-    addOraculoMsg('assistant', '⚠️ O Oráculo está temporariamente indisponível. Verifique sua conexão e tente novamente.');
+    const errMsg = e?.message || String(e);
+    const isCors = errMsg.toLowerCase().includes('fetch') || errMsg.toLowerCase().includes('network') || errMsg.toLowerCase().includes('cors');
+    addOraculoMsg('assistant', isCors
+      ? '⚠️ **Erro de conexão com a API.**\n\nVerifique se sua chave está correta e tente novamente. Se o problema persistir, a chave pode estar inválida ou sem créditos.\n\n_Erro técnico: ' + errMsg + '_'
+      : '⚠️ **Erro:** ' + errMsg
+    );
+    console.error('[Oráculo] erro:', e);
   } finally {
     input.disabled = false;
     document.getElementById('btn-oraculo-enviar').disabled = false;
