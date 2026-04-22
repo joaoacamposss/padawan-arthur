@@ -7272,7 +7272,8 @@ loadEstoque();
 // ── ORÁCULO JEDI — IA Pediátrica ──
 let oraculoHistorico = [];
 let oraculoCarregando = false;
-let ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
+let ORACULO_API_KEY    = localStorage.getItem('oraculo_api_key')     || '';
+let ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url')  || '';
 
 function contextArthur() {
   const hoje = todayISO();
@@ -7330,13 +7331,6 @@ function removeOraculoLoading() {
 
 async function enviarOraculo() {
   if (oraculoCarregando) return;
-  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
-  if (!ORACULO_API_KEY) {
-    document.getElementById('oraculo-cfg').style.display = 'block';
-    document.getElementById('oraculo-input-area').style.display = 'none';
-    addOraculoMsg('assistant','⚙️ Configure sua chave da API Claude no campo acima para usar o Oráculo Jedi.');
-    return;
-  }
   const input = document.getElementById('oraculo-input');
   const pergunta = input.value.trim();
   if (!pergunta) return;
@@ -7376,13 +7370,13 @@ INSTRUÇÕES:
       messages.push({ role:'user', content: pergunta });
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url') || '';
+    if (!ORACULO_WORKER_URL) {
+      throw new Error('URL do Worker não configurada. Configure em Menu → Configurar Oráculo.');
+    }
+    const response = await fetch(ORACULO_WORKER_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ORACULO_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
@@ -7435,48 +7429,48 @@ function salvarOraculoKey() {
 }
 
 function abrirModalOraculoConfig() {
-  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
-  const input = document.getElementById('oraculo-key-input');
-  if (input && ORACULO_API_KEY) input.value = ORACULO_API_KEY;
+  ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url') || '';
+  const input = document.getElementById('oraculo-worker-input');
+  if (input && ORACULO_WORKER_URL) input.value = ORACULO_WORKER_URL;
   const banner = document.getElementById('oraculo-config-status-banner');
-  if (banner) banner.style.display = ORACULO_API_KEY ? 'block' : 'none';
+  if (banner) banner.style.display = ORACULO_WORKER_URL ? 'block' : 'none';
   const msg = document.getElementById('oraculo-config-msg');
   if (msg) msg.textContent = '';
   document.getElementById('modal-oraculo-config').style.display = 'flex';
 }
 
 function salvarOraculoKeyModal() {
-  const key = document.getElementById('oraculo-key-input').value.trim();
+  const url = document.getElementById('oraculo-worker-input').value.trim();
   const msg = document.getElementById('oraculo-config-msg');
-  if (!key.startsWith('sk-ant')) {
+  if (!url.startsWith('https://')) {
     msg.style.color = 'rgba(255,150,100,0.9)';
-    msg.textContent = '⚠️ Chave inválida — deve começar com sk-ant-';
+    msg.textContent = '⚠️ URL inválida — deve começar com https://';
     return;
   }
-  localStorage.setItem('oraculo_api_key', key);
-  ORACULO_API_KEY = key;
+  localStorage.setItem('oraculo_worker_url', url);
+  ORACULO_WORKER_URL = url;
   msg.style.color = 'rgba(57,255,20,0.9)';
-  msg.textContent = '✅ Chave salva com sucesso!';
+  msg.textContent = '✅ Worker configurado!';
   const banner = document.getElementById('oraculo-config-status-banner');
   if (banner) banner.style.display = 'block';
   showToast('🔮 Oráculo Jedi ativado!');
   setTimeout(() => {
     document.getElementById('modal-oraculo-config').style.display = 'none';
-    // Inicializar chat se ainda vazio
-    if (document.getElementById('oraculo-chat') && !document.getElementById('oraculo-chat').children.length) {
+    const chat = document.getElementById('oraculo-chat');
+    if (chat && !chat.children.length) {
       addOraculoMsg('assistant', '🔮 **Oráculo Jedi ativado!**\n\nSou seu assistente pediátrico. Em que posso ajudar hoje, Guardião?');
     }
   }, 1200);
 }
 
 function initOraculo() {
-  ORACULO_API_KEY = localStorage.getItem('oraculo_api_key') || '';
+  ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url') || '';
   const chat = document.getElementById('oraculo-chat');
   if (chat && !chat.children.length) {
-    if (ORACULO_API_KEY) {
+    if (ORACULO_WORKER_URL) {
       addOraculoMsg('assistant', '🔮 **Bem-vindo ao Oráculo Jedi!**\n\nSou seu assistente pediátrico baseado nas diretrizes da SBP e OMS. Posso orientar sobre o desenvolvimento do Arthur, nutrição, sono, sinais de alerta e muito mais.\n\nEm que posso ajudar hoje, Guardião?');
     } else {
-      addOraculoMsg('assistant', '🔮 **Oráculo não configurado**\n\nPara usar o Oráculo Jedi, acesse o **menu do Guardião** (seu nome/foto no topo) → **Configurar Oráculo** → cole sua chave da API Claude.\n\n_A chave é salva apenas neste dispositivo._');
+      addOraculoMsg('assistant', '🔮 **Oráculo não configurado**\n\nPara usar o Oráculo Jedi, acesse o **menu do Guardião** → **Configurar Oráculo** e siga as instruções para criar o Worker gratuito.');
     }
   }
 }
@@ -7760,21 +7754,23 @@ function renderAll() {
       <span style="font-size:1.8rem">🔮</span>
       <div>
         <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#d4a8ff;letter-spacing:0.1em">ORÁCULO JEDI</div>
-        <div style="font-size:0.62rem;color:rgba(212,168,255,0.6);margin-top:2px">Configuração da API Claude</div>
+        <div style="font-size:0.62rem;color:rgba(212,168,255,0.6);margin-top:2px">Configuração via Cloudflare Worker</div>
       </div>
     </div>
     <div id="oraculo-config-status-banner" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:8px;font-size:0.72rem;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#7fff60">
       ✅ Oráculo ativo
     </div>
-    <div style="font-size:0.72rem;color:rgba(212,168,255,0.7);line-height:1.5;margin-bottom:12px;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
-      Cole sua chave da API Claude (Anthropic) para ativar o Oráculo Jedi. A chave é salva apenas neste dispositivo e nunca sai dele.
+    <!-- Instruções passo a passo -->
+    <div style="font-size:0.7rem;color:rgba(212,168,255,0.8);line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
+      <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);margin-bottom:6px;letter-spacing:0.08em">📋 COMO CONFIGURAR</div>
+      <div>1. Acesse <strong style="color:#d4a8ff">workers.cloudflare.com</strong> → conta gratuita</div>
+      <div>2. Crie um Worker → cole o código disponibilizado</div>
+      <div>3. Adicione variável de ambiente: <strong style="color:#d4a8ff">ANTHROPIC_API_KEY</strong></div>
+      <div>4. Cole a URL do Worker abaixo e ative</div>
     </div>
     <div class="form-group" style="margin-bottom:10px">
-      <label style="color:#d4a8ff">Chave da API</label>
-      <input type="password" id="oraculo-key-input" placeholder="sk-ant-api03-..." style="font-size:13px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#d4a8ff;letter-spacing:0.05em" oninput="document.getElementById('oraculo-key-input').style.borderColor=this.value.startsWith('sk-ant')?'rgba(57,255,20,0.5)':'rgba(180,100,255,0.3)'">
-    </div>
-    <div style="font-size:0.6rem;color:rgba(212,168,255,0.4);margin-bottom:14px">
-      💡 Gere sua chave em: <span style="color:rgba(180,100,255,0.7)">console.anthropic.com</span>
+      <label style="color:#d4a8ff">URL do Worker</label>
+      <input type="url" id="oraculo-worker-input" placeholder="https://oraculo.seuusuario.workers.dev" style="font-size:13px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#d4a8ff" oninput="document.getElementById('oraculo-worker-input').style.borderColor=this.value.startsWith('https://')?'rgba(57,255,20,0.5)':'rgba(180,100,255,0.3)'">
     </div>
     <div style="display:flex;gap:8px">
       <button onclick="salvarOraculoKeyModal()" style="flex:1;background:linear-gradient(135deg,rgba(100,0,200,0.6),rgba(60,0,140,0.8));border:1px solid rgba(180,100,255,0.5);color:#d4a8ff;border-radius:10px;padding:12px;font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;letter-spacing:0.06em">✓ ATIVAR</button>
