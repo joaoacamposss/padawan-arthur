@@ -1816,6 +1816,10 @@
     font-size:0.78rem;color:rgba(220,200,255,0.85);
     line-height:1.7;border-top:1px solid rgba(180,100,255,0.12);
     padding-top:10px;
+    max-height:55vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:smooth;
   }
   .oraculo-faq-resposta.aberta { display:block; }
   .oraculo-faq-saberMais {
@@ -2189,35 +2193,133 @@
 
       <!-- Extrair -->
       <div id="epanel-extrair" class="subpanel active">
+
+        <!-- Data -->
+        <div class="form-group">
+          <label>📅 Data</label>
+          <input type="date" id="ext-data">
+        </div>
+
+        <!-- Horário início + término -->
         <div class="row-2">
           <div class="form-group">
-            <label>Data</label>
-            <input type="date" id="ext-data">
+            <label>🕐 Início da extração</label>
+            <input type="time" id="ext-hora-inicio" oninput="calcularDuracaoExtracao();atualizarPreviewValidade()">
           </div>
           <div class="form-group">
-            <label>Hora</label>
-            <input type="time" id="ext-hora">
+            <label>🕑 Término da extração</label>
+            <input type="time" id="ext-hora-fim" oninput="calcularDuracaoExtracao()">
           </div>
         </div>
+
+        <!-- Duração calculada -->
+        <div id="ext-duracao-display" style="display:none;font-size:0.72rem;color:var(--blue-neon);font-family:'Orbitron',monospace;letter-spacing:0.06em;margin:-6px 0 10px;padding:6px 10px;background:rgba(0,180,255,0.06);border-radius:8px;border:1px solid rgba(0,180,255,0.15)">
+          ⏱ Duração: <span id="ext-duracao-val">—</span>
+        </div>
+
+        <!-- Seio -->
+        <div class="form-group">
+          <label>🤱 Seio extratado</label>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button type="button" id="ext-seio-esq" onclick="selecionarSeio('esquerdo')"
+              style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(0,180,255,0.25);background:rgba(0,20,60,0.5);color:var(--text-dim);font-size:0.8rem;cursor:pointer;transition:all 0.15s">
+              👈 Esquerdo
+            </button>
+            <button type="button" id="ext-seio-dir" onclick="selecionarSeio('direito')"
+              style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(0,180,255,0.25);background:rgba(0,20,60,0.5);color:var(--text-dim);font-size:0.8rem;cursor:pointer;transition:all 0.15s">
+              👉 Direito
+            </button>
+            <button type="button" id="ext-seio-amb" onclick="selecionarSeio('ambos')"
+              style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(0,180,255,0.25);background:rgba(0,20,60,0.5);color:var(--text-dim);font-size:0.8rem;cursor:pointer;transition:all 0.15s">
+              🤱 Ambos
+            </button>
+          </div>
+          <input type="hidden" id="ext-seio" value="">
+        </div>
+
+        <!-- Volume + Armazenamento -->
         <div class="row-2">
           <div class="form-group">
-            <label>Volume extraído (ml)</label>
+            <label>💧 Volume extraído (ml)</label>
             <input type="number" id="ext-ml" placeholder="ex: 120" min="0" max="500">
           </div>
           <div class="form-group">
-            <label>Armazenamento</label>
-            <select id="ext-tipo">
-              <option value="geladeira">❄️ Geladeira (48h)</option>
-              <option value="congelador">🧊 Congelador (15 dias)</option>
-              <option value="freezer">🌡️ Freezer (3 meses)</option>
+            <label>🧊 Local de armazenamento</label>
+            <select id="ext-tipo" onchange="atualizarPreviewValidade()">
+              <option value="geladeira">❄️ Geladeira</option>
+              <option value="congelador">🧊 Congelador</option>
+              <option value="freezer">🌡️ Freezer</option>
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label>Observações</label>
-          <input type="text" id="ext-obs" placeholder="ex: seio esquerdo, pós-mamada...">
+
+        <!-- Horário de armazenamento -->
+        <div class="row-2">
+          <div class="form-group">
+            <label>🕐 Hora do armazenamento</label>
+            <input type="time" id="ext-hora-armazen" oninput="atualizarPreviewValidade()">
+          </div>
+          <div class="form-group" style="align-self:flex-end">
+            <div id="ext-validade-preview" style="font-size:0.68rem;color:var(--green-saber);padding:8px 10px;background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.15);border-radius:8px;min-height:38px;display:flex;align-items:center">
+              📋 Validade calculada automaticamente
+            </div>
+          </div>
         </div>
+
+        <!-- Observações (dor, choques, etc.) -->
+        <div class="form-group">
+          <label>📝 Observações</label>
+          <textarea id="ext-obs" rows="2" placeholder="ex: dor ao extrair, choque elétrico no mamilo, ingurgitamento, pós-mamada, leite aquoso..."
+            style="resize:none;font-size:14px;background:rgba(0,10,30,0.6);border-color:rgba(0,180,255,0.2);color:var(--white);border-radius:10px;padding:10px 12px;width:100%;line-height:1.5"></textarea>
+        </div>
+
         <button class="btn btn-primary btn-full" onclick="salvarExtracao()">💾 Registrar Extração</button>
+
+        <!-- 5. Card informativo de armazenamento SBP/BLH -->
+        <div style="margin-top:14px;background:rgba(0,30,80,0.5);border:1px solid rgba(0,180,255,0.2);border-radius:12px;padding:12px">
+          <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--gold);letter-spacing:0.09em;margin-bottom:8px">
+            📡 GUIA DE ARMAZENAMENTO · SBP / REDE BLH / FIOCRUZ
+          </div>
+          <table style="width:100%;font-size:0.7rem;border-collapse:collapse">
+            <thead>
+              <tr style="color:rgba(0,180,255,0.7);font-family:'Orbitron',monospace;font-size:0.58rem">
+                <th style="text-align:left;padding:4px 6px">LOCAL</th>
+                <th style="text-align:center;padding:4px 6px">TEMP.</th>
+                <th style="text-align:center;padding:4px 6px">VALIDADE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-top:1px solid rgba(0,180,255,0.08)">
+                <td style="padding:5px 6px;color:#e8f4fd">❄️ Geladeira</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--text-dim)">0–4°C</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--green-saber);font-weight:700">72h (3 dias)</td>
+              </tr>
+              <tr style="border-top:1px solid rgba(0,180,255,0.08)">
+                <td style="padding:5px 6px;color:#e8f4fd">🧊 Congelador</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--text-dim)">−15°C</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--green-saber);font-weight:700">15 dias</td>
+              </tr>
+              <tr style="border-top:1px solid rgba(0,180,255,0.08)">
+                <td style="padding:5px 6px;color:#e8f4fd">🌡️ Freezer ≥ 2 portas</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--text-dim)">−18°C</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--green-saber);font-weight:700">3 meses</td>
+              </tr>
+              <tr style="border-top:1px solid rgba(0,180,255,0.08)">
+                <td style="padding:5px 6px;color:#e8f4fd">🏦 Freezer BLH</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--text-dim)">−20°C</td>
+                <td style="text-align:center;padding:5px 6px;color:var(--green-saber);font-weight:700">6 meses</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:8px;font-size:0.62rem;color:rgba(122,179,212,0.6);line-height:1.5;border-top:1px solid rgba(0,180,255,0.1);padding-top:6px">
+            ⚠️ <strong style="color:rgba(255,200,80,0.8)">Após descongelar:</strong> usar em até 24h. Nunca recongelar.<br>
+            🌡️ <strong style="color:rgba(255,200,80,0.8)">Descongelar:</strong> geladeira (ideal) ou banho-maria morno. Nunca micro-ondas.<br>
+            💡 <strong style="color:rgba(255,200,80,0.8)">Pode misturar:</strong> leite de dias diferentes se ambos resfriados. Não misturar quente com frio.
+          </div>
+          <div style="margin-top:6px;font-size:0.58rem;color:rgba(0,180,255,0.4);font-family:'Orbitron',monospace">
+            📋 Rede BLH/FIOCRUZ · SBP Manual de Aleitamento 2021 · OMS
+          </div>
+        </div>
       </div>
 
       <!-- Usar estoque -->
@@ -7196,10 +7298,16 @@ function saveEstoque() {
 function initEstoqueForm() {
   const hoje = new Date();
   const y=hoje.getFullYear(), m=String(hoje.getMonth()+1).padStart(2,'0'), d=String(hoje.getDate()).padStart(2,'0');
-  const h=String(hoje.getHours()).padStart(2,'0'), min=String(hoje.getMinutes()).padStart(2,'0');
-  document.getElementById('ext-data').value = `${y}-${m}-${d}`;
-  document.getElementById('ext-hora').value = `${h}:${min}`;
-  document.getElementById('uso-data').value = `${y}-${m}-${d}`;
+  const horaAtual = hoje.toTimeString().slice(0,5);
+  const extData = document.getElementById('ext-data');
+  const extIni  = document.getElementById('ext-hora-inicio');
+  const extArm  = document.getElementById('ext-hora-armazen');
+  if (extData) extData.value = `${y}-${m}-${d}`;
+  if (extIni && !extIni.value)  extIni.value  = horaAtual;
+  if (extArm && !extArm.value)  extArm.value  = horaAtual;
+  // uso-data também pre-preenche
+  const uso = document.getElementById('uso-data');
+  if (uso) uso.value = `${y}-${m}-${d}`;
 }
 
 function showEstoqueTab(id, btn) {
@@ -7220,30 +7328,114 @@ function showMamadasTab(id, btn) {
   if (id === 'banco') { renderEstoqueResumo(); }
 }
 
-function salvarExtracao() {
+// ── Selecionar seio ──
+function selecionarSeio(seio) {
+  document.getElementById('ext-seio').value = seio;
+  const btns = { esquerdo:'ext-seio-esq', direito:'ext-seio-dir', ambos:'ext-seio-amb' };
+  Object.entries(btns).forEach(([k, id]) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const ativo = k === seio;
+    btn.style.background = ativo ? 'rgba(0,100,200,0.5)' : 'rgba(0,20,60,0.5)';
+    btn.style.borderColor = ativo ? 'rgba(0,180,255,0.7)' : 'rgba(0,180,255,0.25)';
+    btn.style.color       = ativo ? 'var(--blue-neon)'     : 'var(--text-dim)';
+    btn.style.fontWeight  = ativo ? '700' : '400';
+  });
+}
+
+// ── Calcular e exibir duração da extração ──
+function calcularDuracaoExtracao() {
+  const ini = document.getElementById('ext-hora-inicio').value;
+  const fim = document.getElementById('ext-hora-fim').value;
+  const disp = document.getElementById('ext-duracao-display');
+  const val  = document.getElementById('ext-duracao-val');
+  if (!ini || !fim || !disp || !val) return;
+  const [hI, mI] = ini.split(':').map(Number);
+  const [hF, mF] = fim.split(':').map(Number);
+  let diff = (hF * 60 + mF) - (hI * 60 + mI);
+  if (diff < 0) diff += 24 * 60;
+  if (diff <= 0) { disp.style.display = 'none'; return; }
+  const h = Math.floor(diff / 60), m = diff % 60;
+  val.textContent = h > 0 ? `${h}h ${m}min` : `${m} min`;
+  disp.style.display = 'block';
+}
+
+// ── Preview de validade ao trocar armazenamento/hora ──
+function atualizarPreviewValidade() {
   const data  = document.getElementById('ext-data').value;
-  const hora  = document.getElementById('ext-hora').value;
-  const ml    = parseInt(document.getElementById('ext-ml').value);
+  const hora  = document.getElementById('ext-hora-armazen').value || '00:00';
   const tipo  = document.getElementById('ext-tipo').value;
-  const obs   = document.getElementById('ext-obs').value.trim();
+  const el    = document.getElementById('ext-validade-preview');
+  if (!el || !data) return;
+  const horas = { geladeira: 72, congelador: 15*24, freezer: 90*24 };
+  const dataObj = new Date(data + 'T' + hora);
+  const validade = new Date(dataObj.getTime() + horas[tipo] * 3600000);
+  const d = String(validade.getDate()).padStart(2,'0');
+  const m = String(validade.getMonth()+1).padStart(2,'0');
+  const y = validade.getFullYear();
+  const hh = String(validade.getHours()).padStart(2,'0');
+  const mm = String(validade.getMinutes()).padStart(2,'0');
+  el.innerHTML = `✅ Válido até <strong style="color:var(--green-saber)">${d}/${m}/${y} às ${hh}:${mm}</strong>`;
+}
+
+function salvarExtracao() {
+  const data           = document.getElementById('ext-data').value;
+  const horaInicio     = document.getElementById('ext-hora-inicio').value;
+  const horaFim        = document.getElementById('ext-hora-fim').value;
+  const horaArmazen    = document.getElementById('ext-hora-armazen').value || horaInicio || '00:00';
+  const ml             = parseInt(document.getElementById('ext-ml').value);
+  const tipo           = document.getElementById('ext-tipo').value;
+  const seio           = document.getElementById('ext-seio').value;
+  const obs            = document.getElementById('ext-obs').value.trim();
 
   if (!data || !ml || ml <= 0) { alert('⚠️ Defina data e volume extraído!'); return; }
 
-  // Validade automática
-  const dataObj = new Date(data + 'T' + hora);
-  const horas = { geladeira: 48, congelador: 15*24, freezer: 90*24 };
-  const validade = new Date(dataObj.getTime() + horas[tipo] * 3600000);
-  const vY=validade.getFullYear(), vM=String(validade.getMonth()+1).padStart(2,'0'), vD=String(validade.getDate()).padStart(2,'0');
+  // Calcular duração
+  let duracaoMin = null;
+  if (horaInicio && horaFim) {
+    const [hI, mI] = horaInicio.split(':').map(Number);
+    const [hF, mF] = horaFim.split(':').map(Number);
+    let diff = (hF * 60 + mF) - (hI * 60 + mI);
+    if (diff < 0) diff += 24 * 60;
+    if (diff > 0) duracaoMin = diff;
+  }
+
+  // Validade a partir da hora de armazenamento (geladeira=72h, congelador=15d, freezer=3m)
+  const horas = { geladeira: 72, congelador: 15*24, freezer: 90*24 };
+  const dataArmazen = new Date(data + 'T' + horaArmazen);
+  const validade = new Date(dataArmazen.getTime() + horas[tipo] * 3600000);
+  const vY = validade.getFullYear();
+  const vM = String(validade.getMonth()+1).padStart(2,'0');
+  const vD = String(validade.getDate()).padStart(2,'0');
+  const vH = String(validade.getHours()).padStart(2,'0');
+  const vMin = String(validade.getMinutes()).padStart(2,'0');
 
   estoqueLeite.push({
-    id: Date.now(), data, hora, ml, tipo, obs,
-    validade: `${vY}-${vM}-${vD}`,
+    id: Date.now(), data,
+    horaInicio, horaFim, horaArmazen,
+    duracaoMin,
+    ml, tipo, seio, obs,
+    validade:       `${vY}-${vM}-${vD}`,
+    validadeHora:   `${vH}:${vMin}`,
     usado: false, autor: usuarioAtual
   });
-  estoqueLeite.sort((a,b) => (b.data+b.hora).localeCompare(a.data+a.hora));
+  estoqueLeite.sort((a,b) => (b.data+(b.horaInicio||'')).localeCompare(a.data+(a.horaInicio||'')));
   saveEstoque();
+
+  // Limpar form
   document.getElementById('ext-ml').value = '';
   document.getElementById('ext-obs').value = '';
+  document.getElementById('ext-hora-inicio').value = '';
+  document.getElementById('ext-hora-fim').value = '';
+  document.getElementById('ext-hora-armazen').value = '';
+  document.getElementById('ext-seio').value = '';
+  document.getElementById('ext-duracao-display').style.display = 'none';
+  // Reset botões seio
+  ['ext-seio-esq','ext-seio-dir','ext-seio-amb'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.style.background='rgba(0,20,60,0.5)'; btn.style.borderColor='rgba(0,180,255,0.25)'; btn.style.color='var(--text-dim)'; btn.style.fontWeight='400'; }
+  });
+  document.getElementById('ext-validade-preview').innerHTML = '📋 Validade calculada automaticamente';
   renderEstoqueResumo();
   showToast('🧊 Extração registrada no Banco Galáctico!');
 }
@@ -7313,6 +7505,7 @@ function renderEstoque() {
   if (!el) return;
   const hoje = todayISO();
   const tipoLabel = { geladeira:'❄️ Geladeira', congelador:'🧊 Congelador', freezer:'🌡️ Freezer', uso:'🍼 Uso' };
+  const seioLabel  = { esquerdo:'👈 Esq', direito:'👉 Dir', ambos:'🤱 Ambos' };
   const itens = estoqueLeite.filter(i => i.tipo !== 'uso').slice(0, 30);
   if (!itens.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">🧊</div><p>Nenhuma extração registrada</p></div>';
@@ -7321,16 +7514,23 @@ function renderEstoque() {
   el.innerHTML = itens.map(i => {
     const vencido = i.validade < hoje;
     const statusColor = i.usado ? 'var(--text-dim)' : vencido ? '#ff6b6b' : 'var(--green-saber)';
-    const statusTxt   = i.usado ? '✓ usado' : vencido ? '⚠️ vencido' : `✓ válido até ${i.validade}`;
+    const validStr  = i.validadeHora ? `${i.validade} ${i.validadeHora}` : i.validade;
+    const statusTxt = i.usado ? '✓ usado' : vencido ? '⚠️ vencido' : `✅ válido até ${validStr}`;
+    const horarios = [];
+    if (i.horaInicio)  horarios.push(`Início: ${i.horaInicio}`);
+    if (i.horaFim)     horarios.push(`Fim: ${i.horaFim}`);
+    if (i.duracaoMin)  { const h=Math.floor(i.duracaoMin/60), m=i.duracaoMin%60; horarios.push(`⏱ ${h>0?h+'h ':''}${m}min`); }
+    if (i.horaArmazen) horarios.push(`Armazenado: ${i.horaArmazen}`);
     return `<div class="estoque-item ${i.usado?'usado':''}">
       <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:6px">
-          <span>${tipoLabel[i.tipo]||i.tipo}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-size:0.78rem">${tipoLabel[i.tipo]||i.tipo}</span>
           <span style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--blue-neon)">${i.ml}ml</span>
+          ${i.seio ? `<span style="font-size:0.68rem;color:rgba(122,179,212,0.7);background:rgba(0,60,140,0.3);padding:2px 7px;border-radius:10px">${seioLabel[i.seio]||i.seio}</span>` : ''}
         </div>
-        <div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px">${i.data} ${i.hora}</div>
-        ${i.obs?`<div style="font-size:0.68rem;color:rgba(122,179,212,0.6)">${i.obs}</div>`:''}
-        <div style="font-size:0.62rem;color:${statusColor};margin-top:2px">${statusTxt}</div>
+        <div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px">${i.data}${horarios.length?' · '+horarios.join(' · '):''}</div>
+        ${i.obs?`<div style="font-size:0.65rem;color:rgba(122,179,212,0.6);margin-top:2px;font-style:italic">📝 ${i.obs}</div>`:''}
+        <div style="font-size:0.62rem;color:${statusColor};margin-top:3px;font-family:'Orbitron',monospace">${statusTxt}</div>
       </div>
       ${!i.usado?`<button onclick="descartarEstoque(${i.id})" style="background:none;border:none;color:rgba(255,100,100,0.5);cursor:pointer;font-size:0.85rem;padding:4px">🗑</button>`:''}
     </div>`;
@@ -7346,7 +7546,7 @@ loadEstoque();
 
 
 // ── ORÁCULO JEDI — IA Pediátrica ──
-let oraculoHistorico = [];
+let oraculoHistorico = JSON.parse(localStorage.getItem('oraculo_historico') || '[]');
 let oraculoCarregando = false;
 let ORACULO_API_KEY    = localStorage.getItem('oraculo_api_key')     || '';
 let ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url')  || '';
@@ -7377,6 +7577,15 @@ function contextArthur() {
 - Dúvidas em aberto: ${duvidAbertas}`;
 }
 
+
+// ── Persistir histórico do Oráculo ──
+function salvarOraculoHistorico() {
+  try {
+    // Guardar apenas as últimas 30 mensagens (texto, sem re-renderizar)
+    const sliced = oraculoHistorico.slice(-30);
+    localStorage.setItem('oraculo_historico', JSON.stringify(sliced));
+  } catch(e) {}
+}
 // Cada par pergunta/resposta vira um item FAQ
 let _oraculoFaqPendente = null; // guarda o item FAQ aguardando resposta
 
@@ -7473,6 +7682,7 @@ async function enviarOraculo() {
   // Mostrar mensagem do usuário
   addOraculoMsg('user', pergunta);
   oraculoHistorico.push({ role: 'user', content: pergunta });
+  salvarOraculoHistorico();
   addOraculoLoading();
 
   try {
@@ -7521,9 +7731,10 @@ INSTRUÇÕES:
     const resposta = data.content?.[0]?.text || 'O Oráculo não conseguiu responder agora. Tente novamente.';
     addOraculoMsg('assistant', resposta);
     oraculoHistorico.push({ role: 'assistant', content: resposta });
+    salvarOraculoHistorico();
 
     // Manter histórico curto
-    if (oraculoHistorico.length > 20) oraculoHistorico = oraculoHistorico.slice(-20);
+    if (oraculoHistorico.length > 20) { oraculoHistorico = oraculoHistorico.slice(-20); salvarOraculoHistorico(); }
 
   } catch(e) {
     removeOraculoLoading();
@@ -7550,6 +7761,7 @@ function perguntaRapidaOraculo(btn) {
 
 function limparOraculo() {
   oraculoHistorico = [];
+  localStorage.removeItem('oraculo_historico');
   document.getElementById('oraculo-chat').innerHTML = '';
 }
 
@@ -7596,7 +7808,50 @@ function salvarOraculoKeyModal() {
 function initOraculo() {
   ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url') || '';
   const chat = document.getElementById('oraculo-chat');
-  if (chat && !chat.children.length) {
+  if (!chat) return;
+
+  // Restaurar conversa salva
+  if (oraculoHistorico.length > 0 && chat.children.length === 0) {
+    // Re-renderizar o histórico visualmente
+    for (let i = 0; i < oraculoHistorico.length; i++) {
+      const msg = oraculoHistorico[i];
+      if (msg.role === 'user') {
+        // Criar card FAQ com pergunta
+        const id = 'oraculo-faq-hist-' + i;
+        const item = document.createElement('div');
+        item.className = 'oraculo-faq-item';
+        item.id = id;
+        item.innerHTML = `
+          <div class="oraculo-faq-pergunta" onclick="toggleOraculoFaq('${id}')">
+            <span class="oraculo-faq-icon">👤</span>
+            <span class="oraculo-faq-texto">${msg.content.replace(/</g,'&lt;')}</span>
+            <span class="oraculo-faq-chev">▼</span>
+          </div>
+          <div class="oraculo-faq-resposta" id="${id}-resp" style="display:none"></div>`;
+        chat.appendChild(item);
+        // Preencher com a resposta correspondente (próxima msg do assistente)
+        if (oraculoHistorico[i+1] && oraculoHistorico[i+1].role === 'assistant') {
+          const respEl = item.querySelector('.oraculo-faq-resposta');
+          const fmtTexto = oraculoHistorico[i+1].content
+            .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g,'<em>$1</em>')
+            .replace(/\n/g,'<br>');
+          if (respEl) respEl.innerHTML = fmtTexto +
+            `<div><button class="oraculo-faq-saberMais" onclick="toggleOraculoFaq('${id}')">
+              🔮 Fechar <span style="font-size:0.7rem">▲</span>
+            </button></div>`;
+        }
+      }
+    }
+    // Badge de histórico restaurado
+    const badge = document.createElement('div');
+    badge.style.cssText = 'text-align:center;font-size:0.62rem;color:rgba(0,180,255,0.4);font-family:Orbitron,monospace;padding:6px;letter-spacing:0.06em';
+    badge.textContent = `── ${oraculoHistorico.filter(m=>m.role==='user').length} PERGUNTAS ANTERIORES ──`;
+    chat.insertBefore(badge, chat.firstChild);
+    return;
+  }
+
+  if (chat.children.length === 0) {
     if (ORACULO_WORKER_URL) {
       addOraculoMsg('assistant', '🔮 **Bem-vindo ao Oráculo Jedi!**\n\nSou seu assistente pediátrico baseado nas diretrizes da SBP e OMS. Posso orientar sobre o desenvolvimento do Arthur, nutrição, sono, sinais de alerta e muito mais.\n\nEm que posso ajudar hoje, Guardião?');
     } else {
