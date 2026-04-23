@@ -4921,11 +4921,11 @@ function saveCrescimentoLocal(d) {
 
 // Curvas OMS peso (kg) — meninos — P3, P15, P50, P85, P97
 const OMS_PESO = {
-  p3:  [2.5,3.4,4.3,5.0,5.6,6.1,6.4,6.7,7.0,7.2,7.5,7.7,7.8],
+  p3:  [2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8],
   p15: [2.9,3.9,4.9,5.7,6.2,6.7,7.1,7.4,7.7,7.9,8.2,8.4,8.6],
   p50: [3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6],
   p85: [3.9,5.1,6.3,7.2,7.8,8.4,8.8,9.2,9.6,9.9,10.2,10.5,10.8],
-  p97: [4.4,5.8,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8],
+  p97: [4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8],
 };
 // Curvas OMS comprimento (cm) — meninos
 const OMS_ALTURA = {
@@ -4938,10 +4938,10 @@ const OMS_ALTURA = {
 // Curvas OMS perímetro cefálico (cm) — meninos
 const OMS_PC = {
   p3:  [32.1,35.1,37.0,38.6,39.9,40.9,41.7,42.4,43.1,43.6,44.1,44.6,45.0],
-  p15: [33.0,36.0,38.0,39.5,40.8,41.9,42.7,43.4,44.1,44.7,45.2,45.6,46.0],
+  p15: [33.1,36.1,38.0,39.5,40.8,41.9,42.7,43.4,44.1,44.7,45.2,45.6,46.0],
   p50: [34.5,37.3,39.1,40.5,41.6,42.6,43.3,44.1,44.8,45.3,45.9,46.3,46.7],
-  p85: [35.6,38.4,40.1,41.5,42.6,43.5,44.3,45.0,45.7,46.2,46.8,47.2,47.6],
-  p97: [36.9,39.5,41.1,42.4,43.5,44.4,45.1,45.9,46.6,47.1,47.6,48.1,48.5],
+  p85: [35.6,38.4,40.2,41.5,42.6,43.5,44.3,45.0,45.7,46.2,46.8,47.2,47.6],
+  p97: [36.9,39.5,41.2,42.4,43.5,44.4,45.1,45.9,46.6,47.1,47.6,48.1,48.5],
 };
 
 const OMS_MESES = [0,1,2,3,4,5,6,7,8,9,10,11,12];
@@ -5077,162 +5077,209 @@ function renderGraficoCrescimento() {
   const canvas = document.getElementById('cresc-chart');
   if (!canvas) return;
 
-  const oms = OMS_MAP[_crescMetrica];
-  const unid = CRESC_UNIDADE[_crescMetrica];
+  const oms   = OMS_MAP[_crescMetrica];
+  const unid  = CRESC_UNIDADE[_crescMetrica];
   const label = CRESC_LABEL[_crescMetrica];
 
-  // Pontos do Arthur para a métrica atual
   const pontosArthur = crescData
     .filter(r => r[_crescMetrica] != null)
-    .map(r => ({ x: r.mes, y: r[_crescMetrica] }));
+    .map(r => ({ x: Number(r.mes), y: Number(r[_crescMetrica]) }))
+    .sort((a, b) => a.x - b.x);
 
-  // Calcular dimensões
-  const W = canvas.parentElement.offsetWidth || 320;
-  const H = Math.min(260, W * 0.65);
+  const W = canvas.parentElement.offsetWidth || 340;
+  const H = Math.round(Math.min(280, W * 0.68));
   canvas.width  = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // Margens
-  const ml = 44, mr = 12, mt = 14, mb = 32;
-  const pw = W - ml - mr, ph = H - mt - mb;
+  // Margens: esquerda maior para Y labels, direita para labels P97/P3
+  const ml = 46, mr = 30, mt = 18, mb = 30;
+  const pw = W - ml - mr;
+  const ph = H - mt - mb;
 
-  // Min/max Y dinâmico
-  const allVals = [
-    ...Object.values(oms).flat(),
-    ...pontosArthur.map(p => p.y)
-  ];
-  let yMin = Math.min(...allVals) * 0.97;
-  let yMax = Math.max(...allVals) * 1.03;
+  // ── Escala Y baseada APENAS nas curvas OMS + margem fixa ──────────
+  // (não distorce quando Arthur está fora do range)
+  const omsAllVals = Object.values(oms).flat();
+  const omsMin = Math.min(...omsAllVals);
+  const omsMax = Math.max(...omsAllVals);
+  // Margem de 8% abaixo/acima para que as curvas não colem nas bordas
+  const yPad  = (omsMax - omsMin) * 0.08;
+  const yMin  = omsMin - yPad;
+  const yMax  = omsMax + yPad;
 
   const scaleX = m => ml + (m / 12) * pw;
   const scaleY = v => mt + ph - ((v - yMin) / (yMax - yMin)) * ph;
 
-  // Fundo
+  // ── Background ────────────────────────────────────────────────────
   ctx.clearRect(0, 0, W, H);
 
-  // Grid
-  ctx.strokeStyle = 'rgba(0,180,255,0.07)';
-  ctx.lineWidth = 1;
-  for (let m = 0; m <= 12; m += 2) {
-    ctx.beginPath();
-    ctx.moveTo(scaleX(m), mt);
-    ctx.lineTo(scaleX(m), mt + ph);
-    ctx.stroke();
-  }
-  const gridLines = 5;
-  for (let i = 0; i <= gridLines; i++) {
-    const y = mt + (ph / gridLines) * i;
-    ctx.beginPath();
-    ctx.moveTo(ml, y);
-    ctx.lineTo(ml + pw, y);
-    ctx.stroke();
-  }
-
-  // Zona sombreada P15–P85
+  // ── Zona sombreada P15–P85 ────────────────────────────────────────
   ctx.beginPath();
-  OMS_MESES.forEach((m,i) => {
+  OMS_MESES.forEach((m, i) => {
     const x = scaleX(m), y = scaleY(oms.p85[i]);
-    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   });
-  [...OMS_MESES].reverse().forEach((m,i) => {
-    const idx = OMS_MESES.length - 1 - i;
-    ctx.lineTo(scaleX(m), scaleY(oms.p15[idx]));
+  [...OMS_MESES].reverse().forEach((m, i) => {
+    const idx2 = OMS_MESES.length - 1 - i;
+    ctx.lineTo(scaleX(m), scaleY(oms.p15[idx2]));
   });
   ctx.closePath();
-  ctx.fillStyle = 'rgba(0,180,255,0.06)';
+  ctx.fillStyle = 'rgba(0,180,255,0.055)';
   ctx.fill();
 
-  // Curvas OMS
-  const curvas = [
-    { key:'p3',  cor:'rgba(255,100,100,0.5)', dash:[4,3] },
-    { key:'p15', cor:'rgba(255,200,50,0.45)', dash:[3,2] },
-    { key:'p50', cor:'rgba(57,255,20,0.7)',   dash:[]    },
-    { key:'p85', cor:'rgba(255,200,50,0.45)', dash:[3,2] },
-    { key:'p97', cor:'rgba(255,100,100,0.5)', dash:[4,3] },
-  ];
-  curvas.forEach(({ key, cor, dash }) => {
+  // ── Grid ─────────────────────────────────────────────────────────
+  ctx.strokeStyle = 'rgba(0,180,255,0.07)';
+  ctx.lineWidth = 1;
+  // Verticais — todos os meses
+  for (let m = 0; m <= 12; m++) {
+    const x = scaleX(m);
+    ctx.beginPath(); ctx.moveTo(x, mt); ctx.lineTo(x, mt + ph); ctx.stroke();
+  }
+  // Horizontais — 6 linhas em valores redondos
+  const gridStep = _crescMetrica === 'peso' ? 2 : (_crescMetrica === 'pc' ? 2 : 5);
+  const gridStart = Math.ceil(yMin / gridStep) * gridStep;
+  for (let v = gridStart; v <= yMax; v += gridStep) {
+    const y = scaleY(v);
+    if (y < mt || y > mt + ph) continue;
+    ctx.beginPath(); ctx.moveTo(ml, y); ctx.lineTo(ml + pw, y); ctx.stroke();
+  }
+
+  // ── Função de curva suavizada (Catmull-Rom spline) ────────────────
+  function desenharCurvaSpline(pts, corStroke, largura, dash) {
+    if (pts.length < 2) return;
     ctx.beginPath();
-    ctx.strokeStyle = cor;
-    ctx.lineWidth = key === 'p50' ? 1.8 : 1.2;
-    ctx.setLineDash(dash);
-    OMS_MESES.forEach((m, i) => {
-      const x = scaleX(m), y = scaleY(oms[key][i]);
-      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
+    ctx.strokeStyle = corStroke;
+    ctx.lineWidth   = largura;
+    ctx.setLineDash(dash || []);
+
+    // Mover para o primeiro ponto
+    ctx.moveTo(pts[0].x, pts[0].y);
+
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i > 0 ? i - 1 : 0];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3b = pts[i + 2 < pts.length ? i + 2 : pts.length - 1];
+
+      // Tensão 0.5 (Catmull-Rom → Bezier)
+      const t = 0.5;
+      const cp1x = p1.x + (p2.x - p0.x) * t / 3;
+      const cp1y = p1.y + (p2.y - p0.y) * t / 3;
+      const cp2x = p2.x - (p3b.x - p1.x) * t / 3;
+      const cp2y = p2.y - (p3b.y - p1.y) * t / 3;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
     ctx.stroke();
     ctx.setLineDash([]);
-  });
-
-  // Linha do Arthur
-  if (pontosArthur.length > 1) {
-    ctx.beginPath();
-    ctx.strokeStyle = CRESC_COR_ARTHUR;
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = CRESC_COR_ARTHUR;
-    ctx.shadowBlur = 6;
-    pontosArthur.forEach((p, i) => {
-      const x = scaleX(p.x), y = scaleY(p.y);
-      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    ctx.shadowBlur = 0;
   }
 
-  // Pontos do Arthur
+  // ── Curvas OMS suavizadas ─────────────────────────────────────────
+  const curvas = [
+    { key:'p3',  cor:'rgba(255,90,90,0.55)',   larg:1.3, dash:[5,3]   },
+    { key:'p15', cor:'rgba(255,210,50,0.50)',  larg:1.2, dash:[3,2]   },
+    { key:'p50', cor:'rgba(57,255,20,0.80)',   larg:2.2, dash:[]      },
+    { key:'p85', cor:'rgba(255,210,50,0.50)',  larg:1.2, dash:[3,2]   },
+    { key:'p97', cor:'rgba(255,90,90,0.55)',   larg:1.3, dash:[5,3]   },
+  ];
+
+  curvas.forEach(({ key, cor, larg, dash }) => {
+    const pts = OMS_MESES.map((m, i) => ({ x: scaleX(m), y: scaleY(oms[key][i]) }));
+    desenharCurvaSpline(pts, cor, larg, dash);
+
+    // Label no final da curva (lado direito)
+    const ultimo = pts[pts.length - 1];
+    const pLabel = { 'p3':'P3','p15':'P15','p50':'P50','p85':'P85','p97':'P97' }[key];
+    ctx.fillStyle = cor.replace(/[\d.]+\)$/, '0.85)');
+    ctx.font = `bold 8px Arial`;
+    ctx.textAlign = 'left';
+    const yOff = key === 'p3' ? 4 : key === 'p97' ? -2 : 3;
+    ctx.fillText(pLabel, ultimo.x + 4, ultimo.y + yOff);
+  });
+
+  // ── Linha do Arthur ───────────────────────────────────────────────
+  if (pontosArthur.length >= 2) {
+    const ptArthur = pontosArthur.map(p => ({ x: scaleX(p.x), y: scaleY(p.y) }));
+    desenharCurvaSpline(ptArthur, CRESC_COR_ARTHUR, 2.8, []);
+    // Sombra
+    ctx.save();
+    ctx.shadowColor  = CRESC_COR_ARTHUR;
+    ctx.shadowBlur   = 7;
+    ctx.strokeStyle  = CRESC_COR_ARTHUR;
+    ctx.lineWidth    = 2.8;
+    ctx.beginPath();
+    ptArthur.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── Pontos do Arthur ──────────────────────────────────────────────
   pontosArthur.forEach(p => {
     const x = scaleX(p.x), y = scaleY(p.y);
+
+    // Ponto fora do range OMS? Flag vermelho
+    const dentroRange = p.y >= omsMin * 0.96 && p.y <= omsMax * 1.04;
+    const dotColor = dentroRange ? CRESC_COR_ARTHUR : '#ff6b6b';
+
+    ctx.save();
+    ctx.shadowColor = dotColor;
+    ctx.shadowBlur  = 10;
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = CRESC_COR_ARTHUR;
-    ctx.shadowColor = CRESC_COR_ARTHUR;
-    ctx.shadowBlur = 10;
+    ctx.fillStyle = dotColor;
     ctx.fill();
-    ctx.shadowBlur = 0;
-    // Valor
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold 9px Arial`;
-    ctx.textAlign = 'center';
-    ctx.fillText(p.y + unid, x, y - 9);
+    ctx.restore();
+
+    // Valor em cima do ponto
+    ctx.fillStyle    = '#fff';
+    ctx.font         = `bold 9px Arial`;
+    ctx.textAlign    = 'center';
+    const valorStr   = p.y + unid;
+    const yTexto     = y < mt + 16 ? y + 17 : y - 9;
+    ctx.fillText(valorStr, x, yTexto);
   });
 
-  // Eixo X — meses
-  ctx.fillStyle = 'rgba(122,179,212,0.8)';
-  ctx.font = '9px Arial';
-  ctx.textAlign = 'center';
-  OMS_MESES.filter(m => m % 2 === 0).forEach(m => {
-    ctx.fillText(m === 0 ? 'Nasc' : m + 'm', scaleX(m), H - 6);
-  });
-
-  // Eixo Y
-  ctx.textAlign = 'right';
-  for (let i = 0; i <= gridLines; i++) {
-    const v = yMin + ((yMax - yMin) / gridLines) * (gridLines - i);
-    ctx.fillText(v.toFixed(1), ml - 4, mt + (ph / gridLines) * i + 3);
+  // ── Eixo X — meses ───────────────────────────────────────────────
+  ctx.fillStyle   = 'rgba(122,179,212,0.8)';
+  ctx.font        = '9px Arial';
+  ctx.textAlign   = 'center';
+  for (let m = 0; m <= 12; m += 2) {
+    const lbl = m === 0 ? 'Nasc' : m + 'm';
+    ctx.fillText(lbl, scaleX(m), H - 5);
   }
 
-  // Título
-  ctx.fillStyle = 'rgba(0,212,255,0.9)';
-  ctx.font = 'bold 10px Orbitron, Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${label.toUpperCase()} (${unid}) · REFERÊNCIAS DA ORDEM (OMS)`, W / 2, 11);
+  // ── Eixo Y — valores redondos ─────────────────────────────────────
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(122,179,212,0.7)';
+  ctx.font      = '9px Arial';
+  for (let v = gridStart; v <= yMax; v += gridStep) {
+    const y = scaleY(v);
+    if (y < mt || y > mt + ph) continue;
+    ctx.fillText(v.toFixed(_crescMetrica === 'peso' ? 0 : 0), ml - 4, y + 3);
+  }
 
-  // Legenda
+  // ── Título ────────────────────────────────────────────────────────
+  ctx.fillStyle   = 'rgba(0,212,255,0.9)';
+  ctx.font        = 'bold 9.5px Orbitron, Arial';
+  ctx.textAlign   = 'center';
+  ctx.fillText(`${label.toUpperCase()} (${unid}) · OMS`, W / 2 - 10, 13);
+
+  // ── Legenda ───────────────────────────────────────────────────────
   const legEl = document.getElementById('cresc-legenda');
   if (legEl) {
     legEl.innerHTML = [
-      { cor: CRESC_COR_ARTHUR,        label: '⚡ Padawan Arthur' },
-      { cor: 'rgba(57,255,20,0.8)',   label: 'P50 (mediana)' },
-      { cor: 'rgba(255,200,50,0.7)',  label: 'P15 / P85' },
-      { cor: 'rgba(255,100,100,0.7)', label: 'P3 / P97' },
+      { cor: CRESC_COR_ARTHUR,       label: '⚡ Padawan Arthur' },
+      { cor: 'rgba(57,255,20,0.9)',  label: 'P50 (mediana)' },
+      { cor: 'rgba(255,210,50,0.8)', label: 'P15 / P85' },
+      { cor: 'rgba(255,90,90,0.8)',  label: 'P3 / P97' },
     ].map(l => `
       <div class="cresc-leg-item">
         <div class="cresc-leg-dot" style="background:${l.cor}"></div>
         <span>${l.label}</span>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 }
+
 
 // ── VACINAS ──
 // Calendário PNI 2025/2026 (Ministério da Saúde) + SBP/SBIm — 0 a 11 anos 11 meses 29 dias
