@@ -27,6 +27,7 @@
 <!-- Firebase SDK — síncrono para garantia de inicialização -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 
@@ -1838,6 +1839,75 @@
   }
   .oraculo-faq-loading .oraculo-faq-icon { animation:pulse 1s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── PRESENÇA & NOTIFICAÇÕES ── */
+  .presence-dot {
+    width:9px;height:9px;border-radius:50%;display:inline-block;
+    flex-shrink:0;transition:background 0.4s;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.4);
+  }
+  .presence-dot.online  { background:#39ff14;box-shadow:0 0 6px #39ff14,0 0 0 2px rgba(0,0,0,0.4); }
+  .presence-dot.offline { background:rgba(255,255,255,0.2); }
+  .presence-dot.away    { background:#ffd700;box-shadow:0 0 4px #ffd700,0 0 0 2px rgba(0,0,0,0.4); }
+
+  /* Badge de notificações no header */
+  #notif-badge {
+    position:absolute;top:-4px;right:-4px;
+    background:#ff4444;color:#fff;
+    font-size:0.55rem;font-family:'Orbitron',monospace;font-weight:700;
+    min-width:16px;height:16px;border-radius:8px;
+    display:none;align-items:center;justify-content:center;padding:0 3px;
+    box-shadow:0 0 6px rgba(255,68,68,0.8);z-index:10;
+  }
+  #notif-badge.visible { display:flex; }
+
+  /* Gaveta de notificações */
+  #notif-drawer {
+    position:fixed;top:0;right:0;width:min(320px,95vw);height:100dvh;
+    background:linear-gradient(160deg,rgba(0,15,40,0.98),rgba(0,5,25,0.99));
+    border-left:1px solid rgba(0,180,255,0.2);
+    z-index:99100;transform:translateX(100%);
+    transition:transform 0.28s cubic-bezier(0.16,1,0.3,1);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  #notif-drawer.open { transform:translateX(0); }
+  #notif-drawer-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,0.5);
+    z-index:99099;display:none;
+  }
+  #notif-drawer-overlay.open { display:block; }
+  .notif-drawer-header {
+    padding:16px;border-bottom:1px solid rgba(0,180,255,0.12);
+    display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  }
+  .notif-list {
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px;
+  }
+  .notif-item {
+    padding:11px 13px;margin-bottom:6px;
+    background:rgba(0,30,70,0.6);border:1px solid rgba(0,180,255,0.12);
+    border-radius:10px;display:flex;align-items:flex-start;gap:10px;
+    transition:opacity 0.2s;
+  }
+  .notif-item.lida { opacity:0.45; }
+  .notif-item.urgente { border-left:3px solid rgba(255,80,80,0.7); }
+  .notif-icon { font-size:1.2rem;flex-shrink:0;margin-top:1px; }
+  .notif-corpo { flex:1;min-width:0; }
+  .notif-titulo { font-size:0.78rem;font-weight:700;color:var(--white);line-height:1.3; }
+  .notif-sub    { font-size:0.65rem;color:var(--text-dim);margin-top:2px;line-height:1.4; }
+  .notif-tempo  { font-size:0.58rem;color:rgba(0,180,255,0.45);font-family:'Orbitron',monospace;margin-top:3px; }
+
+  /* Nadyne online no header */
+  #nadyne-presence-wrap {
+    display:none;align-items:center;gap:5px;
+    font-size:0.62rem;color:var(--text-dim);
+    font-family:'Orbitron',monospace;letter-spacing:0.05em;
+    padding:3px 8px;background:rgba(0,20,50,0.6);
+    border:1px solid rgba(0,180,255,0.15);border-radius:20px;
+    cursor:default;
+  }
+  #nadyne-presence-wrap.visible { display:flex; }
 </style>
 </head>
 <body>
@@ -1977,10 +2047,19 @@
     <span class="pm-idade" id="hdr-idade">—</span>
   </div>
   <p class="subtitle">Arquivos da Ordem Jedi · Primeira Galáxia</p>
-  <div class="user-badge" id="user-badge" title="Opções do Guardião">
-    <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)" style="overflow:hidden;position:relative">
-      <span id="ubadge-emoji">?</span>
-      <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+  <!-- Indicador Nadyne online -->
+  <div id="nadyne-presence-wrap">
+    <span class="presence-dot offline" id="nadyne-dot"></span>
+    <span id="nadyne-nome-hdr">Nadyne</span>
+  </div>
+  <div class="user-badge" id="user-badge" title="Opções do Guardião" style="position:relative">
+    <div style="position:relative;display:inline-block">
+      <div class="user-badge-avatar" id="user-badge-avatar" onclick="abrirMenuGuardiao(event)" style="overflow:hidden;position:relative">
+        <span id="ubadge-emoji">?</span>
+        <img id="ubadge-foto" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
+      <!-- Badge de notificações -->
+      <span id="notif-badge" onclick="abrirNotificacoes()" title="Notificações não lidas"></span>
     </div>
     <span class="user-badge-name" id="user-badge-name" onclick="abrirMenuGuardiao(event)">—</span>
     <span class="user-badge-exit" onclick="sairSessao()" title="Sair" style="cursor:pointer;padding:4px">↩</span>
@@ -3670,6 +3749,7 @@ function fazerLogin(id) {
     renderAll();
     iniciarSyncTempoReal();
     setTimeout(() => verificarNovidades(id), 1000);
+    iniciarSistemaNotificacoes(id);
     // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
     setTimeout(() => mostrarBannerFaceID(id), 2000);
   });
@@ -4277,6 +4357,7 @@ function salvarMamada() {
   renderMamadas();
   renderDashboard();
   showToast('⚡ Recarga registrada nas crônicas!');
+  publicarNotificacao('mamada', `${tipo === 'peito' ? 'Fonte Natural' : tipo === 'formula' ? 'Fórmula' : 'Combinação'} · ${mlReal(entrada)}ml`);
 }
 
 // ── MODAL CONFIRMAÇÃO ──
@@ -4461,6 +4542,7 @@ function salvarDuvida() {
   renderDuvidas();
   renderDashboard();
   showToast('📜 Missiva enviada ao Curandeiro!');
+  publicarNotificacao('duvida', pergunta.substring(0,60));
 }
 
 // ── MODAL RESPOSTA DÚVIDA ──
@@ -4684,6 +4766,7 @@ function salvarEvento() {
   renderAgenda();
   renderDashboard();
   showToast('🗺️ Audiência registrada nas crônicas!');
+  publicarNotificacao('evento', titulo ? titulo.substring(0,60) : '');
 }
 
 function deleteEvento(id) {
@@ -4851,6 +4934,7 @@ function salvarMesversario() {
   document.getElementById('mv-obs').value = '';
   renderMesversario();
   showToast('🌙 Órbita gravada nas crônicas do Padawan!');
+  publicarNotificacao('mesversario', obs ? obs.substring(0,60) : 'Nova órbita gravada');
 }
 
 function deleteMesversario(id) {
@@ -5040,6 +5124,7 @@ function salvarCrescimento() {
   renderCrescimento();
   renderGraficoCrescimento();
   showToast('📏 Medidas gravadas nas crônicas do Padawan!');
+  publicarNotificacao('crescimento', [pesoRaw?pesoRaw+'kg':'', alturaRaw?alturaRaw+'cm':'', pcRaw?'PC:'+pcRaw+'cm':''].filter(Boolean).join(' · '));
 }
 
 function deleteCrescimento(id) {
@@ -5618,6 +5703,7 @@ function salvarNovaVacina() {
   fecharModalNovaVacina();
   renderVacinas();
   showToast('🛡️ Novo escudo gravado nas crônicas!');
+  publicarNotificacao('vacina', '');
 }
 
 function toggleVacinaExtra(id) {
@@ -6164,6 +6250,7 @@ function salvarMedicacao() {
 
   renderMedicacao();
   showToast('⚗️ Elixir ativado nas crônicas da Força!');
+  publicarNotificacao('medicacao', '');
 }
 
 function deleteMedicacao(id) {
@@ -7485,6 +7572,7 @@ function salvarExtracao() {
   document.getElementById('ext-validade-preview').innerHTML = '📋 Validade calculada automaticamente';
   renderEstoqueResumo();
   showToast('🧊 Extração registrada no Banco Galáctico!');
+  publicarNotificacao('extracao', `${ml}ml · ${tipo}`);
 }
 
 function registrarUsoEstoque() {
@@ -8398,6 +8486,306 @@ function renderAll() {
 }
 
 initMedForm();
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE PRESENÇA EM TEMPO REAL
+// ═══════════════════════════════════════════════════════
+const PRESENCE_REF_ID = () => firebase.firestore().collection('presence');
+const FCM_TOKENS_REF  = () => firebase.firestore().collection('fcm_tokens');
+const NOTIF_REF       = () => firebase.firestore().collection('notifications');
+
+let _presenceUnsubscribe = null;
+let _notifUnsubscribe    = null;
+let _notifCache          = [];
+
+// ── Registrar presença do usuário atual ──────────────────────
+async function registrarPresenca(userId) {
+  try {
+    const ref = PRESENCE_REF_ID().doc(userId);
+    await ref.set({
+      online:    true,
+      lastSeen:  Date.now(),
+      nome:      GUARDIOES[userId]?.nome || userId,
+      guardiao:  userId,
+    });
+    // Marcar offline ao sair
+    const marcarOffline = async () => {
+      try { await ref.update({ online: false, lastSeen: Date.now() }); } catch(e) {}
+    };
+    window.addEventListener('beforeunload', marcarOffline);
+    // Heartbeat a cada 90s para manter presença ativa
+    setInterval(async () => {
+      if (document.visibilityState === 'visible') {
+        try { await ref.update({ online: true, lastSeen: Date.now() }); } catch(e) {}
+      } else {
+        try { await ref.update({ online: false, lastSeen: Date.now() }); } catch(e) {}
+      }
+    }, 90000);
+    document.addEventListener('visibilitychange', async () => {
+      try {
+        await ref.update({
+          online:   document.visibilityState === 'visible',
+          lastSeen: Date.now(),
+        });
+      } catch(e) {}
+    });
+  } catch(e) { console.warn('Presença:', e); }
+}
+
+// ── Escutar presença do outro guardião ───────────────────────
+function ouvirPresencaOutro(userId) {
+  const outroId = userId === 'joao' ? 'nadyne' : 'joao';
+  if (_presenceUnsubscribe) _presenceUnsubscribe();
+  _presenceUnsubscribe = PRESENCE_REF_ID().doc(outroId)
+    .onSnapshot(snap => {
+      if (!snap.exists) return;
+      const d = snap.data();
+      atualizarIndicadorPresenca(outroId, d);
+    }, () => {});
+}
+
+function atualizarIndicadorPresenca(outroId, dados) {
+  const wrap = document.getElementById('nadyne-presence-wrap');
+  const dot  = document.getElementById('nadyne-dot');
+  const nome = document.getElementById('nadyne-nome-hdr');
+  if (!wrap || !dot) return;
+
+  const nomeGuardiao = GUARDIOES[outroId]?.nome || dados.nome || outroId;
+  if (nome) nome.textContent = nomeGuardiao;
+
+  const agora = Date.now();
+  const diff  = agora - (dados.lastSeen || 0);
+  const ativo = dados.online && diff < 5 * 60 * 1000;   // < 5min = online
+  const pouco = !ativo && diff < 30 * 60 * 1000;         // 5-30min = away
+
+  dot.className = 'presence-dot ' + (ativo ? 'online' : pouco ? 'away' : 'offline');
+  wrap.classList.add('visible');
+  wrap.title = ativo
+    ? `${nomeGuardiao} está online agora`
+    : pouco
+      ? `${nomeGuardiao} esteve ativo há ${Math.round(diff/60000)}min`
+      : `${nomeGuardiao} está offline`;
+
+  // Toast somente quando vai de offline → online
+  if (ativo && wrap.dataset.eraOffline === '1') {
+    showToast(`✨ ${nomeGuardiao} entrou online!`);
+    dispararNotifNativa(`${nomeGuardiao} está online`, `${nomeGuardiao} abriu o Diário Galáctico agora.`);
+  }
+  wrap.dataset.eraOffline = ativo ? '0' : '1';
+}
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE NOTIFICAÇÕES
+// ═══════════════════════════════════════════════════════
+
+// Tipos de eventos que geram notificações
+const NOTIF_TIPOS = {
+  mamada:       { icon:'🍼', titulo: n => `${n} registrou uma recarga`, urgente: false },
+  mesversario:  { icon:'🌙', titulo: n => `${n} registrou um marco`,    urgente: false },
+  duvida:       { icon:'📜', titulo: n => `${n} adicionou uma missiva`,  urgente: false },
+  evento:       { icon:'🗺️', titulo: n => `${n} registrou uma missão`,  urgente: false },
+  medicacao:    { icon:'💊', titulo: n => `${n} registrou uma medicação`,urgente: true  },
+  crescimento:  { icon:'📏', titulo: n => `${n} registrou medidas`,      urgente: false },
+  vacina:       { icon:'🛡️', titulo: n => `${n} atualizou escudos`,     urgente: false },
+  extracao:     { icon:'🧊', titulo: n => `${n} registrou extração`,    urgente: false },
+  online:       { icon:'✨', titulo: n => `${n} entrou online`,          urgente: false },
+};
+
+// ── Publicar notificação para o outro guardião ────────────────
+async function publicarNotificacao(tipo, detalhes) {
+  if (!usuarioAtual) return;
+  const destinatario = usuarioAtual === 'joao' ? 'nadyne' : 'joao';
+  const nomeRemetente = GUARDIOES[usuarioAtual]?.nome || usuarioAtual;
+  const tipoDef = NOTIF_TIPOS[tipo] || { icon:'📡', titulo: n => `${n} fez uma ação`, urgente: false };
+  try {
+    await NOTIF_REF().add({
+      destinatario,
+      remetente:   usuarioAtual,
+      nomeRemetente,
+      tipo,
+      titulo:  tipoDef.titulo(nomeRemetente),
+      detalhes: detalhes || '',
+      urgente:  tipoDef.urgente,
+      icon:     tipoDef.icon,
+      lida:     false,
+      ts:       Date.now(),
+    });
+  } catch(e) { console.warn('Notif:', e); }
+}
+
+// ── Escutar notificações recebidas ───────────────────────────
+function ouvirNotificacoes(userId) {
+  if (_notifUnsubscribe) _notifUnsubscribe();
+  _notifUnsubscribe = NOTIF_REF()
+    .where('destinatario', '==', userId)
+    .where('lida', '==', false)
+    .orderBy('ts', 'desc')
+    .limit(30)
+    .onSnapshot(snap => {
+      const novas = [];
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') novas.push({ id: change.doc.id, ...change.doc.data() });
+      });
+      _notifCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // Atualizar badge
+      atualizarBadgeNotif(_notifCache.length);
+
+      // Toast + notificação nativa para cada nova
+      novas.forEach(n => {
+        if (Date.now() - n.ts < 10000) { // só notifs recentes (10s)
+          showToast(`${n.icon} ${n.titulo}`);
+          dispararNotifNativa(n.titulo, n.detalhes || 'Padawan Arthur');
+        }
+      });
+    }, () => {});
+}
+
+function atualizarBadgeNotif(count) {
+  const badge = document.getElementById('notif-badge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+// ── Abrir/fechar gaveta ───────────────────────────────────────
+function abrirNotificacoes() {
+  document.getElementById('notif-drawer').classList.add('open');
+  document.getElementById('notif-drawer-overlay').classList.add('open');
+  renderNotificacoes();
+}
+function fecharNotificacoes() {
+  document.getElementById('notif-drawer').classList.remove('open');
+  document.getElementById('notif-drawer-overlay').classList.remove('open');
+}
+
+function renderNotificacoes() {
+  const lista = document.getElementById('notif-lista');
+  const label = document.getElementById('notif-count-label');
+  if (!lista) return;
+  const total = _notifCache.length;
+  if (label) label.textContent = total === 0 ? 'Nenhuma transmissão pendente' : `${total} transmissão${total>1?'ões':''} não lida${total>1?'s':''}`;
+  if (total === 0) {
+    lista.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-dim)">
+      <div style="font-size:2rem;margin-bottom:8px">📡</div>
+      <div style="font-size:0.75rem;font-family:'Orbitron',monospace">Silêncio galáctico</div>
+      <div style="font-size:0.65rem;margin-top:4px">Nenhuma transmissão pendente</div>
+    </div>`;
+    return;
+  }
+  lista.innerHTML = _notifCache.map(n => {
+    const mins = Math.round((Date.now() - n.ts) / 60000);
+    const tempoStr = mins < 1 ? 'agora' : mins < 60 ? `${mins}min atrás` : `${Math.round(mins/60)}h atrás`;
+    return `<div class="notif-item${n.urgente?' urgente':''}${n.lida?' lida':''}" onclick="lerNotificacao('${n.id}')">
+      <div class="notif-icon">${n.icon}</div>
+      <div class="notif-corpo">
+        <div class="notif-titulo">${n.titulo}</div>
+        ${n.detalhes ? `<div class="notif-sub">${n.detalhes}</div>` : ''}
+        <div class="notif-tempo">${tempoStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function lerNotificacao(id) {
+  try {
+    await NOTIF_REF().doc(id).update({ lida: true });
+    _notifCache = _notifCache.filter(n => n.id !== id);
+    atualizarBadgeNotif(_notifCache.length);
+    renderNotificacoes();
+  } catch(e) {}
+}
+
+async function marcarTodasLidas() {
+  try {
+    const batch = firebase.firestore().batch();
+    _notifCache.forEach(n => batch.update(NOTIF_REF().doc(n.id), { lida: true }));
+    await batch.commit();
+    _notifCache = [];
+    atualizarBadgeNotif(0);
+    renderNotificacoes();
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTIFICAÇÕES NATIVAS (quando app está aberto)
+// ═══════════════════════════════════════════════════════
+async function solicitarPermissaoNotificacao() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const result = await Notification.requestPermission();
+  return result === 'granted';
+}
+
+function dispararNotifNativa(titulo, corpo) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (document.visibilityState === 'visible') return; // app está em foco — usa toast
+  try {
+    new Notification(`⚔️ ${titulo}`, {
+      body: corpo,
+      icon: 'https://joaoacamposss.github.io/padawan-arthur/icon-192.png',
+      badge:'https://joaoacamposss.github.io/padawan-arthur/icon-192.png',
+      tag:  'padawan-arthur',
+      requireInteraction: false,
+      silent: false,
+    });
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// FCM: PUSH EM BACKGROUND (registro do token)
+// ═══════════════════════════════════════════════════════
+const FCM_VAPID_KEY = '8eRwh0KavTrkzfGqq0skYKafS5Vl9n_OpeUw2T_tU24';
+
+async function registrarFCMToken(userId) {
+  try {
+    if (!firebase.messaging) return;
+    const messaging = firebase.messaging();
+
+    // Registrar service worker para FCM
+    if ('serviceWorker' in navigator) {
+      const swReg = await navigator.serviceWorker.register('/padawan-arthur/firebase-messaging-sw.js', { scope: '/padawan-arthur/' });
+      messaging.useServiceWorker(swReg);
+    }
+
+    const token = await messaging.getToken({ vapidKey: FCM_VAPID_KEY });
+    if (token) {
+      await FCM_TOKENS_REF().doc(userId).set({
+        token, userId,
+        nome:      GUARDIOES[userId]?.nome || userId,
+        plataforma: /iPhone|iPad/.test(navigator.userAgent) ? 'ios' : 'web',
+        ts: Date.now(),
+      });
+    }
+    // Receber mensagens com app aberto
+    messaging.onMessage(payload => {
+      const { title, body } = payload.notification || {};
+      if (title) showToast(`🔔 ${title}`);
+    });
+  } catch(e) {
+    // FCM falha silenciosamente se SW não estiver disponível
+    console.info('FCM (opcional):', e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// HOOK: chamar após fazerLogin
+// ═══════════════════════════════════════════════════════
+async function iniciarSistemaNotificacoes(userId) {
+  await registrarPresenca(userId);
+  ouvirPresencaOutro(userId);
+  ouvirNotificacoes(userId);
+  // Solicitar permissão de notificação após 3s (não interromper login)
+  setTimeout(async () => {
+    const ok = await solicitarPermissaoNotificacao();
+    if (ok) await registrarFCMToken(userId);
+  }, 3000);
+}
 </script>
 
 <!-- MODAL CONFIGURAR ORÁCULO -->
@@ -8429,6 +8817,28 @@ initMedForm();
     <div id="oraculo-config-msg" style="font-size:0.65rem;margin-top:8px;text-align:center;min-height:16px"></div>
   </div>
 </div>
+
+<!-- OVERLAY NOTIFICAÇÕES -->
+<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
+
+<!-- GAVETA DE NOTIFICAÇÕES -->
+<div id="notif-drawer">
+  <div class="notif-drawer-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.3rem">🔔</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
+      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notif-lista"></div>
+</div>
+
 
 </body>
 </html>
