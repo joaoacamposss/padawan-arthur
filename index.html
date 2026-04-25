@@ -27,7 +27,6 @@
 <!-- Firebase SDK — síncrono para garantia de inicialização -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
 <title>Crônicas do Padawan Arthur ⚔️ · Ordem Jedi</title>
 
@@ -4178,7 +4177,22 @@ function iniciarApp() {
 }
 
 // Inicia quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', iniciarApp);
+document.addEventListener('DOMContentLoaded', () => {
+  // Timeout de segurança: se iniciarApp travar por qualquer motivo,
+  // o splash some em 5s e exibe a tela de login
+  const splashGuard = setTimeout(() => {
+    console.warn('[Padawan] splash guard ativado');
+    removerSplash();
+  }, 5000);
+  try {
+    iniciarApp();
+    clearTimeout(splashGuard);
+  } catch(e) {
+    console.error('[Padawan] erro em iniciarApp:', e);
+    clearTimeout(splashGuard);
+    removerSplash();
+  }
+});
 
 // Indicador online/offline
 function mostrarStatusConexao(online) {
@@ -9842,32 +9856,50 @@ function dispararNotifNativa(titulo, corpo) {
 const FCM_VAPID_KEY = '8eRwh0KavTrkzfGqq0skYKafS5Vl9n_OpeUw2T_tU24';
 
 async function registrarFCMToken(userId) {
+  // Carregar SDK de messaging dinamicamente — não bloqueia o carregamento inicial
   try {
-    if (!firebase.messaging) return;
+    if (typeof firebase.messaging === 'undefined') {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+  } catch(e) {
+    console.info('FCM SDK não disponível:', e.message);
+    return;
+  }
+  try {
     const messaging = firebase.messaging();
-
     // Registrar service worker para FCM
     if ('serviceWorker' in navigator) {
-      const swReg = await navigator.serviceWorker.register('/padawan-arthur/firebase-messaging-sw.js', { scope: '/padawan-arthur/' });
-      messaging.useServiceWorker(swReg);
+      try {
+        const swReg = await navigator.serviceWorker.register(
+          '/padawan-arthur/firebase-messaging-sw.js',
+          { scope: '/padawan-arthur/' }
+        );
+        messaging.useServiceWorker(swReg);
+      } catch(swErr) {
+        console.info('SW FCM não disponível:', swErr.message);
+        return;
+      }
     }
-
     const token = await messaging.getToken({ vapidKey: FCM_VAPID_KEY });
     if (token) {
       await FCM_TOKENS_REF().doc(userId).set({
         token, userId,
-        nome:      GUARDIOES[userId]?.nome || userId,
+        nome:       GUARDIOES[userId]?.nome || userId,
         plataforma: /iPhone|iPad/.test(navigator.userAgent) ? 'ios' : 'web',
         ts: Date.now(),
       });
     }
-    // Receber mensagens com app aberto
     messaging.onMessage(payload => {
       const { title, body } = payload.notification || {};
       if (title) showToast(`🔔 ${title}`);
     });
   } catch(e) {
-    // FCM falha silenciosamente se SW não estiver disponível
     console.info('FCM (opcional):', e.message);
   }
 }
