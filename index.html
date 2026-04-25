@@ -1908,6 +1908,83 @@
     cursor:default;
   }
   #nadyne-presence-wrap.visible { display:flex; }
+
+  /* ── MODAL DICA IA ── */
+  #ia-dica-modal {
+    position:fixed;bottom:0;left:0;right:0;z-index:99200;
+    background:linear-gradient(160deg,rgba(0,15,45,0.98),rgba(10,0,35,0.99));
+    border-top:1.5px solid rgba(180,100,255,0.35);
+    border-radius:20px 20px 0 0;
+    padding:20px 18px 30px;
+    transform:translateY(100%);
+    transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    max-height:70vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+  #ia-dica-modal.open { transform:translateY(0); }
+  #ia-dica-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,0.55);
+    z-index:99199;display:none;
+  }
+  #ia-dica-overlay.open { display:block; }
+  .ia-dica-btn {
+    float:right;margin-left:8px;
+    padding:4px 10px;border-radius:20px;
+    border:1px solid rgba(180,100,255,0.3);
+    background:rgba(80,0,180,0.15);
+    color:rgba(180,100,255,0.8);
+    font-size:0.65rem;font-family:'Orbitron',monospace;
+    letter-spacing:0.06em;cursor:pointer;
+    transition:all 0.15s;
+  }
+  .ia-dica-btn:active { background:rgba(80,0,180,0.4); }
+
+  /* ── MODO NOITE ── */
+  body.modo-noite { --white:rgba(255,180,100,0.95);--text-dim:rgba(200,120,60,0.65);--blue-neon:rgba(255,150,50,0.9);--gold:rgba(255,200,100,0.9);--green-saber:rgba(255,180,80,0.8); }
+  body.modo-noite nav { background:rgba(12,4,0,0.98)!important;border-color:rgba(200,80,20,0.2)!important; }
+  body.modo-noite nav button.active { background:rgba(150,50,0,0.3)!important;border-color:rgba(255,130,40,0.5)!important;color:rgba(255,150,50,0.9)!important; }
+  body.modo-noite .card, body.modo-noite .stat-card { background:rgba(20,8,0,0.75)!important;border-color:rgba(180,70,20,0.2)!important; }
+  #modo-noite-indicator { display:none;align-items:center;gap:5px;padding:3px 9px;background:rgba(120,40,0,0.3);border:1px solid rgba(200,80,20,0.35);border-radius:20px;font-size:0.58rem;font-family:'Orbitron',monospace;color:rgba(255,150,50,0.8);letter-spacing:0.06em;cursor:pointer; }
+  body.modo-noite #modo-noite-indicator { display:flex; }
+
+  /* ── RELATÓRIO CONSULTA ── */
+  #relatorio-modal {
+    position:fixed;bottom:0;left:0;right:0;z-index:99300;
+    background:linear-gradient(160deg,rgba(0,15,45,0.99),rgba(5,0,30,0.99));
+    border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;
+    padding:18px 16px 32px;max-height:80vh;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+  #relatorio-modal.open { transform:translateY(0); }
+  #relatorio-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99299;display:none; }
+  #relatorio-overlay.open { display:block; }
+  @media print {
+    body > *:not(#relatorio-print-area) { display:none !important; }
+    #relatorio-print-area { display:block !important; position:static; }
+    #relatorio-modal { display:none !important; }
+  }
+
+  /* ── ONBOARDING ── */
+  #onboard-card {
+    background:linear-gradient(135deg,rgba(0,30,80,0.75),rgba(10,0,50,0.8));
+    border:1.5px solid rgba(180,100,255,0.3);border-radius:14px;
+    padding:14px;margin-bottom:12px;display:none;
+  }
+  .onboard-missao {
+    display:flex;align-items:center;gap:8px;padding:6px 0;
+    border-bottom:1px solid rgba(0,180,255,0.08);font-size:0.72rem;
+  }
+  .onboard-missao:last-child { border-bottom:none; }
+  .onboard-check {
+    width:20px;height:20px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:0.65rem;
+  }
+  .onboard-check.done  { background:rgba(57,255,20,0.2);border:1.5px solid rgba(57,255,20,0.5);color:var(--green-saber); }
+  .onboard-check.pend  { background:rgba(0,20,60,0.5);border:1.5px solid rgba(0,180,255,0.2);color:var(--text-dim); }
+  .onboard-check.next  { background:rgba(0,100,200,0.25);border:1.5px solid rgba(0,180,255,0.5);color:var(--blue-neon); }
+  .onboard-texto { flex:1;color:rgba(200,220,255,0.85);line-height:1.4; }
+  .onboard-texto.done-text { text-decoration:line-through;opacity:0.45; }
+  .onboard-texto.next-text { color:var(--white);font-weight:600; }
 </style>
 </head>
 <body>
@@ -2084,6 +2161,15 @@
     <button onclick="abrirMigracao()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:rgba(57,255,20,0.8);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">☁️</span> Sincronizar dados locais
     </button>
+    <button id="menu-btn-noite" onclick="menuToggleModoNoite()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:none;border:none;color:rgba(255,180,80,0.85);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(120,50,0,0.25)'" onmouseout="this.style.background='none'">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="menu-noite-icon" style="font-size:1.2rem">🌙</span>
+        <span id="menu-noite-label">Modo Noite</span>
+      </div>
+      <div id="menu-noite-toggle" style="width:36px;height:20px;border-radius:10px;background:rgba(80,40,0,0.4);border:1px solid rgba(200,100,20,0.3);position:relative;transition:background 0.2s;flex-shrink:0">
+        <div id="menu-noite-knob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(180,80,20,0.6);transition:all 0.2s"></div>
+      </div>
+    </button>
     <div style="height:1px;background:rgba(0,180,255,0.12);margin:4px 8px"></div>
     <button id="menu-btn-faceid" onclick="menuToggleFaceID()" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:none;border:none;color:var(--blue-neon);cursor:pointer;border-radius:8px;font-family:'Exo 2',sans-serif;font-size:0.88rem;transition:background 0.15s" onmouseover="this.style.background='rgba(0,80,160,0.3)'" onmouseout="this.style.background='none'">
       <span style="font-size:1.2rem">🔐</span> <span id="menu-faceid-label">Ativar Face ID</span>
@@ -2098,20 +2184,17 @@
 <div class="saber-line"></div>
 
 <nav>
-  <button class="active" onclick="showTab('dashboard')">
-    <span class="nav-icon">🌌</span>Holocron
+  <button class="active" id="nav-btn-dashboard" onclick="showTab('dashboard')">
+    <span class="nav-icon">🏠</span>Início
   </button>
-  <button onclick="showTab('mamadas')">
-    <span class="nav-icon">🍼</span>Fonte de Energia
+  <button id="nav-btn-mamadas" onclick="showTab('mamadas')">
+    <span class="nav-icon">🍼</span>Recargas
   </button>
-  <button onclick="showTab('agenda')">
-    <span class="nav-icon">🩺</span>Ordem da Cura
+  <button id="nav-btn-agenda" onclick="showTab('agenda')">
+    <span class="nav-icon">🗺️</span>Agenda
   </button>
-  <button onclick="showTab('mesversario')">
-    <span class="nav-icon">📈</span>Jornada
-  </button>
-  <button onclick="showTab('vacinas')">
-    <span class="nav-icon">🛡️</span>Escudos
+  <button id="nav-btn-mais" onclick="abrirMenuMais()">
+    <span class="nav-icon">⋯</span>Mais
   </button>
 </nav>
 
@@ -2177,8 +2260,58 @@
 
   <!-- ── SUB-ABA 1: RECARGA ── -->
   <div id="mspanel-recarga" class="subpanel active">
-    <div class="card">
+    <!-- ═══ BRIEFING IA ═══ -->
+  <div id="ia-briefing-card" style="margin-bottom:14px;background:linear-gradient(135deg,rgba(80,0,180,0.25),rgba(0,20,60,0.6));border:1.5px solid rgba(180,100,255,0.3);border-radius:14px;padding:14px;display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:1.3rem">🔮</span>
+      <div style="flex:1">
+        <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:#d4a8ff;letter-spacing:0.1em">ANÁLISE JEDI · IA</div>
+        <div style="font-size:0.58rem;color:rgba(212,168,255,0.5)" id="ia-briefing-ts"></div>
+      </div>
+      <button onclick="gerarBriefingIA(true)" title="Atualizar análise"
+        style="background:none;border:none;color:rgba(180,100,255,0.6);font-size:1rem;cursor:pointer;padding:4px">↺</button>
+    </div>
+    <div id="ia-briefing-content" style="font-size:0.78rem;color:rgba(220,200,255,0.9);line-height:1.7"></div>
+  </div>
+  <div id="ia-briefing-loading" style="margin-bottom:14px;padding:14px;background:linear-gradient(135deg,rgba(80,0,180,0.15),rgba(0,20,60,0.5));border:1.5px solid rgba(180,100,255,0.2);border-radius:14px;display:none;align-items:center;gap:10px">
+    <span style="font-size:1.1rem">🔮</span>
+    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace;letter-spacing:0.06em">CONSULTANDO O ORÁCULO...</span>
+    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
+  </div>
+
+<!-- ═══ ARTHUR AGORA ═══ -->
+  <div id="arthur-agora-card" style="margin-bottom:12px;display:none">
+    <div style="background:linear-gradient(135deg,rgba(0,40,20,0.55),rgba(0,20,60,0.65));border:1.5px solid rgba(57,255,20,0.2);border-radius:14px;padding:13px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:rgba(57,255,20,0.8);letter-spacing:0.1em">⚡ ARTHUR AGORA</div>
+        <div id="arthur-agora-badge" style="font-size:0.58rem;font-family:'Orbitron',monospace;padding:2px 8px;border-radius:10px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.25);color:var(--blue-neon)"></div>
+      </div>
+      <div id="arthur-agora-body" style="font-size:0.74rem;color:rgba(220,235,255,0.88);line-height:1.8"></div>
+    </div>
+  </div>
+
+
+  <!-- ═══ ONBOARDING ═══ -->
+  <div id="onboard-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--purple);letter-spacing:0.09em">⚔️ JORNADA DO GUARDIÃO</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px">Complete as missões para dominar o app</div>
+      </div>
+      <button onclick="ignorarOnboarding()" style="background:none;border:none;color:var(--text-dim);font-size:0.6rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.05em">PULAR ✕</button>
+    </div>
+    <!-- Barra de progresso -->
+    <div style="height:4px;background:rgba(0,180,255,0.1);border-radius:2px;margin-bottom:10px;overflow:hidden">
+      <div id="onboard-progress-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--blue-neon));transition:width 0.4s ease;width:0%"></div>
+    </div>
+    <!-- Lista de missões -->
+    <div id="onboard-missoes"></div>
+  </div>
+
+  <div id="ia-alertas-container" style="margin-bottom:10px"></div>
+  <div class="card">
       <div class="section-title">🍼 Recarga de Energia do Padawan</div>
+      <button class="ia-dica-btn" onclick="abrirDicaIA('mamadas')" title="Dica da Força para Recargas">💡 IA</button>
       <div class="row-2">
         <div class="form-group">
           <label>Ciclo Galáctico</label>
@@ -2256,6 +2389,7 @@
   <div id="mspanel-banco" class="subpanel">
     <div class="card" style="margin-bottom:14px">
       <div class="section-title">🧊 Banco Galáctico de Leite</div>
+      <button class="ia-dica-btn" onclick="abrirDicaIA('banco')" title="Dica da Força para Banco de Leite">💡 IA</button>
       <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:12px;line-height:1.5">
         Registre extrações e controle o estoque de leite materno disponível.
       </div>
@@ -2272,6 +2406,39 @@
 
       <!-- Extrair -->
       <div id="epanel-extrair" class="subpanel active">
+
+        <!-- ═══ CRONÔMETRO DE EXTRAÇÃO ═══ -->
+        <div id="ext-cronometro-card" style="margin-bottom:16px;background:rgba(0,20,60,0.7);border:1.5px solid rgba(0,180,255,0.25);border-radius:14px;padding:14px 14px 12px;text-align:center">
+          <div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.12em;margin-bottom:10px">⏱ CRONÔMETRO DE EXTRAÇÃO</div>
+
+          <!-- Display principal -->
+          <div id="ext-crono-display" style="font-family:'Orbitron',monospace;font-size:2.6rem;color:var(--white);letter-spacing:0.06em;line-height:1;margin-bottom:4px;text-shadow:0 0 20px rgba(0,180,255,0.5)">
+            00:00
+          </div>
+          <div id="ext-crono-ms" style="font-family:'Orbitron',monospace;font-size:0.75rem;color:rgba(0,180,255,0.45);letter-spacing:0.08em;margin-bottom:12px">
+            .00
+          </div>
+
+          <!-- Controles -->
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button id="ext-crono-btn-start" onclick="cronoExtracaoToggle()"
+              style="flex:1;max-width:130px;padding:11px;border-radius:11px;border:1.5px solid rgba(57,255,20,0.5);background:rgba(57,255,20,0.12);color:#39ff14;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s">
+              ▶ INICIAR
+            </button>
+            <button onclick="cronoExtracaoReset()"
+              style="padding:11px 16px;border-radius:11px;border:1.5px solid rgba(0,180,255,0.25);background:rgba(0,20,60,0.5);color:var(--text-dim);font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s">
+              ↺ RESET
+            </button>
+            <button onclick="cronoExtracaoUsarTempo()"
+              style="padding:11px 16px;border-radius:11px;border:1.5px solid rgba(180,100,255,0.35);background:rgba(80,0,180,0.2);color:#d4a8ff;font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s">
+              ✓ USAR
+            </button>
+          </div>
+
+          <!-- Status / horários registrados -->
+          <div id="ext-crono-status" style="margin-top:9px;font-size:0.63rem;color:rgba(0,180,255,0.5);font-family:'Orbitron',monospace;min-height:16px;letter-spacing:0.04em"></div>
+        </div>
+
 
         <!-- Data -->
         <div class="form-group">
@@ -2441,7 +2608,8 @@
 
     <!-- PAINEL MISSÕES -->
     <div id="subpanel-missoes" class="subpanel active">
-      <div class="card">
+        <button class="ia-dica-btn" onclick="abrirDicaIA('agenda')" title="Dica da Força para Agenda">💡 IA</button> 
+  <div class="card">
         <div class="section-title">🗺️ Nova Audiência do Padawan</div>
         <div class="form-group">
           <label>Nome da Audiência</label>
@@ -2637,6 +2805,7 @@
   <!-- ÓRBITAS DO PADAWAN (MESVERSÁRIO + CRESCIMENTO) -->
   <div id="tab-mesversario" class="tab-panel">
     <!-- Sub-abas -->
+    <button class="ia-dica-btn" onclick="abrirDicaIA('jornada')" title="Dica da Força para Jornada">💡 IA</button>
     <div class="orbitas-subtabs">
       <button class="orbitas-stab active" id="ostab-marcos" onclick="showOrbitasTab('marcos',this)">🌙 Marcos</button>
       <button class="orbitas-stab" id="ostab-crescimento" onclick="showOrbitasTab('crescimento',this)">📏 Crescimento</button>
@@ -2693,7 +2862,8 @@
 
     <!-- SUB-ABA: CRESCIMENTO -->
     <div id="orbitas-panel-crescimento" class="orbitas-panel" style="display:none">
-      <div class="card">
+        <button class="ia-dica-btn" onclick="abrirDicaIA('crescimento')" title="Dica da Força para Crescimento">💡 IA</button>
+  <div class="card">
         <div class="section-title">📏 Escaneamento Galáctico do Padawan</div>
         <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5;margin-bottom:12px">
           Registre as medições das Audiências com a Curandeira Jedi. Os dados do Padawan são comparados às referências da Ordem da Saúde Galáctica (OMS).
@@ -2845,7 +3015,8 @@
 
   <!-- ESCUDOS DO PADAWAN (VACINAS) -->
   <div id="tab-vacinas" class="tab-panel">
-    <div class="card" style="margin-bottom:12px">
+      <button class="ia-dica-btn" onclick="abrirDicaIA('vacinas')" title="Dica da Força para Vacinas">💡 IA</button>
+  <div class="card" style="margin-bottom:12px">
       <div class="section-title">🛡️ Escudos de Proteção do Padawan</div>
       <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.5">
         Rituais de imunização conforme a <strong style="color:var(--gold)">Ordem PNI 2025/2026</strong> e os Mestres da <strong style="color:var(--gold)">SBP · SBIm</strong>.<br>
@@ -3750,6 +3921,7 @@ function fazerLogin(id) {
     iniciarSyncTempoReal();
     setTimeout(() => verificarNovidades(id), 1000);
     iniciarSistemaNotificacoes(id);
+    setTimeout(() => verificarOnboarding(id), 600);
     // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
     setTimeout(() => mostrarBannerFaceID(id), 2000);
   });
@@ -3829,11 +4001,32 @@ function nomeAutor(id) {
 // ── MENU GUARDIÃO ──
 function abrirMenuGuardiao(e) {
   e.stopPropagation();
-  // Atualiza label Face ID conforme estado atual
+  // Face ID
   const temFace = temFaceID(usuarioAtual);
   const labelEl = document.getElementById('menu-faceid-label');
   if (labelEl) labelEl.textContent = temFace ? 'Desativar Face ID' : 'Ativar Face ID';
+  // Modo Noite — sincronizar toggle visual
+  _atualizarMenuModoNoite();
   document.getElementById('menu-guardiao').style.display = 'block';
+}
+
+function _atualizarMenuModoNoite() {
+  const ativo  = document.body.classList.contains('modo-noite');
+  const icon   = document.getElementById('menu-noite-icon');
+  const label  = document.getElementById('menu-noite-label');
+  const toggle = document.getElementById('menu-noite-toggle');
+  const knob   = document.getElementById('menu-noite-knob');
+  if (icon)   icon.textContent   = ativo ? '☀️' : '🌙';
+  if (label)  label.textContent  = ativo ? 'Modo Noite (ativo)' : 'Modo Noite';
+  if (toggle) toggle.style.background = ativo ? 'rgba(200,100,20,0.5)' : 'rgba(80,40,0,0.4)';
+  if (toggle) toggle.style.borderColor = ativo ? 'rgba(255,150,50,0.6)' : 'rgba(200,100,20,0.3)';
+  if (knob)   knob.style.left    = ativo ? '18px' : '2px';
+  if (knob)   knob.style.background = ativo ? 'rgba(255,180,60,0.9)' : 'rgba(180,80,20,0.6)';
+}
+
+function menuToggleModoNoite() {
+  toggleModoNoiteManual();
+  _atualizarMenuModoNoite();
 }
 function fecharMenuGuardiao() {
   document.getElementById('menu-guardiao').style.display = 'none';
@@ -4061,6 +4254,8 @@ async function saveData(data) {
 
 // Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
 function iniciarSyncTempoReal() {
+  verificarHorarioNoite();
+  if (!_modoNoiteTimer) _modoNoiteTimer = setInterval(verificarHorarioNoite, 30*60*1000);
   DOC_REF.onSnapshot(snap => {
     if (!snap.exists) return;
     const novos = snap.data();
@@ -4286,11 +4481,15 @@ function showTab(id) {
   const realId = id === 'duvidas' ? 'agenda' : id;
   const tabEl = document.getElementById('tab-' + realId);
   if (tabEl) tabEl.classList.add('active');
-  // Ativar botão nav correspondente
-  const tabs = ['dashboard','mamadas','agenda','mesversario','vacinas'];
-  const navBtns = document.querySelectorAll('nav button');
-  const idx = tabs.indexOf(realId);
-  if (idx >= 0 && navBtns[idx]) navBtns[idx].classList.add('active');
+  // Ativar botão nav correspondente (nova nav com drawer "Mais")
+  const navDiretos = { dashboard:'nav-btn-dashboard', mamadas:'nav-btn-mamadas', agenda:'nav-btn-agenda' };
+  if (navDiretos[realId]) {
+    const btn = document.getElementById(navDiretos[realId]);
+    if (btn) btn.classList.add('active');
+  } else {
+    const btnMais = document.getElementById('nav-btn-mais');
+    if (btnMais) btnMais.classList.add('active');
+  }
   renderAll();
   // Se veio de duvidas, abrir sub-aba Missivas automaticamente
   if (id === 'duvidas') setTimeout(() => showSubTabMissoes('missivas'), 50);
@@ -4357,6 +4556,7 @@ function salvarMamada() {
   renderMamadas();
   renderDashboard();
   showToast('⚡ Recarga registrada nas crônicas!');
+  marcarMissaoConcluida('mamada');
   publicarNotificacao('mamada', `${tipo === 'peito' ? 'Fonte Natural' : tipo === 'formula' ? 'Fórmula' : 'Combinação'} · ${mlReal(entrada)}ml`);
 }
 
@@ -4900,6 +5100,12 @@ function renderDashboard() {
 }
 
 // ── TOAST ──
+  renderEstadoArthur();
+  renderOnboarding();
+  // Briefing IA (assíncrono)
+  setTimeout(() => gerarBriefingIA(), 400);
+  setTimeout(() => gerarAlertaProativo(), 800);
+
 function showToast(msg) {
   const t = document.createElement('div');
   t.textContent = msg;
@@ -5124,6 +5330,7 @@ function salvarCrescimento() {
   renderCrescimento();
   renderGraficoCrescimento();
   showToast('📏 Medidas gravadas nas crônicas do Padawan!');
+  marcarMissaoConcluida('medida');
   publicarNotificacao('crescimento', [pesoRaw?pesoRaw+'kg':'', alturaRaw?alturaRaw+'cm':'', pcRaw?'PC:'+pcRaw+'cm':''].filter(Boolean).join(' · '));
 }
 
@@ -7462,6 +7669,114 @@ function showMamadasTab(id, btn) {
   if (id === 'banco') { renderEstoqueResumo(); }
 }
 
+
+// ═══════════════════════════════════════════════════════
+// CRONÔMETRO DE EXTRAÇÃO DE LEITE
+// ═══════════════════════════════════════════════════════
+let _cronoExtTimer  = null;
+let _cronoExtMs     = 0;       // tempo acumulado em ms
+let _cronoExtInicio = null;    // Date.now() quando iniciou
+let _cronoExtRodando = false;
+let _cronoExtHoraInicio = '';  // HH:MM para preencher campo
+
+function _cronoExtRenderizar() {
+  const total = _cronoExtMs + (_cronoExtRodando ? Date.now() - _cronoExtInicio : 0);
+  const mm  = Math.floor(total / 60000);
+  const ss  = Math.floor((total % 60000) / 1000);
+  const cs  = Math.floor((total % 1000) / 10);
+  const disp = document.getElementById('ext-crono-display');
+  const msEl = document.getElementById('ext-crono-ms');
+  if (disp) disp.textContent = `${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+  if (msEl) msEl.textContent = `.${String(cs).padStart(2,'0')}`;
+  // Cor muda com o tempo: azul → verde → âmbar
+  if (disp) {
+    const cor = mm < 5 ? 'rgba(0,212,255,0.95)' : mm < 15 ? 'rgba(57,255,20,0.95)' : 'rgba(255,200,50,0.95)';
+    disp.style.color = cor;
+    disp.style.textShadow = `0 0 20px ${cor.replace('0.95','0.4')}`;
+  }
+}
+
+function cronoExtracaoToggle() {
+  const btn = document.getElementById('ext-crono-btn-start');
+  const status = document.getElementById('ext-crono-status');
+  if (!_cronoExtRodando) {
+    // INICIAR
+    _cronoExtRodando = true;
+    _cronoExtInicio  = Date.now();
+    // Registrar hora de início
+    const agora = new Date();
+    _cronoExtHoraInicio = agora.toTimeString().slice(0,5);
+    // Preencher campo ext-hora-inicio
+    const campoIni = document.getElementById('ext-hora-inicio');
+    if (campoIni && !campoIni.value) campoIni.value = _cronoExtHoraInicio;
+    if (status) status.textContent = `▶ Iniciado às ${_cronoExtHoraInicio}`;
+    if (btn) { btn.textContent = '⏸ PAUSAR'; btn.style.borderColor='rgba(255,200,50,0.6)'; btn.style.background='rgba(255,200,50,0.1)'; btn.style.color='#ffd700'; }
+    _cronoExtTimer = setInterval(_cronoExtRenderizar, 47); // ~21fps suave
+  } else {
+    // PAUSAR
+    _cronoExtMs     += Date.now() - _cronoExtInicio;
+    _cronoExtRodando = false;
+    clearInterval(_cronoExtTimer);
+    _cronoExtTimer   = null;
+    _cronoExtRenderizar();
+    if (btn) { btn.textContent = '▶ RETOMAR'; btn.style.borderColor='rgba(57,255,20,0.5)'; btn.style.background='rgba(57,255,20,0.12)'; btn.style.color='#39ff14'; }
+    if (status) status.textContent = `⏸ Pausado`;
+  }
+}
+
+function cronoExtracaoReset() {
+  clearInterval(_cronoExtTimer);
+  _cronoExtTimer   = null;
+  _cronoExtMs      = 0;
+  _cronoExtInicio  = null;
+  _cronoExtRodando = false;
+  _cronoExtHoraInicio = '';
+  _cronoExtRenderizar();
+  const btn = document.getElementById('ext-crono-btn-start');
+  const status = document.getElementById('ext-crono-status');
+  if (btn) { btn.textContent = '▶ INICIAR'; btn.style.borderColor='rgba(57,255,20,0.5)'; btn.style.background='rgba(57,255,20,0.12)'; btn.style.color='#39ff14'; }
+  if (status) status.textContent = '';
+}
+
+function cronoExtracaoUsarTempo() {
+  // Parar se ainda rodando
+  if (_cronoExtRodando) {
+    _cronoExtMs     += Date.now() - _cronoExtInicio;
+    _cronoExtRodando = false;
+    clearInterval(_cronoExtTimer);
+    _cronoExtTimer   = null;
+    _cronoExtRenderizar();
+  }
+  const totalMs = _cronoExtMs;
+  if (totalMs < 1000) { showToast('⚠️ Inicie o cronômetro primeiro!'); return; }
+
+  // Calcular hora de fim
+  const mm = Math.floor(totalMs / 60000);
+  const ss = Math.floor((totalMs % 60000) / 1000);
+  const agora = new Date();
+  const horaFim = agora.toTimeString().slice(0,5);
+
+  // Preencher campos automaticamente
+  const campoFim = document.getElementById('ext-hora-fim');
+  if (campoFim) campoFim.value = horaFim;
+
+  // Preencher início se não preenchido
+  if (_cronoExtHoraInicio) {
+    const campoIni = document.getElementById('ext-hora-inicio');
+    if (campoIni && !campoIni.value) campoIni.value = _cronoExtHoraInicio;
+  }
+
+  // Atualizar duração e preview
+  calcularDuracaoExtracao();
+  atualizarPreviewValidade();
+
+  // Status com resultado
+  const status = document.getElementById('ext-crono-status');
+  if (status) status.textContent = `✓ ${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')} transferido para o formulário`;
+
+  showToast(`✅ ${mm}min ${ss}s registrado na extração!`);
+}
+
 // ── Selecionar seio ──
 function selecionarSeio(seio) {
   document.getElementById('ext-seio').value = seio;
@@ -7688,30 +8003,813 @@ let ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url')  || '';
 
 function contextArthur() {
   const hoje = todayISO();
-  const nasc = '2026-03-12';
+  const nasc  = '2026-03-12';
   const agora = new Date();
-  const nascObj = new Date(nasc + 'T00:00:00');
+  const nascObj  = new Date(nasc + 'T00:00:00');
   const diasVida = Math.floor((agora - nascObj) / 86400000);
   const semanas  = Math.floor(diasVida / 7);
   const mesesVida= Math.floor(diasVida / 30.44);
 
-  const mamadasHoje = (db.mamadas||[]).filter(m=>m.data===hoje);
-  const mlHoje = mamadasHoje.reduce((s,m)=>s+mlReal(m),0);
-  const ultima = (db.mamadas||[]).length > 0 ? db.mamadas[0] : null;
-  const pesoAtual = crescData.length > 0 ? crescData[crescData.length-1] : null;
-  const eventosProx = (db.eventos||[]).filter(e=>e.data>=hoje).slice(0,3);
-  const duvidAbertas = (db.duvidas||[]).filter(d=>!d.respondida).length;
+  // ── Mamadas ──────────────────────────────────────────────
+  const todasMamadas = db.mamadas || [];
+  const mamadasHoje  = todasMamadas.filter(m => m.data === hoje);
+  const mlHoje = mamadasHoje.reduce((s,m) => s + mlReal(m), 0);
+  const ultima = todasMamadas[0] || null;
 
-  return `DADOS DO PADAWAN ARTHUR:
+  // Últimas 7 dias — volume médio diário
+  const d7 = new Date(agora - 7*864e5).toISOString().slice(0,10);
+  const m7  = todasMamadas.filter(m => m.data >= d7);
+  const diasComMamada = [...new Set(m7.map(m=>m.data))].length || 1;
+  const mlMedioDiario = Math.round(m7.reduce((s,m)=>s+mlReal(m),0) / diasComMamada);
+
+  // Intervalo desde última mamada
+  let intervaloUltima = '';
+  if (ultima) {
+    const ultTs = new Date(`${ultima.data}T${ultima.hora||'00:00'}`);
+    const diffMin = Math.round((agora - ultTs) / 60000);
+    intervaloUltima = diffMin < 60 ? `${diffMin}min atrás` : `${(diffMin/60).toFixed(1)}h atrás`;
+  }
+
+  // Mamadas noturnas (22h–6h) últimos 7 dias
+  const mamNoturnas = m7.filter(m => {
+    const h = parseInt((m.hora||'00:00').split(':')[0]);
+    return h >= 22 || h < 6;
+  });
+  const mamNot7d = mamNoturnas.length;
+
+  // ── Crescimento ──────────────────────────────────────────
+  const pesoAtual  = crescData.length > 0 ? crescData[crescData.length-1] : null;
+  const pesoAnter  = crescData.length > 1 ? crescData[crescData.length-2] : null;
+  let ganhoSemanal = '';
+  if (pesoAtual && pesoAnter && pesoAtual.peso && pesoAnter.peso) {
+    const diffMeses = (pesoAtual.mes - pesoAnter.mes) || 1;
+    const gKg = ((pesoAtual.peso - pesoAnter.peso) / (diffMeses * 4.33)).toFixed(0);
+    ganhoSemanal = `${gKg}g/semana`;
+  }
+
+  // Percentil aproximado do peso (OMS meninos)
+  let percentilPeso = '';
+  if (pesoAtual && pesoAtual.peso && pesoAtual.mes <= 12) {
+    const p50 = [3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6];
+    const p3  = [2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8];
+    const p97 = [4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
+    const m   = Math.min(pesoAtual.mes, 12);
+    const p   = pesoAtual.peso;
+    if (p < p3[m])       percentilPeso = 'abaixo do P3 ⚠️';
+    else if (p < p50[m]) percentilPeso = 'entre P3 e P50';
+    else if (p < p97[m]) percentilPeso = 'entre P50 e P97';
+    else                 percentilPeso = 'acima do P97';
+  }
+
+  // ── Banco de Leite ───────────────────────────────────────
+  const estoqueAtivo = (estoqueLeite||[]).filter(e => !e.usado);
+  const mlEstoque    = estoqueAtivo.reduce((s,e) => s+Number(e.ml||0), 0);
+  const vencidos     = estoqueAtivo.filter(e => e.validade < hoje).length;
+  const proximoVenc  = estoqueAtivo
+    .filter(e => e.validade >= hoje)
+    .sort((a,b) => a.validade.localeCompare(b.validade))[0];
+
+  // Extrações últimos 7 dias
+  const extracoes7d  = estoqueAtivo.filter(e => e.data >= d7);
+  const mlExtracao7d = extracoes7d.reduce((s,e) => s+Number(e.ml||0), 0);
+
+  // ── Vacinas ──────────────────────────────────────────────
+  const vacinasDadas    = (db.vacinas||[]).length;
+  const totalPNI        = 18; // estimativa calendário 0-12m
+  const vacinaPendentes = Math.max(0, totalPNI - vacinasDadas);
+
+  // ── Agenda ───────────────────────────────────────────────
+  const eventosProx  = (db.eventos||[]).filter(e => e.data >= hoje).slice(0,3);
+  const medicAtivas  = (db.medicacoes||[]).filter(m => m.ativa !== false).slice(0,3);
+  const duvidAbertas = (db.duvidas||[]).filter(d => !d.respondida).length;
+
+  // ── Marcos ───────────────────────────────────────────────
+  const marcosReg = (db.orbitas||db.mesversarios||[]);
+  const ultimoMarco = marcosReg.length > 0 ? marcosReg[0] : null;
+
+  return `DADOS COMPLETOS DO PADAWAN ARTHUR (use para análises personalizadas):
+
+== IDENTIDADE ==
+- Nome: Arthur
 - Nascimento: ${nasc}
-- Idade atual: ${diasVida} dias (${semanas} semanas / ${mesesVida} meses)
-- Mamadas hoje: ${mamadasHoje.length} (${mlHoje}ml total)
-- Última mamada: ${ultima ? `${ultima.data} ${ultima.hora} — ${ultima.tipo}${ultima.ml?' '+ultima.ml+'ml':''}` : 'nenhuma registrada'}
-- Peso/medidas mais recentes: ${pesoAtual ? `${pesoAtual.peso||'?'}kg / ${pesoAtual.altura||'?'}cm (${pesoAtual.mes}º mês)` : 'não registrado'}
-- Consultas futuras: ${eventosProx.length > 0 ? eventosProx.map(e=>e.titulo+' em '+e.data).join('; ') : 'nenhuma agendada'}
-- Dúvidas em aberto: ${duvidAbertas}`;
+- Idade: ${diasVida} dias (${semanas} semanas / ${mesesVida} meses)
+- Sexo: masculino
+
+== ALIMENTAÇÃO ==
+- Mamadas hoje: ${mamadasHoje.length} (${mlHoje}ml)
+- Volume médio diário (7d): ${mlMedioDiario}ml
+- Última mamada: ${ultima ? `${ultima.tipo} · ${ultima.ml||'?'}ml · ${intervaloUltima}` : 'nenhuma registrada'}
+- Mamadas noturnas (22h–6h) nos últimos 7 dias: ${mamNot7d}
+
+== CRESCIMENTO ==
+- Peso atual: ${pesoAtual ? `${pesoAtual.peso||'?'}kg (${pesoAtual.mes}º mês) — ${percentilPeso}` : 'não registrado'}
+- Comprimento: ${pesoAtual?.altura ? `${pesoAtual.altura}cm` : 'não registrado'}
+- Perímetro cefálico: ${pesoAtual?.pc ? `${pesoAtual.pc}cm` : 'não registrado'}
+- Ganho estimado: ${ganhoSemanal || 'insuficiente para calcular'}
+
+== BANCO DE LEITE ==
+- Estoque disponível: ${mlEstoque}ml (${estoqueAtivo.length} unidades)
+- Vencidos no estoque: ${vencidos}
+- Próximo a vencer: ${proximoVenc ? `${proximoVenc.ml}ml em ${proximoVenc.validade}` : 'nenhum'}
+- Extrações (últimos 7d): ${extracoes7d.length} extrações (${mlExtracao7d}ml total)
+
+== AGENDA E SAÚDE ==
+- Consultas futuras: ${eventosProx.length > 0 ? eventosProx.map(e=>`${e.titulo} em ${e.data}`).join(' | ') : 'nenhuma agendada'}
+- Medicações ativas: ${medicAtivas.length > 0 ? medicAtivas.map(m=>`${m.nome||m.medicamento||'?'}`).join(', ') : 'nenhuma'}
+- Dúvidas em aberto: ${duvidAbertas}
+- Vacinas registradas: ${vacinasDadas} (pendentes PNI: ~${vacinaPendentes})
+- Último marco registrado: ${ultimoMarco ? `${ultimoMarco.titulo||ultimoMarco.obs||'marco'} em ${ultimoMarco.data||'?'}` : 'nenhum'}`;
 }
 
+
+
+
+
+// ═══════════════════════════════════════════════════════
+// CAMADA 4 — ALERTAS PROATIVOS INTELIGENTES
+// ═══════════════════════════════════════════════════════
+const IA_ALERTA_KEY    = 'ia_alerta_diario';
+const IA_ALERTA_TTL    = 24 * 60 * 60 * 1000; // 1x/dia
+
+// ── Detector local (sem IA) ──────────────────────────────────
+function detectarAlertasLocais() {
+  const hoje    = todayISO();
+  const agora   = new Date();
+  const alertas = [];
+
+  // 1. Intervalo longo entre mamadas (> 5h, bebê < 3 meses)
+  const diasVida = Math.floor((agora - new Date('2026-03-12')) / 86400000);
+  const todasMam = (db.mamadas || []);
+  if (diasVida < 90 && todasMam.length > 0) {
+    const ultima = todasMam[0];
+    const ultTs  = new Date(`${ultima.data}T${ultima.hora || '00:00'}`);
+    const diffH  = (agora - ultTs) / 3600000;
+    if (diffH > 5 && diffH < 24) {
+      alertas.push({
+        tipo: 'urgente', icon: '🍼',
+        texto: `Última mamada há ${diffH.toFixed(1)}h — bebês de ${Math.floor(diasVida/30)} meses precisam mamar a cada 2–3h.`,
+      });
+    }
+  }
+
+  // 2. Queda de volume > 25% vs média dos 7 dias anteriores
+  const d7   = new Date(agora - 7 * 864e5).toISOString().slice(0, 10);
+  const ontem = new Date(agora - 864e5).toISOString().slice(0, 10);
+  const mHoje = todasMam.filter(m => m.data === hoje);
+  const m7dias = todasMam.filter(m => m.data >= d7 && m.data < hoje);
+  if (mHoje.length >= 3 && m7dias.length >= 7) {
+    const mlHoje  = mHoje.reduce((s, m) => s + mlReal(m), 0);
+    const diasUniq = [...new Set(m7dias.map(m => m.data))].length || 1;
+    const mlMedio  = m7dias.reduce((s, m) => s + mlReal(m), 0) / diasUniq;
+    if (mlMedio > 0 && mlHoje < mlMedio * 0.75) {
+      alertas.push({
+        tipo: 'atencao', icon: '📉',
+        texto: `Volume de hoje (${mlHoje}ml) está ${Math.round((1 - mlHoje/mlMedio)*100)}% abaixo da média dos últimos 7 dias (${Math.round(mlMedio)}ml).`,
+      });
+    }
+  }
+
+  // 3. Estoque com itens vencidos
+  const vencidos = (estoqueLeite || []).filter(e => !e.usado && e.validade < hoje);
+  if (vencidos.length > 0) {
+    alertas.push({
+      tipo: 'atencao', icon: '🧊',
+      texto: `${vencidos.length} unidade(s) do banco de leite vencida(s). Descarte necessário.`,
+    });
+  }
+
+  // 4. Próximo a vencer em 24h
+  const amanha = new Date(agora.getTime() + 864e5).toISOString().slice(0, 10);
+  const proxVenc = (estoqueLeite || []).filter(e => !e.usado && e.validade === amanha);
+  if (proxVenc.length > 0) {
+    const mlProx = proxVenc.reduce((s, e) => s + Number(e.ml || 0), 0);
+    alertas.push({
+      tipo: 'atencao', icon: '⏰',
+      texto: `${mlProx}ml do banco de leite vencem amanhã — ofereça hoje para não desperdiçar.`,
+    });
+  }
+
+  return alertas;
+}
+
+// ── Gerar texto de dica proativa via IA (1x/dia) ─────────────
+async function gerarAlertaProativo() {
+  const workerUrl = localStorage.getItem('oraculo_worker_url');
+  if (!workerUrl) return;
+
+  // Verificar cache
+  try {
+    const cached = JSON.parse(localStorage.getItem(IA_ALERTA_KEY) || 'null');
+    if (cached && (Date.now() - cached.ts) < IA_ALERTA_TTL) {
+      _renderAlertaProativo(cached.alertasLocais, cached.dicaIA);
+      return;
+    }
+  } catch(e) {}
+
+  // Detectar alertas locais
+  const alertasLocais = detectarAlertasLocais();
+
+  // Pedir à IA uma dica diária positiva e informativa
+  const diasVida = Math.floor((Date.now() - new Date('2026-03-12')) / 86400000);
+  const meses    = Math.floor(diasVida / 30.44);
+
+  const prompt = `Você é um assistente pediátrico (SBP/OMS). Para um bebê de ${diasVida} dias (${meses} meses), sugira 1 atividade ou dica de desenvolvimento específica para essa fase, em 1–2 frases práticas e positivas. Sem markdown, sem asteriscos. Comece com um emoji.`;
+
+  try {
+    const res = await Promise.race([
+      fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 120,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+    ]);
+    const data  = await res.json();
+    const dicaIA = data.content?.[0]?.text || '';
+    localStorage.setItem(IA_ALERTA_KEY, JSON.stringify({ alertasLocais, dicaIA, ts: Date.now() }));
+    _renderAlertaProativo(alertasLocais, dicaIA);
+  } catch(e) {
+    // Mostrar só alertas locais se IA indisponível
+    _renderAlertaProativo(alertasLocais, '');
+  }
+}
+
+function _renderAlertaProativo(alertasLocais, dicaIA) {
+  const el = document.getElementById('ia-alertas-container');
+  if (!el) return;
+
+  const itens = [...alertasLocais];
+  if (dicaIA) itens.push({ tipo: 'info', icon: '🌟', texto: dicaIA });
+  if (!itens.length) { el.innerHTML = ''; return; }
+
+  const corMap = { urgente: 'rgba(255,80,80,0.7)', atencao: 'rgba(255,180,50,0.7)', info: 'rgba(57,255,20,0.6)' };
+  const bgMap  = { urgente: 'rgba(255,30,30,0.08)', atencao: 'rgba(255,150,0,0.08)',  info: 'rgba(57,255,20,0.06)' };
+
+  el.innerHTML = itens.map(a => `
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 11px;margin-bottom:6px;
+      background:${bgMap[a.tipo]};border:1px solid ${corMap[a.tipo]};border-radius:10px">
+      <span style="flex-shrink:0;font-size:1rem">${a.icon}</span>
+      <span style="font-size:0.74rem;color:rgba(230,220,255,0.9);line-height:1.5">${a.texto}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// CAMADA 2 — DICAS CONTEXTUAIS POR ABA
+// ═══════════════════════════════════════════════════════
+const IA_DICA_PROMPTS = {
+  mamadas: () => `Analise o padrão de alimentação do bebê abaixo e dê 1 insight prático em 2–3 frases. Foque em: frequência, volume, horários noturnos, variações. Use linguagem simples e empática. Sem markdown.
+
+${contextArthur()}`,
+  banco:   () => `Analise o banco de leite materno abaixo e dê 1 recomendação prática em 2–3 frases. Foque em: estoque disponível, vencimentos próximos, frequência de extrações, sugestões de uso. Sem markdown.
+
+${contextArthur()}`,
+  agenda:  () => `Analise a agenda de saúde do bebê abaixo e dê 1 lembrete ou dica em 2–3 frases. Foque em: consultas próximas, medicações ativas, preparação. Sem markdown.
+
+${contextArthur()}`,
+  jornada: () => `Analise os marcos de desenvolvimento do bebê abaixo e sugira 1 atividade estimulante adequada para a idade atual em 2–3 frases. Baseie-se em SBP/OMS. Sem markdown.
+
+${contextArthur()}`,
+  vacinas: () => `Analise o calendário de vacinas do bebê abaixo e dê 1 orientação em 2–3 frases. Foque em: próximas vacinas, preparação (antitérmico, observação pós-vacina). Baseie-se no PNI/SBP. Sem markdown.
+
+${contextArthur()}`,
+  crescimento: () => `Analise os dados de crescimento do bebê abaixo e dê 1 observação em 2–3 frases sobre a curva de crescimento comparada com a OMS. Use linguagem tranquilizadora mas honesta. Sem markdown.
+
+${contextArthur()}`,
+};
+
+const IA_DICA_TITULOS = {
+  mamadas:     '🍼 ANÁLISE DE RECARGAS',
+  banco:       '🧊 ANÁLISE DO BANCO',
+  agenda:      '🗺️ ANÁLISE DA AGENDA',
+  jornada:     '🌙 DICA DE DESENVOLVIMENTO',
+  vacinas:     '🛡️ ORIENTAÇÃO DE ESCUDOS',
+  crescimento: '📊 ANÁLISE DE CRESCIMENTO',
+};
+
+const _dicaCache = {};
+
+async function abrirDicaIA(aba) {
+  const workerUrl = localStorage.getItem('oraculo_worker_url');
+  if (!workerUrl) { showToast('⚙️ Configure o Oráculo no menu primeiro.'); return; }
+
+  // Abrir modal
+  document.getElementById('ia-dica-overlay').classList.add('open');
+  document.getElementById('ia-dica-modal').classList.add('open');
+
+  const titulo   = document.getElementById('ia-dica-titulo');
+  const content  = document.getElementById('ia-dica-content');
+  const loading  = document.getElementById('ia-dica-loading');
+  if (titulo) titulo.textContent = IA_DICA_TITULOS[aba] || '💡 DICA DA FORÇA';
+
+  // Cache por aba (5 minutos)
+  const agora = Date.now();
+  if (_dicaCache[aba] && (agora - _dicaCache[aba].ts) < 5 * 60 * 1000) {
+    if (content) content.innerHTML = _dicaCache[aba].html;
+    if (loading) loading.style.display = 'none';
+    return;
+  }
+
+  // Loading
+  if (loading) loading.style.display = 'flex';
+  if (content) content.innerHTML = '';
+
+  try {
+    const prompt = IA_DICA_PROMPTS[aba]?.() || `Dê uma dica útil sobre cuidados com bebê de ${Math.floor((Date.now() - new Date('2026-03-12')) / 86400000)} dias.`;
+    const res = await Promise.race([
+      fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 250,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+    ]);
+    const data  = await res.json();
+    const texto = data.content?.[0]?.text || 'Sem resposta disponível.';
+    const html  = texto.split('\n').join('<br>');
+
+    _dicaCache[aba] = { html, ts: agora };
+    if (loading) loading.style.display = 'none';
+    if (content) content.innerHTML = html;
+
+  } catch(e) {
+    if (loading) loading.style.display = 'none';
+    if (content) content.innerHTML = '<span style="color:rgba(255,150,100,0.8)">⚠️ Oráculo indisponível no momento.</span>';
+  }
+}
+
+function fecharDicaIA() {
+  document.getElementById('ia-dica-overlay').classList.remove('open');
+  document.getElementById('ia-dica-modal').classList.remove('open');
+}
+
+
+
+
+
+
+// ═══════════════════════════════════════════════════════
+// PROPOSTA 07 — ONBOARDING PROGRESSIVO
+// ═══════════════════════════════════════════════════════
+const ONBOARD_KEY = 'arthur_onboard_v1';
+const ONBOARD_MISSOES = [
+  { id:'perfil',    icone:'👤', texto:'Criar perfil do Guardião',       acao: null },
+  { id:'mamada',    icone:'🍼', texto:'Registrar a 1ª recarga do Arthur', acao: () => showTab('mamadas') },
+  { id:'oraculo',   icone:'🔮', texto:'Configurar o Oráculo Jedi (IA)',   acao: () => abrirModalOraculoConfig() },
+  { id:'medida',    icone:'📏', texto:'Registrar 1ª medida de crescimento', acao: () => { showTab('mesversario'); setTimeout(()=>showOrbitasTab('crescimento'),150); } },
+];
+
+function _lerOnboard() {
+  try { return JSON.parse(localStorage.getItem(ONBOARD_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function _salvarOnboard(estado) {
+  localStorage.setItem(ONBOARD_KEY, JSON.stringify(estado));
+}
+
+function marcarMissaoConcluida(id) {
+  const estado = _lerOnboard();
+  if (estado.ignorado) return;
+  if (!estado[id]) {
+    estado[id] = true;
+    _salvarOnboard(estado);
+    renderOnboarding();
+    // Toast comemorativo apenas na primeira vez
+    const m = ONBOARD_MISSOES.find(m => m.id === id);
+    if (m) showToast(`✅ Missão concluída: ${m.texto}`);
+    // Verificar se completou tudo
+    const totalDone = ONBOARD_MISSOES.filter(m => estado[m.id]).length;
+    if (totalDone === ONBOARD_MISSOES.length) {
+      setTimeout(() => {
+        showToast('⚔️ Jornada do Guardião completa! Que a Força esteja com você!');
+        const card = document.getElementById('onboard-card');
+        if (card) card.style.display = 'none';
+      }, 800);
+    }
+  }
+}
+
+function ignorarOnboarding() {
+  const estado = _lerOnboard();
+  estado.ignorado = true;
+  _salvarOnboard(estado);
+  const card = document.getElementById('onboard-card');
+  if (card) { card.style.opacity='0'; card.style.transform='scale(0.95)'; card.style.transition='all 0.25s'; setTimeout(()=>card.style.display='none', 250); }
+}
+
+function renderOnboarding() {
+  const card     = document.getElementById('onboard-card');
+  const lista    = document.getElementById('onboard-missoes');
+  const bar      = document.getElementById('onboard-progress-bar');
+  if (!card || !lista) return;
+
+  const estado   = _lerOnboard();
+  if (estado.ignorado) { card.style.display='none'; return; }
+
+  // Só mostrar nos primeiros 14 dias
+  const diasVida = Math.floor((Date.now() - new Date('2026-03-12')) / 86400000);
+  if (diasVida > 14) { card.style.display='none'; return; }
+
+  const done  = ONBOARD_MISSOES.filter(m => estado[m.id]).length;
+  if (done === ONBOARD_MISSOES.length) { card.style.display='none'; return; }
+
+  card.style.display = 'block';
+  if (bar) bar.style.width = `${(done/ONBOARD_MISSOES.length)*100}%`;
+
+  lista.innerHTML = ONBOARD_MISSOES.map((m, i) => {
+    const feita    = !!estado[m.id];
+    const proxima  = !feita && ONBOARD_MISSOES.slice(0,i).every(p=>estado[p.id]);
+    const cls      = feita ? 'done' : proxima ? 'next' : 'pend';
+    const textoCls = feita ? 'done-text' : proxima ? 'next-text' : '';
+    const acaoBtn  = proxima && m.acao
+      ? `<button onclick="(${m.acao.toString()})()" style="background:none;border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:3px 9px;font-size:0.58rem;cursor:pointer;font-family:'Orbitron',monospace;letter-spacing:0.04em;flex-shrink:0">IR →</button>`
+      : '';
+    return `<div class="onboard-missao">
+      <div class="onboard-check ${cls}">${feita ? '✓' : proxima ? '→' : '·'}</div>
+      <div class="onboard-texto ${textoCls}">${m.icone} ${m.texto}</div>
+      ${acaoBtn}
+    </div>`;
+  }).join('');
+}
+
+function verificarOnboarding(userId) {
+  const estado = _lerOnboard();
+  if (estado.ignorado) return;
+  // Marcar perfil como concluído (já logou)
+  if (!estado.perfil) marcarMissaoConcluida('perfil');
+  // Verificar mamadas e crescimento
+  if (!estado.mamada  && (db.mamadas||[]).length > 0)   marcarMissaoConcluida('mamada');
+  if (!estado.medida  && crescData.length > 0)           marcarMissaoConcluida('medida');
+  if (!estado.oraculo && localStorage.getItem('oraculo_worker_url')) marcarMissaoConcluida('oraculo');
+  renderOnboarding();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSTA 06 — RELATÓRIO PDF PARA CONSULTA
+// ═══════════════════════════════════════════════════════
+function abrirRelatorio() {
+  document.getElementById('relatorio-overlay').classList.add('open');
+  document.getElementById('relatorio-modal').classList.add('open');
+  _preencherDadosRelatorio();
+}
+
+function fecharRelatorio() {
+  document.getElementById('relatorio-overlay').classList.remove('open');
+  document.getElementById('relatorio-modal').classList.remove('open');
+}
+
+function _preencherDadosRelatorio() {
+  const hoje  = todayISO();
+  const agora = new Date();
+  const d7    = new Date(agora - 7*864e5).toISOString().slice(0,10);
+
+  // Período
+  const periEl = document.getElementById('relatorio-periodo');
+  if (periEl) periEl.textContent = `${d7} a ${hoje}`;
+
+  // Dados da semana
+  const mams7  = (db.mamadas||[]).filter(m => m.data >= d7);
+  const dias   = [...new Set(mams7.map(m=>m.data))].length || 1;
+  const mlTotal = mams7.reduce((s,m)=>s+mlReal(m),0);
+  const mlMedio = Math.round(mlTotal / dias);
+  const mamMedio = (mams7.length / dias).toFixed(1);
+
+  // Crescimento mais recente
+  const pesoRec = crescData.length > 0 ? crescData[crescData.length-1] : null;
+  const pesoAnt = crescData.length > 1 ? crescData[crescData.length-2] : null;
+  const ganho   = (pesoRec && pesoAnt && pesoRec.peso && pesoAnt.peso)
+    ? `+${((pesoRec.peso - pesoAnt.peso)*1000).toFixed(0)}g`
+    : '—';
+
+  // Próxima vacina
+  const vacPend = (db.vacinas||[]).filter(v=>v.data && v.data >= hoje).sort((a,b)=>a.data.localeCompare(b.data))[0];
+
+  // Estoque banco de leite
+  const estAtivo = (estoqueLeite||[]).filter(e=>!e.usado);
+  const mlEst    = estAtivo.reduce((s,e)=>s+Number(e.ml||0),0);
+
+  const el = document.getElementById('relatorio-dados');
+  if (el) el.innerHTML = `
+    <div style="font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--blue-neon);margin-bottom:8px;letter-spacing:0.08em">
+      👶 ARTHUR · ${Math.floor((agora - new Date('2026-03-12'))/86400000)} DIAS DE VIDA
+    </div>
+    <div>🍼 Mamadas: <strong>${mamMedio}/dia</strong> · Volume médio: <strong>${mlMedio}ml/dia</strong></div>
+    ${pesoRec ? `<div>⚖️ Peso: <strong>${pesoRec.peso}kg</strong> (${pesoRec.mes}º mês) · Ganho: <strong>${ganho}</strong></div>` : ''}
+    ${pesoRec?.altura ? `<div>📏 Comprimento: <strong>${pesoRec.altura}cm</strong></div>` : ''}
+    ${mlEst > 0 ? `<div>🧊 Banco de leite: <strong>${mlEst}ml</strong> disponíveis</div>` : ''}
+    ${vacPend ? `<div>🛡️ Próxima vacina: <strong>${vacPend.nome||'pendente'} em ${vacPend.data}</strong></div>` : ''}
+    ${(db.medicacoes||[]).filter(m=>m.ativa!==false).length > 0 ? `<div>💊 Medicações ativas: <strong>${db.medicacoes.filter(m=>m.ativa!==false).map(m=>m.nome||m.medicamento||'?').join(', ')}</strong></div>` : ''}
+  `;
+
+  // Gerar análise IA
+  _gerarAnaliseRelatorio();
+}
+
+async function _gerarAnaliseRelatorio() {
+  const workerUrl = localStorage.getItem('oraculo_worker_url');
+  const iaLoad = document.getElementById('relatorio-ia-loading');
+  const iaText = document.getElementById('relatorio-ia-texto');
+  if (!workerUrl || !iaLoad || !iaText) return;
+
+  iaLoad.style.display = 'flex';
+  iaText.style.display = 'none';
+
+  const prompt = `Gere um parágrafo curto (3-4 frases) de análise semanal para apresentar ao pediatra sobre o bebê abaixo. Seja objetivo, cite números reais, use linguagem médica acessível. Sem markdown.
+
+${contextArthur()}`;
+
+  try {
+    const res = await Promise.race([
+      fetch(workerUrl, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:200, messages:[{role:'user',content:prompt}] }) }),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))
+    ]);
+    const data = await res.json();
+    const texto = data.content?.[0]?.text || '';
+    if (texto) {
+      iaLoad.style.display = 'none';
+      iaText.style.display = 'block';
+      iaText.innerHTML = `<div style="font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(180,100,255,0.6);margin-bottom:6px;letter-spacing:0.08em">🔮 ANÁLISE DA FORÇA</div>${texto.split('\n').join('<br>')}`;
+    } else { iaLoad.style.display='none'; }
+  } catch(e) { iaLoad.style.display='none'; }
+}
+
+function imprimirRelatorio() {
+  const printArea = document.getElementById('relatorio-print-area');
+  const dados     = document.getElementById('relatorio-dados')?.innerHTML || '';
+  const ia        = document.getElementById('relatorio-ia-texto')?.innerHTML || '';
+  const hoje      = new Date().toLocaleDateString('pt-BR');
+  if (printArea) {
+    printArea.style.display = 'block';
+    printArea.innerHTML = `
+      <div style="font-family:Arial,sans-serif;padding:20px;color:#000">
+        <h2 style="margin-bottom:4px">Relatório do Padawan Arthur</h2>
+        <p style="color:#666;font-size:12px">Gerado em ${hoje} · App Padawan Arthur</p>
+        <hr style="margin:12px 0">
+        <div style="font-size:13px;line-height:2">${dados}</div>
+        ${ia ? `<hr style="margin:12px 0"><div style="font-size:12px;color:#333">${ia}</div>` : ''}
+      </div>`;
+    setTimeout(() => { window.print(); printArea.style.display='none'; }, 100);
+  }
+}
+
+async function compartilharRelatorio() {
+  const dados = document.getElementById('relatorio-dados')?.textContent || '';
+  const ia    = document.getElementById('relatorio-ia-texto')?.textContent || '';
+  const texto = `Relatório Padawan Arthur\n${new Date().toLocaleDateString('pt-BR')}\n\n${dados}\n${ia ? '\nAnálise: '+ia : ''}`;
+  if (navigator.share) {
+    try { await navigator.share({ title:'Relatório Arthur', text: texto }); }
+    catch(e) {}
+  } else {
+    await navigator.clipboard.writeText(texto);
+    showToast('📋 Relatório copiado!');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSTA 05 — MODO NOITE AUTOMÁTICO
+// ═══════════════════════════════════════════════════════
+let _modoNoiteManual = localStorage.getItem('modo_noite_manual');
+let _modoNoiteTimer  = null;
+
+function _aplicarModoNoite(ativar) {
+  if (ativar) document.body.classList.add('modo-noite');
+  else        document.body.classList.remove('modo-noite');
+}
+
+function verificarHorarioNoite() {
+  if (_modoNoiteManual === 'on')  { _aplicarModoNoite(true);  return; }
+  if (_modoNoiteManual === 'off') { _aplicarModoNoite(false); return; }
+  const h = new Date().getHours();
+  _aplicarModoNoite(h >= 22 || h < 6);
+}
+
+function ativarModoNoite()    { _modoNoiteManual='on';  localStorage.setItem('modo_noite_manual','on');  _aplicarModoNoite(true); }
+function desativarModoNoite() { _modoNoiteManual='off'; localStorage.setItem('modo_noite_manual','off'); _aplicarModoNoite(false); }
+
+function toggleModoNoiteManual() {
+  if (document.body.classList.contains('modo-noite')) {
+    desativarModoNoite();
+    showToast('☀️ Modo noite desativado');
+  } else {
+    ativarModoNoite();
+    showToast('🌙 Modo noite ativado');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSTA 04 — NAV REORGANIZADA + DRAWER "MAIS"
+// ═══════════════════════════════════════════════════════
+function abrirMenuMais() {
+  document.getElementById('mais-drawer').style.transform = 'translateY(0)';
+  document.getElementById('mais-drawer-overlay').style.display = 'block';
+}
+function fecharMenuMais() {
+  document.getElementById('mais-drawer').style.transform = 'translateY(100%)';
+  document.getElementById('mais-drawer-overlay').style.display = 'none';
+}
+function showTabFromMais(tabId) {
+  fecharMenuMais();
+  showTab(tabId);
+}
+
+// ═══════════════════════════════════════════════════════
+// PROPOSTA 02 — "ARTHUR AGORA" NO DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderEstadoArthur() {
+  const card  = document.getElementById('arthur-agora-card');
+  const body  = document.getElementById('arthur-agora-body');
+  const badge = document.getElementById('arthur-agora-badge');
+  if (!card || !body) return;
+
+  const hoje  = todayISO();
+  const agora = new Date();
+  const mams  = (db.mamadas || []);
+  const ultima = mams[0];
+
+  // ── Tempo desde última mamada ────────────────────────
+  let intervaloStr = '—';
+  let intervaloMin = null;
+  let alertaIntervalo = false;
+  if (ultima) {
+    const ts   = new Date(`${ultima.data}T${ultima.hora || '00:00'}`);
+    const diff = Math.round((agora - ts) / 60000);
+    intervaloMin = diff;
+    if (diff < 60)      intervaloStr = `${diff}min atrás`;
+    else if (diff < 120) intervaloStr = `1h ${diff-60}min atrás`;
+    else                 intervaloStr = `${(diff/60).toFixed(1)}h atrás`;
+    // Alerta: > 3h para bebê < 90 dias
+    const diasVida = Math.floor((agora - new Date('2026-03-12')) / 86400000);
+    if (diasVida < 90 && diff > 180) alertaIntervalo = true;
+  }
+
+  // ── Volume hoje ──────────────────────────────────────
+  const mamadasHoje = mams.filter(m => m.data === hoje);
+  const mlHoje = mamadasHoje.reduce((s, m) => s + mlReal(m), 0);
+
+  // Comparar com ontem
+  const ontem = new Date(agora - 864e5).toISOString().slice(0,10);
+  const mamsOntem = mams.filter(m => m.data === ontem);
+  const mlOntem   = mamsOntem.reduce((s, m) => s + mlReal(m), 0);
+  let tendencia = '';
+  if (mlOntem > 0 && mlHoje > 0) {
+    const pct = ((mlHoje - mlOntem) / mlOntem * 100);
+    if (Math.abs(pct) > 10) tendencia = pct > 0
+      ? `<span style="color:var(--green-saber);font-size:0.65rem"> ↑ ${Math.abs(pct).toFixed(0)}% vs ontem</span>`
+      : `<span style="color:rgba(255,180,50,0.8);font-size:0.65rem"> ↓ ${Math.abs(pct).toFixed(0)}% vs ontem</span>`;
+  }
+
+  // ── Estoque de leite ─────────────────────────────────
+  const estAtivo = (estoqueLeite || []).filter(e => !e.usado);
+  const mlEst    = estAtivo.reduce((s, e) => s + Number(e.ml || 0), 0);
+
+  // ── Próxima consulta ─────────────────────────────────
+  const proxEv = (db.eventos || []).filter(e => e.data >= hoje).sort((a,b) => a.data.localeCompare(b.data))[0];
+
+  // ── Próxima vacina (dias) ────────────────────────────
+  const vacsPend = (db.vacinas || []).filter(v => v.data && v.data >= hoje).sort((a,b)=>a.data.localeCompare(b.data))[0];
+  const diasVacina = vacsPend ? Math.ceil((new Date(vacsPend.data) - agora) / 864e5) : null;
+
+  // ── Badge de estado ──────────────────────────────────
+  const diasVida2 = Math.floor((agora - new Date('2026-03-12')) / 86400000);
+  if (badge) {
+    badge.textContent = `${diasVida2}d de vida`;
+  }
+
+  // ── Montar HTML ──────────────────────────────────────
+  const corIntervalo = alertaIntervalo ? 'rgba(255,150,50,0.9)' : 'var(--blue-neon)';
+  let html = `<div style="display:grid;gap:4px">`;
+
+  // Linha 1: última mamada
+  html += `<div>🍼 Última mamada: <strong style="color:${corIntervalo}">${intervaloStr}</strong>`;
+  if (alertaIntervalo) html += ` <span style="color:rgba(255,150,50,0.8);font-size:0.65rem">⚠ Pode estar com fome</span>`;
+  html += `</div>`;
+
+  // Linha 2: volume hoje
+  if (mlHoje > 0) {
+    html += `<div>💧 Volume hoje: <strong style="color:var(--blue-neon)">${mlHoje}ml</strong>${tendencia}</div>`;
+  }
+
+  // Linha 3: estoque
+  if (mlEst > 0) {
+    const proxVenc = estAtivo.filter(e => e.validade >= hoje).sort((a,b)=>a.validade.localeCompare(b.validade))[0];
+    const vencStr  = proxVenc ? ` · vence ${proxVenc.validade}` : '';
+    html += `<div>🧊 Banco de leite: <strong style="color:var(--blue-neon)">${mlEst}ml disponíveis</strong><span style="color:var(--text-dim);font-size:0.65rem">${vencStr}</span></div>`;
+  }
+
+  // Linha 4: próxima consulta
+  if (proxEv) {
+    const dDiff = Math.ceil((new Date(proxEv.data) - agora) / 864e5);
+    const dStr  = dDiff === 0 ? 'hoje' : dDiff === 1 ? 'amanhã' : `em ${dDiff} dias`;
+    html += `<div>🗺️ ${proxEv.titulo}: <strong style="color:var(--gold)">${dStr}</strong></div>`;
+  }
+
+  // Linha 5: vacina próxima
+  if (diasVacina !== null && diasVacina <= 7) {
+    const dStr = diasVacina === 0 ? 'hoje' : diasVacina === 1 ? 'amanhã' : `em ${diasVacina} dias`;
+    html += `<div>🛡️ Vacina pendente: <strong style="color:rgba(255,150,50,0.9)">${dStr}</strong></div>`;
+  }
+
+  html += `</div>`;
+  body.innerHTML = html;
+  card.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════
+// CAMADA 1 — BRIEFING DIÁRIO IA NO DASHBOARD
+// ═══════════════════════════════════════════════════════
+const IA_BRIEFING_CACHE_KEY = 'ia_briefing_cache';
+const IA_BRIEFING_TTL = 30 * 60 * 1000; // 30 minutos
+
+async function gerarBriefingIA(forcar = false) {
+  const workerUrl = localStorage.getItem('oraculo_worker_url');
+  if (!workerUrl) return; // silencioso se Worker não configurado
+
+  // Cache: não chamar mais de 1x/30min
+  if (!forcar) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(IA_BRIEFING_CACHE_KEY) || 'null');
+      if (cached && (Date.now() - cached.ts) < IA_BRIEFING_TTL) {
+        _renderBriefing(cached.texto, cached.ts);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Mostrar loading
+  const loading = document.getElementById('ia-briefing-loading');
+  const card    = document.getElementById('ia-briefing-card');
+  if (loading) loading.style.display = 'flex';
+  if (card)    card.style.display    = 'none';
+
+  const prompt = `Você é um assistente pediátrico especializado (SBP/OMS). Analise os dados do bebê abaixo e gere exatamente 3 insights curtos e práticos para os pais. Cada insight deve ser 1 frase direta. Use emojis. Priorize alertas reais se houver, depois observações úteis, depois dicas positivas. NÃO use markdown com asteriscos — apenas texto limpo com emojis.
+
+${contextArthur()}
+
+Responda com exatamente 3 linhas, uma por insight, sem numeração, sem título.`;
+
+  try {
+    const res = await Promise.race([
+      fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+    ]);
+
+    const data = await res.json();
+    const texto = data.content?.[0]?.text || '';
+    if (!texto) throw new Error('empty');
+
+    // Salvar cache
+    localStorage.setItem(IA_BRIEFING_CACHE_KEY, JSON.stringify({ texto, ts: Date.now() }));
+    _renderBriefing(texto, Date.now());
+
+  } catch(e) {
+    // Falha silenciosa — não mostrar erro no Dashboard
+    if (loading) loading.style.display = 'none';
+    console.info('[Briefing IA]', e.message);
+  }
+}
+
+function _renderBriefing(texto, ts) {
+  const card    = document.getElementById('ia-briefing-card');
+  const content = document.getElementById('ia-briefing-content');
+  const tsEl    = document.getElementById('ia-briefing-ts');
+  const loading = document.getElementById('ia-briefing-loading');
+
+  if (loading) loading.style.display = 'none';
+  if (!card || !content || !texto) return;
+
+  // Renderizar cada linha como item visual
+  const linhas = texto.split('\n').map(l => l.trim()).filter(Boolean);
+  content.innerHTML = linhas.map(l =>
+    `<div style="padding:5px 0;border-bottom:1px solid rgba(180,100,255,0.1);last-child:border:none">${l}</div>`
+  ).join('');
+
+  // Remover border da última linha
+  const divs = content.querySelectorAll('div');
+  if (divs.length) divs[divs.length-1].style.borderBottom = 'none';
+
+  if (tsEl) {
+    const d = new Date(ts);
+    tsEl.textContent = `Atualizado às ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+  }
+
+  card.style.display = 'block';
+}
 
 // ── Persistir histórico do Oráculo ──
 function salvarOraculoHistorico() {
@@ -7931,6 +9029,7 @@ function salvarOraculoKeyModal() {
   const banner = document.getElementById('oraculo-config-status-banner');
   if (banner) banner.style.display = 'block';
   showToast('🔮 Oráculo Jedi ativado!');
+  marcarMissaoConcluida('oraculo');
   setTimeout(() => {
     document.getElementById('modal-oraculo-config').style.display = 'none';
     const chat = document.getElementById('oraculo-chat');
@@ -8840,5 +9939,110 @@ async function iniciarSistemaNotificacoes(userId) {
 </div>
 
 
+<!-- OVERLAY DICA IA -->
+<div id="ia-dica-overlay" onclick="fecharDicaIA()"></div>
+
+<!-- MODAL BOTTOM SHEET DICA IA -->
+<div id="ia-dica-modal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.4rem">💡</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#d4a8ff;letter-spacing:0.09em" id="ia-dica-titulo">DICA DA FORÇA</div>
+        <div style="font-size:0.6rem;color:rgba(212,168,255,0.5);margin-top:1px">análise personalizada do Oráculo</div>
+      </div>
+    </div>
+    <button onclick="fecharDicaIA()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div id="ia-dica-loading" style="display:none;align-items:center;gap:10px;padding:10px 0">
+    <span>🔮</span>
+    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">CONSULTANDO O ORÁCULO...</span>
+    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
+  </div>
+  <div id="ia-dica-content" style="font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.75"></div>
+</div>
+
+
+<!-- DRAWER "MAIS" -->
+<div id="mais-drawer-overlay" onclick="fecharMenuMais()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99050"></div>
+<div id="mais-drawer" style="position:fixed;bottom:0;left:0;right:0;z-index:99051;background:linear-gradient(0deg,rgba(0,10,35,0.99),rgba(0,15,45,0.98));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:12px 16px 30px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.16,1,0.3,1)">
+  <div style="width:36px;height:3px;background:rgba(0,180,255,0.2);border-radius:2px;margin:0 auto 14px"></div>
+  <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:12px;text-align:center">MÓDULOS DA ORDEM</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <button onclick="showTabFromMais('mesversario')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">🌙</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Jornada</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">Marcos · Crescimento</span>
+    </button>
+    <button onclick="showTabFromMais('vacinas')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">🛡️</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Escudos</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">Vacinas PNI</span>
+    </button>
+    <button onclick="showTabFromMais('mesversario');showOrbitasTab('oraculo')" style="background:linear-gradient(135deg,rgba(80,0,180,0.3),rgba(40,0,100,0.4));border:1px solid rgba(180,100,255,0.3);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+      <span style="font-size:1.5rem">🔮</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--purple)">Oráculo</span>
+      <span style="font-size:0.58rem;color:rgba(212,168,255,0.5)">IA Pediátrica</span>
+    </button>
+    <button onclick="showTabFromMais('mesversario');showOrbitasTab('sabedoria')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">📚</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Sabedoria</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">43 artigos SBP</span>
+    </button>
+  </div>
+</div>
+
+
+<!-- OVERLAY RELATÓRIO -->
+<div id="relatorio-overlay" onclick="fecharRelatorio()"></div>
+
+<!-- MODAL RELATÓRIO -->
+<div id="relatorio-modal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.3rem">📋</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--white);letter-spacing:0.08em">RELATÓRIO PARA CONSULTA</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="relatorio-periodo"></div>
+      </div>
+    </div>
+    <button onclick="fecharRelatorio()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+  </div>
+
+  <!-- Dados estruturados -->
+  <div id="relatorio-dados" style="font-size:0.74rem;color:rgba(200,220,255,0.85);line-height:1.8;margin-bottom:12px"></div>
+
+  <!-- Loading IA -->
+  <div id="relatorio-ia-loading" style="display:none;align-items:center;gap:8px;padding:10px 0">
+    <span>🔮</span>
+    <span style="font-size:0.7rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">GERANDO ANÁLISE...</span>
+    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
+  </div>
+
+  <!-- Análise IA -->
+  <div id="relatorio-ia-texto" style="display:none;background:rgba(80,0,180,0.15);border:1px solid rgba(180,100,255,0.25);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.73rem;color:rgba(220,200,255,0.9);line-height:1.7"></div>
+
+  <!-- Ações -->
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button onclick="imprimirRelatorio()" style="flex:1;background:rgba(0,40,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">📄 PDF</button>
+    <button onclick="compartilharRelatorio()" style="flex:1;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:var(--green-saber);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">📤 COMPARTILHAR</button>
+  </div>
+</div>
+
+<!-- Área invisível para impressão -->
+<div id="relatorio-print-area" style="display:none"></div>
+
+
 </body>
 </html>
+  <!-- ═══ BOTÃO RELATÓRIO ═══ -->
+  <button onclick="abrirRelatorio()" style="width:100%;background:linear-gradient(135deg,rgba(0,30,80,0.6),rgba(0,20,60,0.7));border:1.5px solid rgba(0,180,255,0.22);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px">
+    <span style="font-size:1.2rem">📋</span>
+    <div style="text-align:left;flex:1">
+      <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--white);letter-spacing:0.06em">RELATÓRIO PARA CONSULTA</div>
+      <div style="font-size:0.62rem;color:var(--text-dim);margin-top:1px">Resumo semanal gerado com IA · PDF · Compartilhar</div>
+    </div>
+    <span style="color:var(--text-dim);font-size:0.8rem">›</span>
+  </button>
+
+
