@@ -4190,9 +4190,12 @@ function removerSplash() {
   setTimeout(() => { splash.style.display = 'none'; }, 420);
 }
 
+// Variável global do banco de leite — deve estar antes de qualquer uso
+let estoqueLeite = [];
+
 function iniciarApp() {
   initFirebaseRefs();
-  loadEstoque();       // Garante estoqueLeite carregado antes de qualquer render
+  loadEstoque();
   initEstoqueForm();
   renderEstoqueResumo();
 
@@ -7717,8 +7720,6 @@ function copiarRelatorio() {
 
 // ── ESTOQUE DE LEITE MATERNO ──
 const ESTOQUE_KEY = 'arthur_estoque_leite_v1';
-let estoqueLeite = [];
-
 function loadEstoque() {
   try { estoqueLeite = JSON.parse(localStorage.getItem(ESTOQUE_KEY)) || []; } catch(e) { estoqueLeite = []; }
 }
@@ -8016,7 +8017,6 @@ function registrarUsoEstoque() {
 }
 
 function renderEstoqueResumo() {
-  if (typeof estoqueLeite === 'undefined') return; // ainda não carregado
   const el = document.getElementById('estoque-resumo');
   if (!el) return;
   const hoje = todayISO();
@@ -8156,7 +8156,7 @@ function contextArthur() {
   }
 
   // ── Banco de Leite ───────────────────────────────────────
-  const estoqueAtivo = (typeof estoqueLeite !== 'undefined' ? estoqueLeite : []).filter(e => !e.usado);
+  const estoqueAtivo = (estoqueLeite || []).filter(e => !e.usado);
   const mlEstoque    = estoqueAtivo.reduce((s,e) => s+Number(e.ml||0), 0);
   const vencidos     = estoqueAtivo.filter(e => e.validade < hoje).length;
   const proximoVenc  = estoqueAtivo
@@ -8761,8 +8761,7 @@ function renderEstadoArthur() {
   }
 
   // ── Estoque de leite ─────────────────────────────────
-  const estoqueLeiteLocal = typeof estoqueLeite !== 'undefined' ? estoqueLeite : [];
-  const estAtivo = estoqueLeiteLocal.filter(e => !e.usado);
+  const estAtivo = (estoqueLeite || []).filter(e => !e.usado);
   const mlEst    = estAtivo.reduce((s, e) => s + Number(e.ml || 0), 0);
 
   // ── Próxima consulta ─────────────────────────────────
