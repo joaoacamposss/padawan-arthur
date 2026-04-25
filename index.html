@@ -4142,6 +4142,7 @@ function removerSplash() {
 
 function iniciarApp() {
   initFirebaseRefs();
+  loadEstoque();       // Garante estoqueLeite carregado antes de qualquer render
   initEstoqueForm();
   renderEstoqueResumo();
 
@@ -4191,6 +4192,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('[Padawan] erro em iniciarApp:', e);
     clearTimeout(splashGuard);
     removerSplash();
+    // Garantir que a tela de login aparece mesmo em caso de erro
+    setTimeout(() => {
+      const telaLogin = document.getElementById('tela-login');
+      if (telaLogin) telaLogin.style.display = 'flex';
+      try { renderListaGuardioes(); } catch(e2) {}
+    }, 200);
   }
 });
 
@@ -7937,6 +7944,7 @@ function registrarUsoEstoque() {
 }
 
 function renderEstoqueResumo() {
+  if (typeof estoqueLeite === 'undefined') return; // ainda não carregado
   const el = document.getElementById('estoque-resumo');
   if (!el) return;
   const hoje = todayISO();
@@ -8076,7 +8084,7 @@ function contextArthur() {
   }
 
   // ── Banco de Leite ───────────────────────────────────────
-  const estoqueAtivo = (estoqueLeite||[]).filter(e => !e.usado);
+  const estoqueAtivo = (typeof estoqueLeite !== 'undefined' ? estoqueLeite : []).filter(e => !e.usado);
   const mlEstoque    = estoqueAtivo.reduce((s,e) => s+Number(e.ml||0), 0);
   const vencidos     = estoqueAtivo.filter(e => e.validade < hoje).length;
   const proximoVenc  = estoqueAtivo
@@ -8681,7 +8689,8 @@ function renderEstadoArthur() {
   }
 
   // ── Estoque de leite ─────────────────────────────────
-  const estAtivo = (estoqueLeite || []).filter(e => !e.usado);
+  const estoqueLeiteLocal = typeof estoqueLeite !== 'undefined' ? estoqueLeite : [];
+  const estAtivo = estoqueLeiteLocal.filter(e => !e.usado);
   const mlEst    = estAtivo.reduce((s, e) => s + Number(e.ml || 0), 0);
 
   // ── Próxima consulta ─────────────────────────────────
