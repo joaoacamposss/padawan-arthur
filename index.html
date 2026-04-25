@@ -1997,6 +1997,29 @@
 </div>
 
 <!-- Firebase init — feito por iniciarApp() no DOMContentLoaded -->
+
+<!-- LIMPEZA DE SERVICE WORKERS — remove cache antigo que serve HTML desatualizado -->
+<script>
+(function() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(r => {
+        r.unregister().then(() => console.log('[Padawan] SW removido:', r.scope));
+      });
+    }).catch(() => {});
+  }
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(n => {
+        if (n.startsWith('padawan')) {
+          caches.delete(n).then(() => console.log('[Padawan] Cache removido:', n));
+        }
+      });
+    }).catch(() => {});
+  }
+})();
+</script>
+
 <div class="nebula"></div>
 
 <!-- ── TELA DE LOGIN ── -->
@@ -3923,6 +3946,25 @@ function fazerLogin(id) {
     setTimeout(() => verificarOnboarding(id), 600);
     // Oferecer Face ID após 2s se não registrado e WebAuthn disponível
     setTimeout(() => mostrarBannerFaceID(id), 2000);
+  }).catch(err => {
+    // Falhou tudo — tentar localStorage como última salvaguarda
+    console.warn('[Padawan] loadData falhou, tentando localStorage:', err);
+    try {
+      const keys = ['diario_arthur_offline', 'diario_arthur_v1'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.mamadas) {
+          db = parsed;
+          renderAll();
+          console.warn('[Padawan] Dados recuperados de localStorage:', k);
+          return;
+        }
+      }
+    } catch(e2) {}
+    db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
+    renderAll();
   });
   // Sync crescimento do Firebase
   try {
@@ -4115,6 +4157,7 @@ function iniciarAutoLock() {
 let DOC_REF, VACINHAS_REF, EXTRAS_REF, GUARDIOES_REF, MED_REF;
 
 function initFirebaseRefs() {
+  try {
   if (!firebase.apps.length) {
     firebase.initializeApp({
       apiKey:            "AIzaSyBEvy695Be5k9ntWWNvqg_Zy5hVN8ZfuDo",
@@ -4126,11 +4169,18 @@ function initFirebaseRefs() {
     });
   }
   const fs   = firebase.firestore();
+  // iOS Safari bloqueia WebSockets — longPolling garante que Firebase funciona
+  try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
   DOC_REF        = fs.collection('diario').doc('arthur');
   VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
   EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
   GUARDIOES_REF  = fs.collection('diario').doc('arthur_guardioes');
   MED_REF        = fs.collection('diario').doc('arthur_medicacao');
+  window._firebaseReady = true;
+  } catch(e) {
+    console.warn('[Padawan] Firebase indisponível, modo offline:', e.message || e);
+    window._firebaseReady = false;
+  }
 }
 
 function removerSplash() {
@@ -4235,17 +4285,39 @@ window.addEventListener('offline', () => mostrarStatusConexao(false));
 const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
+  // Garantir que DOC_REF foi inicializado
+  if (!DOC_REF) {
+    console.warn('[Padawan] DOC_REF não inicializado, usando localStorage');
+    try {
+      const cache = localStorage.getItem(LOCAL_KEY);
+      if (cache) return JSON.parse(cache);
+    } catch(e) {}
+    return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
+  }
   try {
     const snap = await DOC_REF.get();
     if (snap.exists) {
       const { _ultimaAtualizacao, ...dados } = snap.data();
-      // Salva cache local sem o metadado de atualização
       localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
       return dados;
     }
+    // Doc existe mas vazio — tentar cache local
+    const cacheEmpty = localStorage.getItem(LOCAL_KEY);
+    if (cacheEmpty) {
+      try { return JSON.parse(cacheEmpty); } catch(e2) {}
+    }
   } catch(e) {
-    const cache = localStorage.getItem(LOCAL_KEY);
-    if (cache) return JSON.parse(cache);
+    // Firebase falhou (offline, CORS, etc) — usar cache local
+    console.warn('[Padawan] Firebase offline, usando cache local:', e.message || e);
+    try {
+      const cache = localStorage.getItem(LOCAL_KEY);
+      if (cache) {
+        const parsed = JSON.parse(cache);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch(e2) {
+      console.warn('[Padawan] Cache local corrompido:', e2);
+    }
   }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
 }
