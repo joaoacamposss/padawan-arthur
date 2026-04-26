@@ -2047,11 +2047,31 @@
 
   /* ── PRINT — ocultar tudo exceto área de impressão ── */
   @media print {
-    body > *:not(#relatorio-print-area) { display:none !important; }
-    #relatorio-print-area { display:block !important; position:static !important; }
-    #relatorio-print-area * { color:#000 !important; background:transparent !important; border-color:#ccc !important; }
-    #relatorio-print-area h2 { font-size:14pt; }
-    #relatorio-print-area .rel-tabela { font-size:9pt; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body { background: #fff !important; color: #000 !important; }
+    body > * { display: none !important; }
+    #relatorio-print-area { display: block !important; position: static !important; background: #fff !important; }
+    #relatorio-print-area * {
+      color: #000 !important;
+      background: transparent !important;
+      border-color: #ccc !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      font-family: Arial, sans-serif !important;
+    }
+    #relatorio-print-area h1 { font-size: 16pt !important; }
+    #relatorio-print-area h2 { font-size: 13pt !important; }
+    #relatorio-print-area h3 { font-size: 11pt !important; }
+    #relatorio-print-area table { font-size: 9pt !important; border-collapse: collapse !important; }
+    #relatorio-print-area td, #relatorio-print-area th {
+      padding: 4px 6px !important; border: 1px solid #ddd !important;
+    }
+    #relatorio-print-area .rel-badge-dado { background: #e8f5e9 !important; color: #2e7d32 !important; border: 1px solid #a5d6a7 !important; border-radius: 4px; padding: 1px 5px; }
+    #relatorio-print-area .rel-badge-pend { background: #fff8e1 !important; color: #f57f17 !important; border: 1px solid #ffe082 !important; border-radius: 4px; padding: 1px 5px; }
+    #relatorio-print-area .rel-barra-wrap { display: flex; gap: 6px; }
+    #relatorio-print-area .rel-barra-track { background: #eee !important; }
+    #relatorio-print-area .rel-barra-fill  { background: #1565c0 !important; }
+    @page { margin: 15mm; size: A4; }
   }
 </style>
 </head>
@@ -3124,10 +3144,10 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div>
         <div class="section-title" style="margin-bottom:2px">⚔️ ARQUIVOS DO TEMPLO JEDI</div>
-        <div style="font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em">🌌 Crônicas do Padawan Arthur · Ordem Jedi</div>
+        <div style="font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em">🌌 Coruscant · Crônicas do Padawan Arthur · Ordem Jedi · 🚀</div>
       </div>
       <button onclick="exportarRelatorioCompleto()" style="background:rgba(0,60,140,0.5);border:1.5px solid rgba(0,180,255,0.4);color:var(--blue-neon);border-radius:10px;padding:9px 14px;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;cursor:pointer">
-        ⚔️ EXPORTAR HOLOCRON
+        🔮 HOLOCRON COMPLETO
       </button>
     </div>
   </div>
@@ -3135,7 +3155,7 @@
   <!-- ── SEÇÃO 1: Recargas ── -->
   <div class="card" style="margin-bottom:12px" id="rel-card-recargas">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="rel-section-title" style="margin:0">🍼 Câmara das Recargas</div>
+      <div class="rel-section-title" style="margin:0">🍼 Câmara das Recargas · <span style="font-size:0.7em;opacity:0.7">Grogu precisa se alimentar 🐣</span></div>
       <button onclick="exportarSecaoPDF('rel-card-recargas','🍼 Câmara das Recargas')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
     </div>
     <!-- Seletor de período -->
@@ -3150,7 +3170,7 @@
   <!-- ── SEÇÃO 2: Crescimento ── -->
   <div class="card" style="margin-bottom:12px" id="rel-card-crescimento">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="rel-section-title" style="margin:0">📏 Crônicas de Crescimento do Padawan</div>
+      <div class="rel-section-title" style="margin:0">📏 Crônicas de Crescimento · <span style="font-size:0.7em;opacity:0.7">Crescendo na Força 💫</span></div>
       <button onclick="exportarSecaoPDF('rel-card-crescimento','📏 Crônicas de Crescimento')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
     </div>
     <div id="rel-crescimento-conteudo"></div>
@@ -3159,7 +3179,7 @@
   <!-- ── SEÇÃO 3: Vacinas ── -->
   <div class="card" style="margin-bottom:12px" id="rel-card-vacinas">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="rel-section-title" style="margin:0">🛡️ Registro dos Escudos da Força</div>
+      <div class="rel-section-title" style="margin:0">🛡️ Escudos da Força · <span style="font-size:0.7em;opacity:0.7">Protegido como o Mandaloriano protege Grogu 🪖</span></div>
       <button onclick="exportarSecaoPDF('rel-card-vacinas','🛡️ Registro dos Escudos')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
     </div>
     <div id="rel-vacinas-conteudo"></div>
@@ -3168,7 +3188,7 @@
   <!-- ── SEÇÃO 4: Agenda e Medicações ── -->
   <div class="card" style="margin-bottom:60px" id="rel-card-agenda">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div class="rel-section-title" style="margin:0">🗺️ Missões e Elixires da Ordem</div>
+      <div class="rel-section-title" style="margin:0">🗺️ Missões e Elixires · <span style="font-size:0.7em;opacity:0.7">Conselho Jedi · Médicos da Ordem ⚕️</span></div>
       <button onclick="exportarSecaoPDF('rel-card-agenda','🗺️ Missões e Elixires')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
     </div>
     <div id="rel-agenda-conteudo"></div>
@@ -6156,16 +6176,65 @@ function deleteVacinaExtra(grupoIdx, id) {
 
 function toggleVacina(id) {
   if (!vacStatus[id]) {
-    const hoje = new Date();
-    const d = String(hoje.getDate()).padStart(2,'0');
-    const m = String(hoje.getMonth()+1).padStart(2,'0');
-    const y = hoje.getFullYear();
-    vacStatus[id] = { feita: true, data: `${d}/${m}/${y}` };
+    // Pedir data real da vacinação (não assumir hoje)
+    const nomeVac = _nomeVacinaById(id);
+    const dataInput = prompt(
+      `📅 Quando foi aplicada a vacina "${nomeVac}"?\nDigite no formato DD/MM/AAAA ou pressione OK para usar a data de hoje.`,
+      _formatarDataHoje()
+    );
+    if (dataInput === null) return; // cancelou
+    const dataFinal = _validarDataVacina(dataInput) || _formatarDataHoje();
+    vacStatus[id] = { feita: true, data: dataFinal };
   } else {
     delete vacStatus[id];
   }
   saveVacinas(vacStatus);
   renderVacinas();
+}
+
+function editarDataVacina(id) {
+  if (!vacStatus[id]) return;
+  const nomeVac   = _nomeVacinaById(id);
+  const dataAtual = vacStatus[id].data || _formatarDataHoje();
+  const novaData  = prompt(
+    `✏️ Editar data da vacina "${nomeVac}"\nData atual: ${dataAtual}\nDigite no formato DD/MM/AAAA:`,
+    dataAtual
+  );
+  if (!novaData) return;
+  const dataFinal = _validarDataVacina(novaData);
+  if (!dataFinal) { showToast('⚠️ Formato inválido. Use DD/MM/AAAA'); return; }
+  vacStatus[id].data = dataFinal;
+  saveVacinas(vacStatus);
+  renderVacinas();
+  showToast('✅ Data da vacina atualizada!');
+}
+
+function _formatarDataHoje() {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function _validarDataVacina(str) {
+  if (!str) return null;
+  str = str.trim();
+  // Aceitar DD/MM/AAAA
+  const m1 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m1) {
+    const [,d,mo,y] = m1;
+    if (Number(d)>=1&&Number(d)<=31&&Number(mo)>=1&&Number(mo)<=12) {
+      return `${d.padStart(2,'0')}/${mo.padStart(2,'0')}/${y}`;
+    }
+  }
+  return null;
+}
+
+function _nomeVacinaById(id) {
+  if (typeof VACINAS_CALENDARIO === 'undefined') return id;
+  for (const grupo of VACINAS_CALENDARIO) {
+    const v = grupo.vacinas.find(v => v.id === id);
+    if (v) return v.nome;
+  }
+  return id;
 }
 
 function renderVacinas() {
@@ -6214,7 +6283,10 @@ function renderVacinas() {
             <div class="vac-doenca">${v.doenca}</div>
             ${v.obs ? `<div class="vac-obs">⚠ ${v.obs}</div>` : ''}
             <div class="vac-fonte">📡 Fonte: ${v.fonte}</div>
-            ${feita ? `<div class="vac-data-aplicacao">🛡️ Ritual concluído em ${dataApl}</div>` : ''}
+            ${feita ? `<div class="vac-data-aplicacao" style="display:flex;align-items:center;gap:6px">
+              <span>⚡ ${dataApl}</span>
+              <button onclick="event.stopPropagation();editarDataVacina('${v.id}')" style="background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.3);border-radius:5px;color:var(--blue-neon);font-size:0.58rem;padding:1px 6px;cursor:pointer">✏️</button>
+            </div>` : ''}
           </div>
         </div>
       `;
@@ -6231,7 +6303,10 @@ function renderVacinas() {
             <div class="vac-doenca">${v.doenca}</div>
             ${v.obs ? `<div class="vac-obs">⚠ ${v.obs}</div>` : ''}
             <div class="vac-fonte">📡 Fonte: ${v.fonte}</div>
-            ${feita ? `<div class="vac-data-aplicacao">🛡️ Ritual concluído em ${dataApl}</div>` : ''}
+            ${feita ? `<div class="vac-data-aplicacao" style="display:flex;align-items:center;gap:6px">
+              <span>⚡ ${dataApl}</span>
+              <button onclick="event.stopPropagation();editarDataVacina('${v.id}')" style="background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.3);border-radius:5px;color:var(--blue-neon);font-size:0.58rem;padding:1px 6px;cursor:pointer">✏️</button>
+            </div>` : ''}
           </div>
           <button class="btn-del-vac-extra" onclick="event.stopPropagation();deleteVacinaExtra(${grupoIdx},'${v.id}')">🗑</button>
         </div>
@@ -8294,10 +8369,10 @@ function contextArthur() {
     const p97 = [4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
     const m   = Math.min(pesoAtual.mes, 12);
     const p   = pesoAtual.peso;
-    if (p < p3[m])       percentilPeso = 'abaixo do P3 ⚠️';
-    else if (p < p50[m]) percentilPeso = 'entre P3 e P50';
-    else if (p < p97[m]) percentilPeso = 'entre P50 e P97';
-    else                 percentilPeso = 'acima do P97';
+    if (p < p3[m])       percentilPeso = '⚠️ Abaixo do P3 — Alerta da Ordem';
+    else if (p < p50[m]) percentilPeso = '📊 P3–P50 — Pequeno Padawan crescendo';
+    else if (p < p97[m]) percentilPeso = '✅ P50–P97 — Na Força da galáxia';
+    else                 percentilPeso = '🚀 Acima P97 — Força extraordinária!';
   }
 
   // ── Banco de Leite ───────────────────────────────────────
@@ -9919,7 +9994,7 @@ function _renderRelRecargas() {
   el.innerHTML = `
     <div class="rel-total-box" style="margin-bottom:10px">
       <div class="rel-total-num">${totalN}</div>
-      <div class="rel-total-label">🍼 RECARGAS DO PADAWAN</div>
+      <div class="rel-total-label">🍼 RECARGAS DO PADAWAN ARTHUR</div>
       ${totalMl>0?`<div style="margin-top:4px;font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold)">${totalMl} ml total</div>`:''}
     </div>
     <div class="rel-stat-row"><span class="rel-stat-label">📅 Média por dia</span><span class="rel-stat-value">${mediaDia}× · ${mediaMl}ml</span></div>
@@ -10131,16 +10206,31 @@ function _renderRelAgenda() {
 
 // ── Exportar seção individual como PDF ──────────────────────
 function exportarSecaoPDF(cardId, titulo) {
-  const card = document.getElementById(cardId);
   const area = document.getElementById('relatorio-print-area');
-  if (!card || !area) return;
+  if (!area) return;
+
+  // Mapa explícito de card → conteúdo
+  const mapaConteudo = {
+    'rel-card-recargas':    'rel-recargas-conteudo',
+    'rel-card-crescimento': 'rel-crescimento-conteudo',
+    'rel-card-vacinas':     'rel-vacinas-conteudo',
+    'rel-card-agenda':      'rel-agenda-conteudo',
+  };
+  const conteudoEl = document.getElementById(mapaConteudo[cardId]);
+  const conteudo   = conteudoEl?.innerHTML || '<p style="color:#999">Sem dados</p>';
+  const hoje       = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
   area.style.display = 'block';
   area.innerHTML = `
-    <div style="font-family:Arial,sans-serif;padding:20px;color:#000;max-width:600px">
-      <h2 style="font-size:13pt;margin:0 0 2px">Padawan Arthur — ${titulo}</h2>
-      <p style="font-size:8pt;color:#666;margin:0 0 12px">${new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>
-      <hr style="margin:0 0 12px;border-color:#ccc">
-      ${card.querySelector('[id^="rel-"]')?.innerHTML || card.innerHTML}
+    <div style="font-family:Arial,sans-serif;padding:0;color:#000;background:#fff;max-width:600px;margin:0 auto">
+      <div style="border-bottom:3px solid #1565c0;padding-bottom:10px;margin-bottom:14px">
+        <h2 style="font-size:14pt;margin:0 0 2px;color:#1565c0">⚔️ Arquivos Jedi · ${titulo}</h2>
+        <p style="font-size:8pt;color:#666;margin:0">Padawan Arthur · ${hoje}</p>
+      </div>
+      ${conteudo}
+      <div style="margin-top:14px;border-top:1px solid #ccc;padding-top:6px;font-size:7pt;color:#999;text-align:center">
+        Padawan Arthur · Arquivos da Ordem Jedi
+      </div>
     </div>`;
   setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
 }
@@ -10149,32 +10239,63 @@ function exportarSecaoPDF(cardId, titulo) {
 function exportarRelatorioCompleto() {
   const area = document.getElementById('relatorio-print-area');
   if (!area) return;
-  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
-  const secoes = ['rel-card-recargas','rel-card-crescimento','rel-card-vacinas','rel-card-agenda'];
-  const titulos = ['🍼 Câmara das Recargas','📏 Crônicas de Crescimento','🛡️ Escudos da Força (PNI)','🗺️ Missões e Elixires'];
 
-  let htmlSecoes = secoes.map((id,i) => {
-    const card = document.getElementById(id);
-    if (!card) return '';
-    const conteudo = card.querySelector('[id^="rel-"]')?.innerHTML || '';
+  // Garantir que os dados estão renderizados (período 7 dias para o PDF)
+  const periodoAnterior = _relPeriodo;
+  _relPeriodo = 'semana';
+  renderRelatorioTab();
+
+  const hoje     = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
+
+  // Mapa explícito: card → ID do div de conteúdo
+  const mapaConteudo = {
+    'rel-card-recargas':    'rel-recargas-conteudo',
+    'rel-card-crescimento': 'rel-crescimento-conteudo',
+    'rel-card-vacinas':     'rel-vacinas-conteudo',
+    'rel-card-agenda':      'rel-agenda-conteudo',
+  };
+  const titulos = [
+    '🍼 Câmara das Recargas — 7 órbitas',
+    '📏 Crônicas de Crescimento',
+    '🛡️ Escudos da Força (PNI)',
+    '🗺️ Missões e Elixires da Ordem',
+  ];
+
+  let htmlSecoes = Object.keys(mapaConteudo).map((cardId, i) => {
+    const conteudoEl = document.getElementById(mapaConteudo[cardId]);
+    const conteudo   = conteudoEl?.innerHTML || '<p style="color:#999;font-size:9pt">Sem dados registrados</p>';
     return `
-      <div style="page-break-inside:avoid;margin-bottom:20px">
-        <h3 style="font-size:11pt;color:#000;margin:0 0 8px;border-bottom:1px solid #ccc;padding-bottom:4px">${titulos[i]}</h3>
+      <div style="page-break-inside:avoid;margin-bottom:22px">
+        <h3 style="font-size:11pt;color:#000;margin:0 0 8px;border-bottom:2px solid #1565c0;padding-bottom:4px">${titulos[i]}</h3>
         ${conteudo}
       </div>`;
   }).join('');
 
   area.style.display = 'block';
   area.innerHTML = `
-    <div style="font-family:Arial,sans-serif;padding:24px;color:#000;max-width:640px;margin:0 auto">
-      <h1 style="font-size:16pt;margin:0 0 4px">Relatório do Padawan Arthur</h1>
-      <p style="font-size:9pt;color:#666;margin:0 0 2px">${hoje}</p>
-      <p style="font-size:9pt;color:#666;margin:0 0 16px">${diasVida} dias de vida</p>
-      <hr style="margin:0 0 16px;border-color:#ccc">
+    <div id="print-wrapper" style="font-family:Arial,sans-serif;padding:0;color:#000;background:#fff;max-width:640px;margin:0 auto">
+      <div style="border-bottom:3px solid #1565c0;padding-bottom:12px;margin-bottom:16px">
+        <h1 style="font-size:18pt;margin:0 0 2px;color:#1565c0">⚔️ Arquivos do Templo Jedi</h1>
+        <h2 style="font-size:12pt;margin:0 0 2px;color:#000;font-weight:normal">Padawan Arthur · Crônicas da Força</h2>
+        <p style="font-size:8pt;color:#666;margin:0">${hoje} · ${diasVida} dias de vida na galáxia</p>
+      </div>
       ${htmlSecoes}
+      <div style="margin-top:16px;border-top:1px solid #ccc;padding-top:8px;font-size:7pt;color:#999;text-align:center">
+        Gerado pelo app Padawan Arthur · Arquivos da Ordem Jedi · Uso exclusivo familiar
+      </div>
     </div>`;
-  setTimeout(() => { window.print(); area.style.display = 'none'; }, 150);
+
+  setTimeout(() => {
+    window.print();
+    area.style.display = 'none';
+    // Restaurar período anterior
+    _relPeriodo = periodoAnterior;
+    ['dia','semana','mes'].forEach(p => {
+      const btn = document.getElementById('rel-p-'+p);
+      if (btn) btn.classList.toggle('active', p === periodoAnterior);
+    });
+  }, 200);
 }
 
 // ═══════════════════════════════════════════════════════
