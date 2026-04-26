@@ -1984,6 +1984,75 @@
   .onboard-texto { flex:1;color:rgba(200,220,255,0.85);line-height:1.4; }
   .onboard-texto.done-text { text-decoration:line-through;opacity:0.45; }
   .onboard-texto.next-text { color:var(--white);font-weight:600; }
+
+  /* ── ABA RELATÓRIO ── */
+  .rel-periodo-btn {
+    flex:1;padding:6px 4px;
+    background:rgba(0,20,60,0.5);
+    border:1px solid rgba(0,180,255,0.18);
+    border-radius:8px;color:var(--text-dim);
+    font-family:'Orbitron',monospace;font-size:0.58rem;
+    letter-spacing:0.05em;cursor:pointer;
+    transition:all 0.15s;
+  }
+  .rel-periodo-btn.active {
+    background:rgba(0,60,140,0.5);
+    border-color:rgba(0,180,255,0.5);
+    color:var(--blue-neon);
+  }
+  .rel-tabela {
+    width:100%;border-collapse:collapse;
+    font-size:0.71rem;color:rgba(200,220,255,0.85);
+  }
+  .rel-tabela th {
+    font-family:'Orbitron',monospace;font-size:0.56rem;
+    color:var(--text-dim);letter-spacing:0.06em;
+    padding:5px 6px;border-bottom:1px solid rgba(0,180,255,0.15);
+    text-align:left;
+  }
+  .rel-tabela td {
+    padding:6px 6px;
+    border-bottom:1px solid rgba(0,180,255,0.07);
+    vertical-align:top;
+  }
+  .rel-tabela tr:last-child td { border-bottom:none; }
+  .rel-barra-wrap {
+    display:flex;align-items:center;gap:6px;
+    padding:4px 0;border-bottom:1px solid rgba(0,180,255,0.07);
+    font-size:0.68rem;
+  }
+  .rel-barra-label { min-width:30px;color:var(--text-dim);font-size:0.6rem; }
+  .rel-barra-track {
+    flex:1;height:8px;border-radius:4px;
+    background:rgba(0,180,255,0.08);overflow:hidden;
+  }
+  .rel-barra-fill {
+    height:100%;border-radius:4px;
+    background:linear-gradient(90deg,var(--blue-neon),rgba(0,100,255,0.7));
+  }
+  .rel-barra-val { min-width:40px;text-align:right;color:var(--blue-neon);
+    font-family:'Orbitron',monospace;font-size:0.62rem; }
+  .rel-badge-dado {
+    display:inline-flex;align-items:center;gap:4px;
+    background:rgba(57,255,20,0.12);border:1px solid rgba(57,255,20,0.25);
+    border-radius:6px;padding:2px 7px;
+    font-size:0.62rem;color:rgba(57,255,20,0.9);
+  }
+  .rel-badge-pend {
+    display:inline-flex;align-items:center;gap:4px;
+    background:rgba(255,180,50,0.1);border:1px solid rgba(255,180,50,0.25);
+    border-radius:6px;padding:2px 7px;
+    font-size:0.62rem;color:rgba(255,180,50,0.85);
+  }
+
+  /* ── PRINT — ocultar tudo exceto área de impressão ── */
+  @media print {
+    body > *:not(#relatorio-print-area) { display:none !important; }
+    #relatorio-print-area { display:block !important; position:static !important; }
+    #relatorio-print-area * { color:#000 !important; background:transparent !important; border-color:#ccc !important; }
+    #relatorio-print-area h2 { font-size:14pt; }
+    #relatorio-print-area .rel-tabela { font-size:9pt; }
+  }
 </style>
 </head>
 <body>
@@ -2215,6 +2284,9 @@
   <button id="nav-btn-agenda" onclick="showTab('agenda')">
     <span class="nav-icon">🗺️</span>Agenda
   </button>
+  <button id="nav-btn-relatorio" onclick="showTab('relatorio')">
+    <span class="nav-icon">⚔️</span>Arquivos
+  </button>
   <button id="nav-btn-mais" onclick="abrirMenuMais()">
     <span class="nav-icon">⋯</span>Mais
   </button>
@@ -2301,16 +2373,7 @@
     <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
   </div>
 
-<!-- ═══ ARTHUR AGORA ═══ -->
-  <div id="arthur-agora-card" style="margin-bottom:12px;display:none">
-    <div style="background:linear-gradient(135deg,rgba(0,40,20,0.55),rgba(0,20,60,0.65));border:1.5px solid rgba(57,255,20,0.2);border-radius:14px;padding:13px 14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:rgba(57,255,20,0.8);letter-spacing:0.1em">⚡ ARTHUR AGORA</div>
-        <div id="arthur-agora-badge" style="font-size:0.58rem;font-family:'Orbitron',monospace;padding:2px 8px;border-radius:10px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.25);color:var(--blue-neon)"></div>
-      </div>
-      <div id="arthur-agora-body" style="font-size:0.74rem;color:rgba(220,235,255,0.88);line-height:1.8"></div>
-    </div>
-  </div>
+
 
 
   <!-- ═══ ONBOARDING ═══ -->
@@ -3050,6 +3113,70 @@
     <div id="lista-vacinas"></div>
   </div>
 
+
+<!-- ══════════════════════════════════════════════════════
+     TAB RELATÓRIO — Relatório completo de todas as abas
+     ════════════════════════════════════════════════════ -->
+<div id="tab-relatorio" class="tab-panel">
+
+  <!-- HEADER com exportação consolidada -->
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div>
+        <div class="section-title" style="margin-bottom:2px">⚔️ ARQUIVOS DO TEMPLO JEDI</div>
+        <div style="font-size:0.62rem;color:var(--text-dim);font-family:'Orbitron',monospace;letter-spacing:0.06em">🌌 Crônicas do Padawan Arthur · Ordem Jedi</div>
+      </div>
+      <button onclick="exportarRelatorioCompleto()" style="background:rgba(0,60,140,0.5);border:1.5px solid rgba(0,180,255,0.4);color:var(--blue-neon);border-radius:10px;padding:9px 14px;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;cursor:pointer">
+        ⚔️ EXPORTAR HOLOCRON
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SEÇÃO 1: Recargas ── -->
+  <div class="card" style="margin-bottom:12px" id="rel-card-recargas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="rel-section-title" style="margin:0">🍼 Câmara das Recargas</div>
+      <button onclick="exportarSecaoPDF('rel-card-recargas','🍼 Câmara das Recargas')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
+    </div>
+    <!-- Seletor de período -->
+    <div style="display:flex;gap:6px;margin-bottom:10px" id="rel-periodo-btns">
+      <button onclick="setRelPeriodo('dia')"    id="rel-p-dia"    class="rel-periodo-btn active">🌅 Hoje</button>
+      <button onclick="setRelPeriodo('semana')" id="rel-p-semana" class="rel-periodo-btn">⚡ 7 órbitas</button>
+      <button onclick="setRelPeriodo('mes')"    id="rel-p-mes"    class="rel-periodo-btn">🌌 30 órbitas</button>
+    </div>
+    <div id="rel-recargas-conteudo"></div>
+  </div>
+
+  <!-- ── SEÇÃO 2: Crescimento ── -->
+  <div class="card" style="margin-bottom:12px" id="rel-card-crescimento">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="rel-section-title" style="margin:0">📏 Crônicas de Crescimento do Padawan</div>
+      <button onclick="exportarSecaoPDF('rel-card-crescimento','📏 Crônicas de Crescimento')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
+    </div>
+    <div id="rel-crescimento-conteudo"></div>
+  </div>
+
+  <!-- ── SEÇÃO 3: Vacinas ── -->
+  <div class="card" style="margin-bottom:12px" id="rel-card-vacinas">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="rel-section-title" style="margin:0">🛡️ Registro dos Escudos da Força</div>
+      <button onclick="exportarSecaoPDF('rel-card-vacinas','🛡️ Registro dos Escudos')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
+    </div>
+    <div id="rel-vacinas-conteudo"></div>
+  </div>
+
+  <!-- ── SEÇÃO 4: Agenda e Medicações ── -->
+  <div class="card" style="margin-bottom:60px" id="rel-card-agenda">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="rel-section-title" style="margin:0">🗺️ Missões e Elixires da Ordem</div>
+      <button onclick="exportarSecaoPDF('rel-card-agenda','🗺️ Missões e Elixires')" style="background:rgba(0,40,100,0.4);border:1px solid rgba(0,180,255,0.25);color:var(--text-dim);border-radius:8px;padding:5px 10px;font-size:0.6rem;cursor:pointer">📄 PDF</button>
+    </div>
+    <div id="rel-agenda-conteudo"></div>
+  </div>
+
+</div>
+<!-- ── FIM TAB RELATÓRIO ── -->
+
 </main>
 
 <!-- MODAL EDITAR MAMADA -->
@@ -3190,7 +3317,7 @@
 
     <!-- Botões -->
     <div class="modal-btns" style="margin-top:16px">
-      <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="copiarRelatorio()">📋 Copiar Relatório</button>
+      <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="imprimirRelatorioOriginal()">📄 Exportar PDF</button>
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);font-size:0.68rem" onclick="fecharRelatorio()">Fechar</button>
     </div>
   </div>
@@ -4578,7 +4705,7 @@ function showTab(id) {
   const tabEl = document.getElementById('tab-' + realId);
   if (tabEl) tabEl.classList.add('active');
   // Ativar botão nav correspondente (nova nav com drawer "Mais")
-  const navDiretos = { dashboard:'nav-btn-dashboard', mamadas:'nav-btn-mamadas', agenda:'nav-btn-agenda' };
+  const navDiretos = { dashboard:'nav-btn-dashboard', mamadas:'nav-btn-mamadas', agenda:'nav-btn-agenda', relatorio:'nav-btn-relatorio' };
   if (navDiretos[realId]) {
     const btn = document.getElementById(navDiretos[realId]);
     if (btn) btn.classList.add('active');
@@ -4786,7 +4913,7 @@ function renderMamadas() {
     <div class="feed-item ${m.tipo}">
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱 Fonte Natural' : m.tipo === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação da Força'}</span>
+          <span class="badge badge-${m.tipo}">${m.tipo === 'peito' ? '🤱 Fonte Natural da Força' : m.tipo === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação da Força'}</span>
           ${m.tipo === 'misto' && (m.ml_peito || m.ml_formula) ? `
             <span style="font-size:0.7rem;color:var(--text-dim)">
               ${m.ml_peito   ? `<span style="color:#7ab3d4">🤱 ${m.ml_peito}ml</span>` : ''}
@@ -7534,6 +7661,24 @@ function copiarRelatorioCrescimento() {
   }
 }
 
+
+// ── Imprimir relatório do ciclo diário (modal original) ──
+function imprimirRelatorioOriginal() {
+  const conteudo = document.getElementById('rel-conteudo');
+  const titulo   = document.getElementById('rel-data-titulo');
+  const area     = document.getElementById('relatorio-print-area');
+  if (!conteudo || !area) return;
+  area.style.display = 'block';
+  area.innerHTML = `
+    <div style="font-family:Arial,sans-serif;padding:24px;color:#000;max-width:480px;margin:0 auto">
+      <h2 style="margin:0 0 4px;font-size:1.1rem">Relatório do Ciclo Galáctico</h2>
+      <p style="margin:0 0 14px;font-size:0.75rem;color:#666">Padawan Arthur · ${titulo ? titulo.textContent : ''}</p>
+      <hr style="margin:0 0 12px">
+      ${conteudo.innerHTML}
+    </div>`;
+  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+}
+
 // ── RELATÓRIO DIÁRIO ──
 let _relDataAtual = null;
 
@@ -7615,7 +7760,7 @@ function renderRelatorio() {
   const primeiraHora = horariosOrdenados[0] || '—';
   const ultimaHora   = horariosOrdenados[horariosOrdenados.length - 1] || '—';
 
-  const nomeTipo = t => t === 'peito' ? '🤱 Fonte Natural' : t === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação';
+  const nomeTipo = t => t === 'peito' ? '🤱 Fonte Natural da Força' : t === 'formula' ? '🥛 Fórmula Alquímica' : '✨ Combinação da Força';
   const ehHoje = dataISO === todayISO();
 
   const el = document.getElementById('rel-conteudo');
@@ -8168,8 +8313,10 @@ function contextArthur() {
   const mlExtracao7d = extracoes7d.reduce((s,e) => s+Number(e.ml||0), 0);
 
   // ── Vacinas ──────────────────────────────────────────────
-  const vacinasDadas    = (db.vacinas||[]).length;
-  const totalPNI        = 18; // estimativa calendário 0-12m
+  const vacinasFeitasCtx = typeof vacStatus !== 'undefined' 
+    ? Object.values(vacStatus).filter(v => v?.feita).length : 0;
+  const vacinasDadas    = vacinasFeitasCtx + (typeof vacExtras !== 'undefined' ? Object.values(vacExtras).flat().length : 0);
+  const totalPNI        = 18;
   const vacinaPendentes = Math.max(0, totalPNI - vacinasDadas);
 
   // ── Agenda ───────────────────────────────────────────────
@@ -8548,16 +8695,9 @@ function verificarOnboarding(userId) {
 // ═══════════════════════════════════════════════════════
 // PROPOSTA 06 — RELATÓRIO PDF PARA CONSULTA
 // ═══════════════════════════════════════════════════════
-function abrirRelatorio() {
-  document.getElementById('relatorio-overlay').classList.add('open');
-  document.getElementById('relatorio-modal').classList.add('open');
-  _preencherDadosRelatorio();
-}
+// abrirRelatorio Proposta06 removido — usar original
 
-function fecharRelatorio() {
-  document.getElementById('relatorio-overlay').classList.remove('open');
-  document.getElementById('relatorio-modal').classList.remove('open');
-}
+// fecharRelatorio Proposta06 removido — usar original
 
 function _preencherDadosRelatorio() {
   const hoje  = todayISO();
@@ -9676,9 +9816,366 @@ function renderAll() {
   renderVacinas();
   renderMedicacao();
   renderCrescimento();
+  renderRelatorioTab();
 }
 
 initMedForm();
+
+
+// ══════════════════════════════════════════════════════════════
+// ABA RELATÓRIO — renderização e exportação
+// ══════════════════════════════════════════════════════════════
+let _relPeriodo = 'dia'; // 'dia' | 'semana' | 'mes'
+
+function setRelPeriodo(periodo) {
+  _relPeriodo = periodo;
+  ['dia','semana','mes'].forEach(p => {
+    const btn = document.getElementById('rel-p-'+p);
+    if (btn) btn.classList.toggle('active', p === periodo);
+  });
+  renderRelatorioTab();
+}
+
+function renderRelatorioTab() {
+  _renderRelRecargas();
+  _renderRelCrescimento();
+  _renderRelVacinas();
+  _renderRelAgenda();
+}
+
+// ── Seção 1: Recargas ───────────────────────────────────────
+function _renderRelRecargas() {
+  const el = document.getElementById('rel-recargas-conteudo');
+  if (!el) return;
+
+  const hoje  = todayISO();
+  const agora = new Date();
+  let dataInicio;
+  if (_relPeriodo === 'dia') {
+    dataInicio = hoje;
+  } else if (_relPeriodo === 'semana') {
+    dataInicio = new Date(agora - 6*864e5).toISOString().slice(0,10);
+  } else {
+    dataInicio = new Date(agora - 29*864e5).toISOString().slice(0,10);
+  }
+
+  const mams = (db.mamadas||[]).filter(m => m.data >= dataInicio && m.data <= hoje);
+  if (!mams.length) {
+    el.innerHTML = '<div class="rel-empty">Nenhuma recarga no período</div>';
+    return;
+  }
+
+  const totalMl   = mams.reduce((s,m) => s+mlReal(m), 0);
+  const totalN    = mams.length;
+  const diasUniq  = [...new Set(mams.map(m=>m.data))].length || 1;
+  const mediaDia  = Math.round(totalN  / diasUniq * 10) / 10;
+  const mediaMl   = Math.round(totalMl / diasUniq);
+
+  // Distribuição por tipo
+  const tipos = { peito:0, formula:0, misto:0 };
+  const mlTipos = { peito:0, formula:0, misto:0 };
+  mams.forEach(m => {
+    tipos[m.tipo]   = (tipos[m.tipo]||0) + 1;
+    mlTipos[m.tipo] = (mlTipos[m.tipo]||0) + mlReal(m);
+  });
+
+  // Intervalo médio (todos os pares do período)
+  let intervaloStr = '—';
+  const allHorarios = mams.map(m => {
+    const [h,min] = (m.hora||'00:00').split(':').map(Number);
+    return h*60+min + (m.data > dataInicio ? 1440 * (new Date(m.data) - new Date(dataInicio))/864e5 : 0);
+  }).sort((a,b)=>a-b);
+  if (allHorarios.length >= 2) {
+    let sum = 0;
+    for (let i=1;i<allHorarios.length;i++) sum += allHorarios[i]-allHorarios[i-1];
+    const med = Math.round(sum/(allHorarios.length-1));
+    intervaloStr = med>=60 ? `${Math.floor(med/60)}h ${med%60}min` : `${med}min`;
+  }
+
+  // Gráfico de barras diárias (últimos dias)
+  let graficoBars = '';
+  if (_relPeriodo !== 'dia') {
+    const diasMap = {};
+    mams.forEach(m => { diasMap[m.data] = (diasMap[m.data]||0) + mlReal(m); });
+    const diasOrden = Object.keys(diasMap).sort().slice(-(_relPeriodo==='semana'?7:14));
+    const maxMl = Math.max(...diasOrden.map(d => diasMap[d]), 1);
+    graficoBars = `
+      <div style="margin:10px 0 4px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.56rem;color:var(--text-dim);margin-bottom:6px">⚡ PODER DA FORÇA (ml)</div>
+        ${diasOrden.map(d => {
+          const pct = Math.round(diasMap[d]/maxMl*100);
+          const lbl = d.slice(5).replace('-','/');
+          return `<div class="rel-barra-wrap">
+            <span class="rel-barra-label">${lbl}</span>
+            <div class="rel-barra-track"><div class="rel-barra-fill" style="width:${pct}%"></div></div>
+            <span class="rel-barra-val">${diasMap[d]}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  const nomeTipo = t => t==='peito'?'🤱 Fonte Natural da Força':t==='formula'?'🥛 Elixir Alquímico':'✨ Combinação da Força';
+
+  el.innerHTML = `
+    <div class="rel-total-box" style="margin-bottom:10px">
+      <div class="rel-total-num">${totalN}</div>
+      <div class="rel-total-label">🍼 RECARGAS DO PADAWAN</div>
+      ${totalMl>0?`<div style="margin-top:4px;font-family:'Orbitron',monospace;font-size:0.85rem;color:var(--gold)">${totalMl} ml total</div>`:''}
+    </div>
+    <div class="rel-stat-row"><span class="rel-stat-label">📅 Média por dia</span><span class="rel-stat-value">${mediaDia}× · ${mediaMl}ml</span></div>
+    <div class="rel-stat-row"><span class="rel-stat-label">⏳ Intervalo médio</span><span class="rel-stat-value">${intervaloStr}</span></div>
+    ${tipos.peito  >0?`<div class="rel-stat-row"><span class="rel-stat-label">🤱 Fonte Natural</span><span class="rel-stat-value">${tipos.peito}× · ${mlTipos.peito}ml</span></div>`:''}
+    ${tipos.formula>0?`<div class="rel-stat-row"><span class="rel-stat-label">🥛 Fórmula</span><span class="rel-stat-value">${tipos.formula}× · ${mlTipos.formula}ml</span></div>`:''}
+    ${tipos.misto  >0?`<div class="rel-stat-row"><span class="rel-stat-label">✨ Combinação</span><span class="rel-stat-value">${tipos.misto}× · ${mlTipos.misto}ml</span></div>`:''}
+    ${graficoBars}`;
+}
+
+// ── Seção 2: Crescimento ────────────────────────────────────
+function _renderRelCrescimento() {
+  const el = document.getElementById('rel-crescimento-conteudo');
+  if (!el) return;
+  const dados = (crescData||[]).slice().sort((a,b) => a.mes - b.mes);
+
+  if (!dados.length) {
+    el.innerHTML = '<div class="rel-empty">Nenhuma medida registrada</div>';
+    return;
+  }
+
+  // Percentis P3/P50/P97 OMS (meninos) para peso
+  const p3  = [2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8];
+  const p50 = [3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6];
+  const p97 = [4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
+
+  const linhas = dados.map((r, i) => {
+    const mes = r.mes;
+    const ant = i > 0 ? dados[i-1] : null;
+    let pesoPerc = '';
+    if (r.peso && mes <= 12) {
+      const p = r.peso;
+      if      (p < p3[mes])  pesoPerc = '<span style="color:rgba(255,150,50,0.8)">< P3</span>';
+      else if (p < p50[mes]) pesoPerc = '<span style="color:rgba(0,212,255,0.8)">P3–P50</span>';
+      else if (p < p97[mes]) pesoPerc = '<span style="color:rgba(57,255,20,0.8)">P50–P97</span>';
+      else                   pesoPerc = '<span style="color:rgba(255,180,50,0.8)">> P97</span>';
+    }
+    let ganho = '';
+    if (ant && ant.peso && r.peso) {
+      const g = Math.round((r.peso - ant.peso) * 1000);
+      ganho = `<span style="color:${g>=0?'rgba(57,255,20,0.7)':'rgba(255,80,80,0.7)'};font-size:0.62rem">${g>=0?'+':''}${g}g</span>`;
+    }
+    const dataFmt = r.data ? r.data.slice(5).replace('-','/') : `${mes}m`;
+    return `<tr>
+      <td>${r.mes}ª órbita<br><span style="font-size:0.6rem;color:var(--text-dim)">${dataFmt}</span></td>
+      <td>${r.peso?r.peso+'kg':''} ${ganho}<br><span style="font-size:0.62rem">${pesoPerc}</span></td>
+      <td>${r.altura?r.altura+'cm':''}</td>
+      <td>${r.pc?r.pc+'cm':''}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <table class="rel-tabela">
+      <thead><tr>
+        <th>Órbita</th><th>Peso</th><th>Compr.</th><th>PC</th>
+      </tr></thead>
+      <tbody>${linhas}</tbody>
+    </table>`;
+}
+
+// ── Seção 3: Vacinas ────────────────────────────────────────
+function _renderRelVacinas() {
+  const el = document.getElementById('rel-vacinas-conteudo');
+  if (!el) return;
+
+  // vacStatus = { 'bcg': { feita: true, data: '12/03/2026' }, ... }
+  // VACINAS_CALENDARIO é o array com todas as vacinas e seus IDs
+  const status  = typeof vacStatus  !== 'undefined' ? vacStatus  : {};
+  const extras  = typeof vacExtras  !== 'undefined' ? vacExtras  : {};
+  const hoje    = todayISO();
+  const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
+  const mesAtual = Math.floor(diasVida/30.44);
+
+  // Construir lista de vacinas dadas a partir do vacStatus
+  const vacinasFeitasIds = Object.keys(status).filter(id => status[id]?.feita);
+
+  // Calendário PNI com IDs reais do sistema
+  const PNI = [
+    { mes:0,  id:'bcg',        nome:'BCG',                       },
+    { mes:0,  id:'hepb_nasc',  nome:'Hepatite B (ao nascer)',     },
+    { mes:2,  id:'penta_1',    nome:'Pentavalente (1ª dose)',     },
+    { mes:2,  id:'vip_1',      nome:'VIP/VOP (1ª dose)',         },
+    { mes:2,  id:'pneumo_1',   nome:'Pneumocócica 10V (1ª dose)',},
+    { mes:2,  id:'rota_1',     nome:'Rotavírus (1ª dose)',       },
+    { mes:4,  id:'penta_2',    nome:'Pentavalente (2ª dose)',     },
+    { mes:4,  id:'vip_2',      nome:'VIP/VOP (2ª dose)',         },
+    { mes:4,  id:'pneumo_2',   nome:'Pneumocócica 10V (2ª dose)',},
+    { mes:4,  id:'rota_2',     nome:'Rotavírus (2ª dose)',       },
+    { mes:6,  id:'penta_3',    nome:'Pentavalente (3ª dose)',     },
+    { mes:6,  id:'vip_3',      nome:'VIP/VOP (3ª dose)',         },
+    { mes:6,  id:'influen_1',  nome:'Influenza (1ª dose)',       },
+    { mes:9,  id:'febre_am',   nome:'Febre Amarela',             },
+    { mes:9,  id:'meningo_1',  nome:'Meningocócica C (1ª dose)', },
+    { mes:12, id:'triplice_1', nome:'Tríplice Viral (1ª dose)',  },
+    { mes:12, id:'varicela_1', nome:'Varicela (1ª dose)',        },
+    { mes:12, id:'pneumo_ref', nome:'Pneumocócica 10V (reforço)',},
+    { mes:12, id:'hepa_1',     nome:'Hepatite A (1ª dose)',      },
+  ];
+
+  // Verificar IDs reais do VACINAS_CALENDARIO para match preciso
+  const todosIds = typeof VACINAS_CALENDARIO !== 'undefined'
+    ? VACINAS_CALENDARIO.flatMap(g => g.vacinas.map(v => v.id))
+    : [];
+
+  const linhas = PNI.map(pni => {
+    // Match direto pelo ID ou por ID que contenha o prefixo
+    const idReal = todosIds.find(id =>
+      id === pni.id ||
+      id.startsWith(pni.id.split('_')[0])
+    ) || pni.id;
+
+    const st = status[idReal] || status[pni.id];
+    const feita = st?.feita;
+    const dataFeita = st?.data || st?.dataFeita || '';
+
+    const futura   = pni.mes > mesAtual;
+    const pendente = pni.mes <= mesAtual && !feita;
+
+    let statusHtml;
+    if (feita) {
+      statusHtml = `<span class="rel-badge-dado">⚡ ${dataFeita || 'registrada'}</span>`;
+    } else if (futura) {
+      statusHtml = `<span style="font-size:0.62rem;color:var(--text-dim)">~${pni.mes}m</span>`;
+    } else {
+      statusHtml = `<span class="rel-badge-pend">⚠ Pendente</span>`;
+    }
+
+    return `<tr>
+      <td>${pni.nome}</td>
+      <td style="text-align:center">${pni.mes}m</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+
+  // Extras (vacinas fora do calendário padrão)
+  const allExtras = Object.values(extras).flat();
+  const extrasHTML = allExtras.length > 0
+    ? `<div style="margin-top:10px">
+        <div style="font-family:'Orbitron',monospace;font-size:0.56rem;color:var(--text-dim);letter-spacing:0.08em;margin-bottom:6px">VACINAS EXTRAS</div>
+        ${allExtras.map(v => `<div class="rel-stat-row">
+          <span class="rel-stat-label">${v.nome||'?'}</span>
+          <span class="rel-badge-dado">⚡ registrada</span>
+        </div>`).join('')}
+      </div>`
+    : '';
+
+  const totalDadas = vacinasFeitasIds.length + allExtras.length;
+  el.innerHTML = `
+    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px">
+      ${totalDadas} escudo(s) da Força ativado(s) · Padawan com ${mesAtual} mese(s)
+    </div>
+    <table class="rel-tabela">
+      <thead><tr><th>Vacina</th><th style="text-align:center">Idade</th><th>Status</th></tr></thead>
+      <tbody>${linhas}</tbody>
+    </table>
+    ${extrasHTML}`;
+}
+
+// ── Seção 4: Agenda e Medicações ────────────────────────────
+function _renderRelAgenda() {
+  const el = document.getElementById('rel-agenda-conteudo');
+  if (!el) return;
+  const hoje     = todayISO();
+  const eventos  = (db.eventos||[]).slice().sort((a,b) => a.data.localeCompare(b.data));
+  const medicacoes = db.medicacoes || [];
+
+  let html = '';
+
+  // Consultas
+  const futuras   = eventos.filter(e => e.data >= hoje);
+  const passadas  = eventos.filter(e => e.data <  hoje);
+
+  if (futuras.length) {
+    html += `<div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--blue-neon);letter-spacing:0.08em;margin-bottom:6px">PRÓXIMAS CONSULTAS</div>`;
+    html += futuras.map(e => `
+      <div class="rel-stat-row">
+        <span class="rel-stat-label">${e.data.slice(5).replace('-','/')} ${e.hora||''}</span>
+        <span class="rel-stat-value">${e.titulo||e.tipo||'Consulta'}</span>
+      </div>`).join('');
+  }
+
+  if (passadas.length) {
+    html += `<div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--text-dim);letter-spacing:0.08em;margin:8px 0 6px">CONSULTAS ANTERIORES</div>`;
+    html += passadas.slice(-5).reverse().map(e => `
+      <div class="rel-stat-row" style="opacity:0.6">
+        <span class="rel-stat-label">${e.data.slice(5).replace('-','/')}</span>
+        <span class="rel-stat-value">${e.titulo||e.tipo||'Consulta'}</span>
+      </div>`).join('');
+  }
+
+  if (!futuras.length && !passadas.length) {
+    html += '<div class="rel-empty">Nenhuma consulta registrada</div>';
+  }
+
+  // Medicações
+  if (medicacoes.length) {
+    html += `<div style="font-family:'Orbitron',monospace;font-size:0.58rem;color:var(--gold);letter-spacing:0.08em;margin:10px 0 6px">💊 MEDICAÇÕES</div>`;
+    html += medicacoes.map(m => {
+      const ativa = m.ativa !== false;
+      return `<div class="rel-stat-row" style="${ativa?'':'opacity:0.5'}">
+        <span class="rel-stat-label">${m.nome||m.medicamento||'?'}${ativa?'':'<span>(encerrado)</span>'}</span>
+        <span class="rel-stat-value">${m.dose||m.dosagem||''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  el.innerHTML = html || '<div class="rel-empty">Sem registros</div>';
+}
+
+// ── Exportar seção individual como PDF ──────────────────────
+function exportarSecaoPDF(cardId, titulo) {
+  const card = document.getElementById(cardId);
+  const area = document.getElementById('relatorio-print-area');
+  if (!card || !area) return;
+  area.style.display = 'block';
+  area.innerHTML = `
+    <div style="font-family:Arial,sans-serif;padding:20px;color:#000;max-width:600px">
+      <h2 style="font-size:13pt;margin:0 0 2px">Padawan Arthur — ${titulo}</h2>
+      <p style="font-size:8pt;color:#666;margin:0 0 12px">${new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>
+      <hr style="margin:0 0 12px;border-color:#ccc">
+      ${card.querySelector('[id^="rel-"]')?.innerHTML || card.innerHTML}
+    </div>`;
+  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+}
+
+// ── Exportar relatório completo ──────────────────────────────
+function exportarRelatorioCompleto() {
+  const area = document.getElementById('relatorio-print-area');
+  if (!area) return;
+  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
+  const secoes = ['rel-card-recargas','rel-card-crescimento','rel-card-vacinas','rel-card-agenda'];
+  const titulos = ['🍼 Câmara das Recargas','📏 Crônicas de Crescimento','🛡️ Escudos da Força (PNI)','🗺️ Missões e Elixires'];
+
+  let htmlSecoes = secoes.map((id,i) => {
+    const card = document.getElementById(id);
+    if (!card) return '';
+    const conteudo = card.querySelector('[id^="rel-"]')?.innerHTML || '';
+    return `
+      <div style="page-break-inside:avoid;margin-bottom:20px">
+        <h3 style="font-size:11pt;color:#000;margin:0 0 8px;border-bottom:1px solid #ccc;padding-bottom:4px">${titulos[i]}</h3>
+        ${conteudo}
+      </div>`;
+  }).join('');
+
+  area.style.display = 'block';
+  area.innerHTML = `
+    <div style="font-family:Arial,sans-serif;padding:24px;color:#000;max-width:640px;margin:0 auto">
+      <h1 style="font-size:16pt;margin:0 0 4px">Relatório do Padawan Arthur</h1>
+      <p style="font-size:9pt;color:#666;margin:0 0 2px">${hoje}</p>
+      <p style="font-size:9pt;color:#666;margin:0 0 16px">${diasVida} dias de vida</p>
+      <hr style="margin:0 0 16px;border-color:#ccc">
+      ${htmlSecoes}
+    </div>`;
+  setTimeout(() => { window.print(); area.style.display = 'none'; }, 150);
+}
 
 // ═══════════════════════════════════════════════════════
 // SISTEMA DE PRESENÇA EM TEMPO REAL
@@ -10147,14 +10644,6 @@ async function iniciarSistemaNotificacoes(userId) {
 
 </body>
 </html>
-  <!-- ═══ BOTÃO RELATÓRIO ═══ -->
-  <button onclick="abrirRelatorio()" style="width:100%;background:linear-gradient(135deg,rgba(0,30,80,0.6),rgba(0,20,60,0.7));border:1.5px solid rgba(0,180,255,0.22);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px">
-    <span style="font-size:1.2rem">📋</span>
-    <div style="text-align:left;flex:1">
-      <div style="font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--white);letter-spacing:0.06em">RELATÓRIO PARA CONSULTA</div>
-      <div style="font-size:0.62rem;color:var(--text-dim);margin-top:1px">Resumo semanal gerado com IA · PDF · Compartilhar</div>
-    </div>
-    <span style="color:var(--text-dim);font-size:0.8rem">›</span>
-  </button>
+  
 
 
