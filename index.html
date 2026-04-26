@@ -41,7 +41,7 @@
     transition: opacity 0.4s ease;
   }
   #splash.fadeout { opacity: 0; pointer-events: none; }
-  #splash-nave { font-size: 3rem; animation: splash-pulse 1.5s ease-in-out infinite; }
+  #splash-nave { font-size: 3rem; animation: splash-pulse 1.5s ease-in-out infinite; display:flex; justify-content:center; }
   #splash-title {
     font-family: 'Orbitron', 'Arial Black', sans-serif;
     font-size: 1.4rem; font-weight: 900;
@@ -2073,13 +2073,82 @@
     #relatorio-print-area .rel-barra-fill  { background: #1565c0 !important; }
     @page { margin: 15mm; size: A4; }
   }
+
+  /* ── SINTOMAS MAMADA ── */
+  .sintomas-wrap {
+    display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;
+  }
+  .sintoma-chip {
+    display:inline-flex;align-items:center;gap:4px;
+    padding:5px 10px;border-radius:20px;cursor:pointer;
+    font-size:0.7rem;font-family:'Exo 2',sans-serif;
+    border:1.5px solid rgba(0,180,255,0.2);
+    background:rgba(0,20,60,0.5);
+    color:var(--text-dim);
+    transition:all 0.15s;user-select:none;-webkit-user-select:none;
+  }
+  .sintoma-chip.sel {
+    background:rgba(0,80,180,0.35);
+    border-color:rgba(0,180,255,0.6);
+    color:var(--white);
+    box-shadow:0 0 6px rgba(0,180,255,0.25);
+  }
+  .sintoma-chip.sel.urgente {
+    background:rgba(180,40,0,0.3);
+    border-color:rgba(255,100,50,0.6);
+    color:rgba(255,150,100,0.95);
+    box-shadow:0 0 6px rgba(255,80,0,0.25);
+  }
+  /* Badge sintomas no feed */
+  .sintoma-badge {
+    display:inline-flex;align-items:center;gap:3px;
+    font-size:0.62rem;padding:2px 7px;border-radius:10px;margin:2px 2px 0 0;
+    background:rgba(0,60,140,0.35);border:1px solid rgba(0,180,255,0.25);
+    color:rgba(150,200,255,0.9);
+  }
+  .sintoma-badge.urgente {
+    background:rgba(140,40,0,0.3);border-color:rgba(255,100,50,0.35);
+    color:rgba(255,150,100,0.9);
+  }
 </style>
 </head>
 <body>
 
 <!-- SPLASH SCREEN — aparece imediatamente, some quando o app estiver pronto -->
 <div id="splash">
-  <div id="splash-nave">🛸</div>
+  <div id="splash-nave"><svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" width="90" height="60" style="filter:drop-shadow(0 0 12px rgba(0,212,255,0.7))">
+  <!-- Casco principal — disco achatado -->
+  <ellipse cx="60" cy="44" rx="52" ry="20" fill="#8fa8b8" stroke="#aaccdd" stroke-width="1.2"/>
+  <!-- Cúpula superior -->
+  <ellipse cx="60" cy="38" rx="28" ry="11" fill="#9fbece" stroke="#bbddee" stroke-width="0.8"/>
+  <!-- Cabine do piloto -->
+  <ellipse cx="60" cy="34" rx="13" ry="6" fill="#c8dde8" stroke="#ddeeff" stroke-width="0.7"/>
+  <!-- Janela da cabine -->
+  <ellipse cx="60" cy="33" rx="7" ry="3.5" fill="#001830" stroke="rgba(0,212,255,0.6)" stroke-width="0.5"/>
+  <!-- Luz da janela -->
+  <ellipse cx="60" cy="33" rx="4" ry="2" fill="rgba(0,200,255,0.25)"/>
+  <!-- Corredor lateral direito -->
+  <rect x="90" y="38" width="20" height="9" rx="4" fill="#7a96a8" stroke="#9abccc" stroke-width="0.8"/>
+  <!-- Recuo corredor -->
+  <rect x="91" y="40" width="17" height="5" rx="2.5" fill="#5a7888"/>
+  <!-- Antenas -->
+  <line x1="96" y1="38" x2="100" y2="28" stroke="#aaccdd" stroke-width="1"/>
+  <circle cx="100" cy="27" r="1.5" fill="#00d4ff" opacity="0.9"/>
+  <line x1="102" y1="38" x2="107" y2="30" stroke="#8ab8cc" stroke-width="0.8"/>
+  <!-- Motores traseiros (3) -->
+  <ellipse cx="11" cy="40" rx="7" ry="4" fill="#4a6878" stroke="#6a98b0" stroke-width="0.8"/>
+  <ellipse cx="11" cy="40" rx="4" ry="2.5" fill="rgba(0,150,255,0.3)"/>
+  <ellipse cx="11" cy="48" rx="6" ry="3.5" fill="#4a6878" stroke="#6a98b0" stroke-width="0.7"/>
+  <ellipse cx="11" cy="48" rx="3.5" ry="2" fill="rgba(0,150,255,0.25)"/>
+  <!-- Detalhes da fuselagem -->
+  <line x1="20" y1="36" x2="85" y2="36" stroke="#6a8898" stroke-width="0.5" opacity="0.6"/>
+  <line x1="15" y1="50" x2="80" y2="50" stroke="#6a8898" stroke-width="0.5" opacity="0.5"/>
+  <!-- Fosso da nave -->
+  <path d="M 30 44 Q 60 52 90 44" stroke="#506878" stroke-width="0.8" fill="none" opacity="0.7"/>
+  <!-- Luzes de navegação -->
+  <circle cx="108" cy="42" r="2" fill="#ff4444" opacity="0.9"/>
+  <circle cx="8"   cy="44" r="1.8" fill="#44ff44" opacity="0.9"/>
+</svg></div>
   <div id="splash-title">PADAWAN ARTHUR</div>
   <div id="splash-sub">ARQUIVOS DA ORDEM JEDI</div>
   <div id="splash-bar-wrap"><div id="splash-bar"></div></div>
@@ -2469,6 +2538,19 @@
       <div class="form-group">
         <label>Observações</label>
         <input type="text" id="m-obs" placeholder="ex: o Padawan adormeceu durante a recarga da Força...">
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Sintomas pós-recarga</label>
+        <div class="sintomas-wrap" id="m-sintomas-wrap">
+          <div class="sintoma-chip" data-val="regurgitamento" onclick="toggleSintoma(this)">🤮 Regurgitamento</div>
+          <div class="sintoma-chip" data-val="disquesia" onclick="toggleSintoma(this)">😣 Disquesia</div>
+          <div class="sintoma-chip" data-val="soluco" onclick="toggleSintoma(this)">😮 Soluço</div>
+          <div class="sintoma-chip urgente" data-val="colica" onclick="toggleSintoma(this)">😭 Crise de Cólica</div>
+          <div class="sintoma-chip" data-val="arroto" onclick="toggleSintoma(this)">💨 Arroto +2×</div>
+          <div class="sintoma-chip" data-val="tosse" onclick="toggleSintoma(this)">🤧 Tosse</div>
+          <div class="sintoma-chip" data-val="choro" onclick="toggleSintoma(this)">😢 Choro</div>
+        </div>
+        <input type="hidden" id="m-sintomas" value="">
       </div>
       <div class="form-group">
         <label>Guardião</label>
@@ -3337,7 +3419,7 @@
 
     <!-- Botões -->
     <div class="modal-btns" style="margin-top:16px">
-      <button class="btn btn-primary" style="flex:1;font-size:0.68rem" onclick="imprimirRelatorioOriginal()">📄 Exportar PDF</button>
+      <!-- PDF movido para aba Arquivos -->
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim);font-size:0.68rem" onclick="fecharRelatorio()">Fechar</button>
     </div>
   </div>
@@ -4761,12 +4843,31 @@ function toggleMistoFields(tipo, fieldId) {
   el.style.display = tipo === 'misto' ? 'block' : 'none';
 }
 
+
+// ── Sintomas da mamada ──────────────────────────────────────
+function toggleSintoma(chip) {
+  chip.classList.toggle('sel');
+  // Atualizar input hidden
+  const selecionados = [...document.querySelectorAll('#m-sintomas-wrap .sintoma-chip.sel')]
+    .map(c => c.dataset.val);
+  const input = document.getElementById('m-sintomas');
+  if (input) input.value = selecionados.join(',');
+}
+
+function limparSintomas() {
+  document.querySelectorAll('#m-sintomas-wrap .sintoma-chip').forEach(c => c.classList.remove('sel'));
+  const input = document.getElementById('m-sintomas');
+  if (input) input.value = '';
+}
+
 function salvarMamada() {
   const data   = document.getElementById('m-data').value;
   const hora   = document.getElementById('m-hora').value;
   const tipo   = document.getElementById('m-tipo').value;
   const ml     = document.getElementById('m-ml').value;
   const obs    = document.getElementById('m-obs').value;
+  var sintomasEl = document.getElementById('m-sintomas');
+  var sintomas   = sintomasEl && sintomasEl.value ? sintomasEl.value.split(',').filter(Boolean) : [];
 
   if (!data || !hora) { alert('⚠️ Defina o ciclo galáctico e a hora-padrão antes de registrar!'); return; }
 
@@ -4784,7 +4885,7 @@ function salvarMamada() {
     id: Date.now(), data, hora, tipo,
     ml: ml ? parseInt(ml) : null,
     ml_peito, ml_formula,
-    obs, autor: usuarioAtual
+    obs, sintomas: sintomas.length > 0 ? sintomas : undefined, autor: usuarioAtual
   });
   db.mamadas = ordenarMamadas(db.mamadas);
   saveData(db);
@@ -4944,6 +5045,13 @@ function renderMamadas() {
         </div>
         <div class="feed-meta">${formatDate(m.data)} · ${m.hora}</div>
         ${m.obs ? `<div style="font-size:0.8rem;color:#7ab3d4;margin-top:4px">${m.obs}</div>` : ''}
+        ${(m.sintomas && m.sintomas.length > 0) ? `<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px">${
+          m.sintomas.map(function(s) {
+            var lbls = {'regurgitamento':'\u{1F92E} Regurgitamento','disquesia':'\u{1F623} Disquesia','soluco':'\u{1F62E} Soluco','colica':'\u{1F62D} Colica','arroto':'\u{1F4A8} Arroto +2x','tosse':'\u{1F927} Tosse','choro':'\u{1F622} Choro'};
+            var urgs = {'colica':1};
+            return '<span class="sintoma-badge'+(urgs[s]?' urgente':'')+'">'+(lbls[s]||s)+'</span>';
+          }).join('')
+        }</div>` : ''}
         ${m.autor ? `<div class="autor-tag">⚔️ ${nomeAutor(m.autor)}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
@@ -7738,25 +7846,15 @@ function copiarRelatorioCrescimento() {
 
 
 // ── Imprimir relatório do ciclo diário (modal original) ──
-function imprimirRelatorioOriginal() {
-  const conteudo = document.getElementById('rel-conteudo');
-  const titulo   = document.getElementById('rel-data-titulo');
-  const area     = document.getElementById('relatorio-print-area');
-  if (!conteudo || !area) return;
-  area.style.display = 'block';
-  area.innerHTML = `
-    <div style="font-family:Arial,sans-serif;padding:24px;color:#000;max-width:480px;margin:0 auto">
-      <h2 style="margin:0 0 4px;font-size:1.1rem">Relatório do Ciclo Galáctico</h2>
-      <p style="margin:0 0 14px;font-size:0.75rem;color:#666">Padawan Arthur · ${titulo ? titulo.textContent : ''}</p>
-      <hr style="margin:0 0 12px">
-      ${conteudo.innerHTML}
-    </div>`;
-  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+async function imprimirRelatorioOriginal() {
+  const el  = document.getElementById('rel-conteudo');
+  const tit = document.getElementById('rel-data-titulo');
+  if (!el) return;
+  const html = _htmlBase('Relatorio do Ciclo Galactico','Padawan Arthur',tit?tit.textContent:'',
+    _limparCss(el.innerHTML));
+  showToast('Gerando PDF do ciclo...');
+  await _gerarPDF(html,'Padawan-Arthur-Ciclo-'+(document.getElementById('rel-data-input')?.value||todayISO())+'.pdf');
 }
-
-// ── RELATÓRIO DIÁRIO ──
-let _relDataAtual = null;
-
 function abrirRelatorio() {
   _relDataAtual = todayISO();
   document.getElementById('rel-data-input').value = _relDataAtual;
@@ -7766,6 +7864,13 @@ function abrirRelatorio() {
 
 function fecharRelatorio() {
   document.getElementById('modal-relatorio').style.display = 'none';
+}
+
+function fecharRelatorioConsulta() {
+  var el = document.getElementById('relatorio-modal');
+  var ov = document.getElementById('relatorio-overlay');
+  if (el) el.style.transform = 'translateY(100%)';
+  if (ov) ov.style.display = 'none';
 }
 
 function relNavDia(delta) {
@@ -10060,98 +10165,111 @@ function _renderRelVacinas() {
   const el = document.getElementById('rel-vacinas-conteudo');
   if (!el) return;
 
-  // vacStatus = { 'bcg': { feita: true, data: '12/03/2026' }, ... }
-  // VACINAS_CALENDARIO é o array com todas as vacinas e seus IDs
-  const status  = typeof vacStatus  !== 'undefined' ? vacStatus  : {};
-  const extras  = typeof vacExtras  !== 'undefined' ? vacExtras  : {};
-  const hoje    = todayISO();
+  const status   = typeof vacStatus !== 'undefined' ? vacStatus : {};
+  const extras   = typeof vacExtras !== 'undefined' ? vacExtras : {};
+  const hoje     = todayISO();
   const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
   const mesAtual = Math.floor(diasVida/30.44);
 
-  // Construir lista de vacinas dadas a partir do vacStatus
-  const vacinasFeitasIds = Object.keys(status).filter(id => status[id]?.feita);
-
   // Calendário PNI com IDs reais do sistema
   const PNI = [
-    { mes:0,  id:'bcg',        nome:'BCG',                       },
-    { mes:0,  id:'hepb_nasc',  nome:'Hepatite B (ao nascer)',     },
-    { mes:2,  id:'penta_1',    nome:'Pentavalente (1ª dose)',     },
-    { mes:2,  id:'vip_1',      nome:'VIP/VOP (1ª dose)',         },
-    { mes:2,  id:'pneumo_1',   nome:'Pneumocócica 10V (1ª dose)',},
-    { mes:2,  id:'rota_1',     nome:'Rotavírus (1ª dose)',       },
-    { mes:4,  id:'penta_2',    nome:'Pentavalente (2ª dose)',     },
-    { mes:4,  id:'vip_2',      nome:'VIP/VOP (2ª dose)',         },
-    { mes:4,  id:'pneumo_2',   nome:'Pneumocócica 10V (2ª dose)',},
-    { mes:4,  id:'rota_2',     nome:'Rotavírus (2ª dose)',       },
-    { mes:6,  id:'penta_3',    nome:'Pentavalente (3ª dose)',     },
-    { mes:6,  id:'vip_3',      nome:'VIP/VOP (3ª dose)',         },
-    { mes:6,  id:'influen_1',  nome:'Influenza (1ª dose)',       },
-    { mes:9,  id:'febre_am',   nome:'Febre Amarela',             },
-    { mes:9,  id:'meningo_1',  nome:'Meningocócica C (1ª dose)', },
-    { mes:12, id:'triplice_1', nome:'Tríplice Viral (1ª dose)',  },
-    { mes:12, id:'varicela_1', nome:'Varicela (1ª dose)',        },
-    { mes:12, id:'pneumo_ref', nome:'Pneumocócica 10V (reforço)',},
-    { mes:12, id:'hepa_1',     nome:'Hepatite A (1ª dose)',      },
+    { mes:0,  id:'bcg',        nome:'BCG'                          },
+    { mes:0,  id:'hepb_nasc',  nome:'Hepatite B (ao nascer)'       },
+    { mes:2,  id:'penta_1',    nome:'Pentavalente (1ª dose)'       },
+    { mes:2,  id:'vip_1',      nome:'VIP/VOP (1ª dose)'           },
+    { mes:2,  id:'pneumo_1',   nome:'Pneumocócica 10V (1ª dose)'  },
+    { mes:2,  id:'rota_1',     nome:'Rotavírus (1ª dose)'         },
+    { mes:4,  id:'penta_2',    nome:'Pentavalente (2ª dose)'       },
+    { mes:4,  id:'vip_2',      nome:'VIP/VOP (2ª dose)'           },
+    { mes:4,  id:'pneumo_2',   nome:'Pneumocócica 10V (2ª dose)'  },
+    { mes:4,  id:'rota_2',     nome:'Rotavírus (2ª dose)'         },
+    { mes:6,  id:'penta_3',    nome:'Pentavalente (3ª dose)'       },
+    { mes:6,  id:'vip_3',      nome:'VIP/VOP (3ª dose)'           },
+    { mes:6,  id:'influen_1',  nome:'Influenza (1ª dose)'         },
+    { mes:9,  id:'febre_am',   nome:'Febre Amarela'               },
+    { mes:9,  id:'meningo_1',  nome:'Meningocócica C (1ª dose)'   },
+    { mes:12, id:'triplice_1', nome:'Tríplice Viral (1ª dose)'    },
+    { mes:12, id:'varicela_1', nome:'Varicela (1ª dose)'          },
+    { mes:12, id:'pneumo_ref', nome:'Pneumocócica 10V (reforço)'  },
+    { mes:12, id:'hepa_1',     nome:'Hepatite A (1ª dose)'        },
   ];
 
-  // Verificar IDs reais do VACINAS_CALENDARIO para match preciso
+  // Tentar resolver ID real via VACINAS_CALENDARIO
   const todosIds = typeof VACINAS_CALENDARIO !== 'undefined'
     ? VACINAS_CALENDARIO.flatMap(g => g.vacinas.map(v => v.id))
     : [];
 
-  const linhas = PNI.map(pni => {
-    // Match direto pelo ID ou por ID que contenha o prefixo
-    const idReal = todosIds.find(id =>
-      id === pni.id ||
-      id.startsWith(pni.id.split('_')[0])
-    ) || pni.id;
-
+  // ── SEÇÃO 1: Vacinas tomadas ─────────────────────────
+  const vacinasTomadas = PNI.filter(pni => {
+    const idReal = todosIds.find(id => id === pni.id || id.startsWith(pni.id.split('_')[0])) || pni.id;
     const st = status[idReal] || status[pni.id];
-    const feita = st?.feita;
-    const dataFeita = st?.data || st?.dataFeita || '';
+    return st?.feita;
+  });
 
-    const futura   = pni.mes > mesAtual;
-    const pendente = pni.mes <= mesAtual && !feita;
-
-    let statusHtml;
-    if (feita) {
-      statusHtml = `<span class="rel-badge-dado">⚡ ${dataFeita || 'registrada'}</span>`;
-    } else if (futura) {
-      statusHtml = `<span style="font-size:0.62rem;color:var(--text-dim)">~${pni.mes}m</span>`;
-    } else {
-      statusHtml = `<span class="rel-badge-pend">⚠ Pendente</span>`;
-    }
-
-    return `<tr>
-      <td>${pni.nome}</td>
-      <td style="text-align:center">${pni.mes}m</td>
-      <td>${statusHtml}</td>
-    </tr>`;
-  }).join('');
-
-  // Extras (vacinas fora do calendário padrão)
   const allExtras = Object.values(extras).flat();
-  const extrasHTML = allExtras.length > 0
-    ? `<div style="margin-top:10px">
-        <div style="font-family:'Orbitron',monospace;font-size:0.56rem;color:var(--text-dim);letter-spacing:0.08em;margin-bottom:6px">VACINAS EXTRAS</div>
-        ${allExtras.map(v => `<div class="rel-stat-row">
-          <span class="rel-stat-label">${v.nome||'?'}</span>
-          <span class="rel-badge-dado">⚡ registrada</span>
-        </div>`).join('')}
-      </div>`
-    : '';
+  const totalTomadas = vacinasTomadas.length + allExtras.length;
 
-  const totalDadas = vacinasFeitasIds.length + allExtras.length;
+  let linhasTomadas = '';
+  if (vacinasTomadas.length > 0) {
+    linhasTomadas = vacinasTomadas.map(pni => {
+      const idReal = todosIds.find(id => id === pni.id || id.startsWith(pni.id.split('_')[0])) || pni.id;
+      const st = status[idReal] || status[pni.id];
+      const dataFeita = st?.data || '';
+      return `<tr>
+        <td>${pni.nome}</td>
+        <td style="text-align:center">${pni.mes}m</td>
+        <td><span class="rel-badge-dado">⚡ ${dataFeita || 'registrada'}</span>
+          <button onclick="event.stopPropagation();editarDataVacina('${pni.id}')" style="background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.3);border-radius:5px;color:var(--blue-neon);font-size:0.55rem;padding:1px 5px;cursor:pointer;margin-left:4px">✏️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Extras
+  let linhasExtras = '';
+  if (allExtras.length > 0) {
+    linhasExtras = `
+      <tr><td colspan="3" style="padding-top:10px;font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--text-dim);letter-spacing:0.08em">⭐ ESCUDOS EXTRAS</td></tr>
+      ${allExtras.map(v => `<tr>
+        <td>${v.nome || '?'}</td>
+        <td style="text-align:center">—</td>
+        <td><span class="rel-badge-dado">⚡ Escudo Ativado</span></td>
+      </tr>`).join('')}`;
+  }
+
+  // ── SEÇÃO 2: Próximas vacinas ────────────────────────
+  const proximasPNI = PNI.filter(pni => {
+    const idReal = todosIds.find(id => id === pni.id || id.startsWith(pni.id.split('_')[0])) || pni.id;
+    const st = status[idReal] || status[pni.id];
+    return !st?.feita && pni.mes <= mesAtual + 2; // próximos 2 meses
+  }).slice(0, 5);
+
+  let linhasProximas = '';
+  if (proximasPNI.length > 0) {
+    linhasProximas = `
+      <tr><td colspan="3" style="padding-top:10px;font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(255,180,50,0.7);letter-spacing:0.08em">⚔️ PRÓXIMAS MISSÕES</td></tr>
+      ${proximasPNI.map(pni => `<tr>
+        <td>${pni.nome}</td>
+        <td style="text-align:center">${pni.mes}m</td>
+        <td><span class="rel-badge-pend">${pni.mes <= mesAtual ? '⚠ Pendente' : '~' + pni.mes + 'm'}</span></td>
+      </tr>`).join('')}`;
+  }
+
   el.innerHTML = `
     <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px">
-      ${totalDadas} escudo(s) da Força ativado(s) · Padawan com ${mesAtual} mese(s)
+      ⚡ ${totalTomadas} escudo(s) da Força ativado(s) · Padawan com ${mesAtual} mese(s)
     </div>
+    ${totalTomadas === 0 ? '<div class="rel-empty">Nenhum escudo registrado ainda</div>' : `
     <table class="rel-tabela">
-      <thead><tr><th>Vacina</th><th style="text-align:center">Idade</th><th>Status</th></tr></thead>
-      <tbody>${linhas}</tbody>
-    </table>
-    ${extrasHTML}`;
+      <thead><tr><th>Vacina</th><th style="text-align:center">Idade</th><th>Data</th></tr></thead>
+      <tbody>
+        ${linhasTomadas}
+        ${linhasExtras}
+        ${linhasProximas}
+      </tbody>
+    </table>`}`;
 }
+
 
 // ── Seção 4: Agenda e Medicações ────────────────────────────
 function _renderRelAgenda() {
@@ -10205,418 +10323,86 @@ function _renderRelAgenda() {
 }
 
 // ── Exportar seção individual como PDF ──────────────────────
-function exportarSecaoPDF(cardId, titulo) {
-  const area = document.getElementById('relatorio-print-area');
-  if (!area) return;
-
-  // Mapa explícito de card → conteúdo
-  const mapaConteudo = {
-    'rel-card-recargas':    'rel-recargas-conteudo',
-    'rel-card-crescimento': 'rel-crescimento-conteudo',
-    'rel-card-vacinas':     'rel-vacinas-conteudo',
-    'rel-card-agenda':      'rel-agenda-conteudo',
-  };
-  const conteudoEl = document.getElementById(mapaConteudo[cardId]);
-  const conteudo   = conteudoEl?.innerHTML || '<p style="color:#999">Sem dados</p>';
-  const hoje       = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-  area.style.display = 'block';
-  area.innerHTML = `
-    <div style="font-family:Arial,sans-serif;padding:0;color:#000;background:#fff;max-width:600px;margin:0 auto">
-      <div style="border-bottom:3px solid #1565c0;padding-bottom:10px;margin-bottom:14px">
-        <h2 style="font-size:14pt;margin:0 0 2px;color:#1565c0">⚔️ Arquivos Jedi · ${titulo}</h2>
-        <p style="font-size:8pt;color:#666;margin:0">Padawan Arthur · ${hoje}</p>
-      </div>
-      ${conteudo}
-      <div style="margin-top:14px;border-top:1px solid #ccc;padding-top:6px;font-size:7pt;color:#999;text-align:center">
-        Padawan Arthur · Arquivos da Ordem Jedi
-      </div>
-    </div>`;
-  setTimeout(() => { window.print(); area.style.display = 'none'; }, 100);
+async function exportarSecaoPDF(cardId, titulo) {
+  const ids={
+    'rel-card-recargas':'rel-recargas-conteudo',
+    'rel-card-crescimento':'rel-crescimento-conteudo',
+    'rel-card-vacinas':'rel-vacinas-conteudo',
+    'rel-card-agenda':'rel-agenda-conteudo'};
+  const el   = document.getElementById(ids[cardId]);
+  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const html = _htmlBase('Arquivos Jedi · '+titulo,'Padawan Arthur',hoje,
+    '<div>'+_limparCss(el?el.innerHTML:'<p>Sem dados</p>')+'</div>');
+  showToast('Gerando PDF...');
+  await _gerarPDF(html,'Padawan-Arthur-'+titulo.replace(/[^a-zA-Z0-9]/g,'-')+'-'+todayISO()+'.pdf');
 }
+
 
 // ── Exportar relatório completo ──────────────────────────────
-function exportarRelatorioCompleto() {
-  const area = document.getElementById('relatorio-print-area');
-  if (!area) return;
-
-  // Garantir que os dados estão renderizados (período 7 dias para o PDF)
-  const periodoAnterior = _relPeriodo;
-  _relPeriodo = 'semana';
-  renderRelatorioTab();
-
-  const hoje     = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const diasVida = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
-
-  // Mapa explícito: card → ID do div de conteúdo
-  const mapaConteudo = {
-    'rel-card-recargas':    'rel-recargas-conteudo',
-    'rel-card-crescimento': 'rel-crescimento-conteudo',
-    'rel-card-vacinas':     'rel-vacinas-conteudo',
-    'rel-card-agenda':      'rel-agenda-conteudo',
-  };
-  const titulos = [
-    '🍼 Câmara das Recargas — 7 órbitas',
-    '📏 Crônicas de Crescimento',
-    '🛡️ Escudos da Força (PNI)',
-    '🗺️ Missões e Elixires da Ordem',
-  ];
-
-  let htmlSecoes = Object.keys(mapaConteudo).map((cardId, i) => {
-    const conteudoEl = document.getElementById(mapaConteudo[cardId]);
-    const conteudo   = conteudoEl?.innerHTML || '<p style="color:#999;font-size:9pt">Sem dados registrados</p>';
-    return `
-      <div style="page-break-inside:avoid;margin-bottom:22px">
-        <h3 style="font-size:11pt;color:#000;margin:0 0 8px;border-bottom:2px solid #1565c0;padding-bottom:4px">${titulos[i]}</h3>
-        ${conteudo}
-      </div>`;
-  }).join('');
-
-  area.style.display = 'block';
-  area.innerHTML = `
-    <div id="print-wrapper" style="font-family:Arial,sans-serif;padding:0;color:#000;background:#fff;max-width:640px;margin:0 auto">
-      <div style="border-bottom:3px solid #1565c0;padding-bottom:12px;margin-bottom:16px">
-        <h1 style="font-size:18pt;margin:0 0 2px;color:#1565c0">⚔️ Arquivos do Templo Jedi</h1>
-        <h2 style="font-size:12pt;margin:0 0 2px;color:#000;font-weight:normal">Padawan Arthur · Crônicas da Força</h2>
-        <p style="font-size:8pt;color:#666;margin:0">${hoje} · ${diasVida} dias de vida na galáxia</p>
-      </div>
-      ${htmlSecoes}
-      <div style="margin-top:16px;border-top:1px solid #ccc;padding-top:8px;font-size:7pt;color:#999;text-align:center">
-        Gerado pelo app Padawan Arthur · Arquivos da Ordem Jedi · Uso exclusivo familiar
-      </div>
-    </div>`;
-
-  setTimeout(() => {
-    window.print();
-    area.style.display = 'none';
-    // Restaurar período anterior
-    _relPeriodo = periodoAnterior;
-    ['dia','semana','mes'].forEach(p => {
-      const btn = document.getElementById('rel-p-'+p);
-      if (btn) btn.classList.toggle('active', p === periodoAnterior);
-    });
-  }, 200);
-}
-
-// ═══════════════════════════════════════════════════════
-// SISTEMA DE PRESENÇA EM TEMPO REAL
-// ═══════════════════════════════════════════════════════
-const PRESENCE_REF_ID = () => firebase.firestore().collection('presence');
-const FCM_TOKENS_REF  = () => firebase.firestore().collection('fcm_tokens');
-const NOTIF_REF       = () => firebase.firestore().collection('notifications');
-
-let _presenceUnsubscribe = null;
-let _notifUnsubscribe    = null;
-let _notifCache          = [];
-
-// ── Registrar presença do usuário atual ──────────────────────
-async function registrarPresenca(userId) {
-  try {
-    const ref = PRESENCE_REF_ID().doc(userId);
-    await ref.set({
-      online:    true,
-      lastSeen:  Date.now(),
-      nome:      GUARDIOES[userId]?.nome || userId,
-      guardiao:  userId,
-    });
-    // Marcar offline ao sair
-    const marcarOffline = async () => {
-      try { await ref.update({ online: false, lastSeen: Date.now() }); } catch(e) {}
-    };
-    window.addEventListener('beforeunload', marcarOffline);
-    // Heartbeat a cada 90s para manter presença ativa
-    setInterval(async () => {
-      if (document.visibilityState === 'visible') {
-        try { await ref.update({ online: true, lastSeen: Date.now() }); } catch(e) {}
-      } else {
-        try { await ref.update({ online: false, lastSeen: Date.now() }); } catch(e) {}
-      }
-    }, 90000);
-    document.addEventListener('visibilitychange', async () => {
-      try {
-        await ref.update({
-          online:   document.visibilityState === 'visible',
-          lastSeen: Date.now(),
-        });
-      } catch(e) {}
-    });
-  } catch(e) { console.warn('Presença:', e); }
-}
-
-// ── Escutar presença do outro guardião ───────────────────────
-function ouvirPresencaOutro(userId) {
-  const outroId = userId === 'joao' ? 'nadyne' : 'joao';
-  if (_presenceUnsubscribe) _presenceUnsubscribe();
-  _presenceUnsubscribe = PRESENCE_REF_ID().doc(outroId)
-    .onSnapshot(snap => {
-      if (!snap.exists) return;
-      const d = snap.data();
-      atualizarIndicadorPresenca(outroId, d);
-    }, () => {});
-}
-
-function atualizarIndicadorPresenca(outroId, dados) {
-  const wrap = document.getElementById('nadyne-presence-wrap');
-  const dot  = document.getElementById('nadyne-dot');
-  const nome = document.getElementById('nadyne-nome-hdr');
-  if (!wrap || !dot) return;
-
-  const nomeGuardiao = GUARDIOES[outroId]?.nome || dados.nome || outroId;
-  if (nome) nome.textContent = nomeGuardiao;
-
-  const agora = Date.now();
-  const diff  = agora - (dados.lastSeen || 0);
-  const ativo = dados.online && diff < 5 * 60 * 1000;   // < 5min = online
-  const pouco = !ativo && diff < 30 * 60 * 1000;         // 5-30min = away
-
-  dot.className = 'presence-dot ' + (ativo ? 'online' : pouco ? 'away' : 'offline');
-  wrap.classList.add('visible');
-  wrap.title = ativo
-    ? `${nomeGuardiao} está online agora`
-    : pouco
-      ? `${nomeGuardiao} esteve ativo há ${Math.round(diff/60000)}min`
-      : `${nomeGuardiao} está offline`;
-
-  // Toast somente quando vai de offline → online
-  if (ativo && wrap.dataset.eraOffline === '1') {
-    showToast(`✨ ${nomeGuardiao} entrou online!`);
-    dispararNotifNativa(`${nomeGuardiao} está online`, `${nomeGuardiao} abriu o Diário Galáctico agora.`);
+async function exportarRelatorioCompleto() {
+  const pAntes = _relPeriodo; _relPeriodo='semana'; renderRelatorioTab();
+  await new Promise(r=>setTimeout(r,80));
+  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const dias = Math.floor((Date.now()-new Date('2026-03-12'))/86400000);
+  const ids  = {recargas:'rel-recargas-conteudo',crescimento:'rel-crescimento-conteudo',vacinas:'rel-vacinas-conteudo',agenda:'rel-agenda-conteudo'};
+  const titulos = {'recargas':'Recargas (7 orbitas)','crescimento':'Crescimento','vacinas':'Escudos da Forca','agenda':'Missoes e Elixires'};
+  let corpo = '';
+  for (const [k,id] of Object.entries(ids)) {
+    const el = document.getElementById(id);
+    corpo += '<div style="page-break-inside:avoid;margin-bottom:18px">' +
+      '<h3 style="font-size:11pt;color:#1a237e;border-bottom:1.5px solid #1a237e;padding-bottom:3px;margin:0 0 6px">' + titulos[k] + '</h3>' +
+      _limparCss(el ? el.innerHTML : '<p>Sem dados</p>') + '</div>';
   }
-  wrap.dataset.eraOffline = ativo ? '0' : '1';
+  const html = _htmlBase('Arquivos do Templo Jedi','Padawan Arthur · ' + dias + ' dias de vida',hoje,corpo);
+  showToast('Gerando Holocron PDF...');
+  await _gerarPDF(html,'Padawan-Arthur-Holocron-'+todayISO()+'.pdf');
+  _relPeriodo=pAntes;
+  ['dia','semana','mes'].forEach(p=>{const b=document.getElementById('rel-p-'+p);if(b)b.classList.toggle('active',p===pAntes);});
 }
 
-// ═══════════════════════════════════════════════════════
-// SISTEMA DE NOTIFICAÇÕES
-// ═══════════════════════════════════════════════════════
-
-// Tipos de eventos que geram notificações
-const NOTIF_TIPOS = {
-  mamada:       { icon:'🍼', titulo: n => `${n} registrou uma recarga`, urgente: false },
-  mesversario:  { icon:'🌙', titulo: n => `${n} registrou um marco`,    urgente: false },
-  duvida:       { icon:'📜', titulo: n => `${n} adicionou uma missiva`,  urgente: false },
-  evento:       { icon:'🗺️', titulo: n => `${n} registrou uma missão`,  urgente: false },
-  medicacao:    { icon:'💊', titulo: n => `${n} registrou uma medicação`,urgente: true  },
-  crescimento:  { icon:'📏', titulo: n => `${n} registrou medidas`,      urgente: false },
-  vacina:       { icon:'🛡️', titulo: n => `${n} atualizou escudos`,     urgente: false },
-  extracao:     { icon:'🧊', titulo: n => `${n} registrou extração`,    urgente: false },
-  online:       { icon:'✨', titulo: n => `${n} entrou online`,          urgente: false },
-};
-
-// ── Publicar notificação para o outro guardião ────────────────
-async function publicarNotificacao(tipo, detalhes) {
-  if (!usuarioAtual) return;
-  const destinatario = usuarioAtual === 'joao' ? 'nadyne' : 'joao';
-  const nomeRemetente = GUARDIOES[usuarioAtual]?.nome || usuarioAtual;
-  const tipoDef = NOTIF_TIPOS[tipo] || { icon:'📡', titulo: n => `${n} fez uma ação`, urgente: false };
-  try {
-    await NOTIF_REF().add({
-      destinatario,
-      remetente:   usuarioAtual,
-      nomeRemetente,
-      tipo,
-      titulo:  tipoDef.titulo(nomeRemetente),
-      detalhes: detalhes || '',
-      urgente:  tipoDef.urgente,
-      icon:     tipoDef.icon,
-      lida:     false,
-      ts:       Date.now(),
-    });
-  } catch(e) { console.warn('Notif:', e); }
-}
-
-// ── Escutar notificações recebidas ───────────────────────────
-function ouvirNotificacoes(userId) {
-  if (_notifUnsubscribe) _notifUnsubscribe();
-  _notifUnsubscribe = NOTIF_REF()
-    .where('destinatario', '==', userId)
-    .where('lida', '==', false)
-    .orderBy('ts', 'desc')
-    .limit(30)
-    .onSnapshot(snap => {
-      const novas = [];
-      snap.docChanges().forEach(change => {
-        if (change.type === 'added') novas.push({ id: change.doc.id, ...change.doc.data() });
-      });
-      _notifCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      // Atualizar badge
-      atualizarBadgeNotif(_notifCache.length);
-
-      // Toast + notificação nativa para cada nova
-      novas.forEach(n => {
-        if (Date.now() - n.ts < 10000) { // só notifs recentes (10s)
-          showToast(`${n.icon} ${n.titulo}`);
-          dispararNotifNativa(n.titulo, n.detalhes || 'Padawan Arthur');
-        }
-      });
-    }, () => {});
-}
-
-function atualizarBadgeNotif(count) {
-  const badge = document.getElementById('notif-badge');
-  if (!badge) return;
-  if (count > 0) {
-    badge.textContent = count > 99 ? '99+' : String(count);
-    badge.classList.add('visible');
-  } else {
-    badge.classList.remove('visible');
-  }
-}
-
-// ── Abrir/fechar gaveta ───────────────────────────────────────
-function abrirNotificacoes() {
-  document.getElementById('notif-drawer').classList.add('open');
-  document.getElementById('notif-drawer-overlay').classList.add('open');
-  renderNotificacoes();
-}
-function fecharNotificacoes() {
-  document.getElementById('notif-drawer').classList.remove('open');
-  document.getElementById('notif-drawer-overlay').classList.remove('open');
-}
-
-function renderNotificacoes() {
-  const lista = document.getElementById('notif-lista');
-  const label = document.getElementById('notif-count-label');
-  if (!lista) return;
-  const total = _notifCache.length;
-  if (label) label.textContent = total === 0 ? 'Nenhuma transmissão pendente' : `${total} transmissão${total>1?'ões':''} não lida${total>1?'s':''}`;
-  if (total === 0) {
-    lista.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-dim)">
-      <div style="font-size:2rem;margin-bottom:8px">📡</div>
-      <div style="font-size:0.75rem;font-family:'Orbitron',monospace">Silêncio galáctico</div>
-      <div style="font-size:0.65rem;margin-top:4px">Nenhuma transmissão pendente</div>
-    </div>`;
-    return;
-  }
-  lista.innerHTML = _notifCache.map(n => {
-    const mins = Math.round((Date.now() - n.ts) / 60000);
-    const tempoStr = mins < 1 ? 'agora' : mins < 60 ? `${mins}min atrás` : `${Math.round(mins/60)}h atrás`;
-    return `<div class="notif-item${n.urgente?' urgente':''}${n.lida?' lida':''}" onclick="lerNotificacao('${n.id}')">
-      <div class="notif-icon">${n.icon}</div>
-      <div class="notif-corpo">
-        <div class="notif-titulo">${n.titulo}</div>
-        ${n.detalhes ? `<div class="notif-sub">${n.detalhes}</div>` : ''}
-        <div class="notif-tempo">${tempoStr}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function lerNotificacao(id) {
-  try {
-    await NOTIF_REF().doc(id).update({ lida: true });
-    _notifCache = _notifCache.filter(n => n.id !== id);
-    atualizarBadgeNotif(_notifCache.length);
-    renderNotificacoes();
-  } catch(e) {}
-}
-
-async function marcarTodasLidas() {
-  try {
-    const batch = firebase.firestore().batch();
-    _notifCache.forEach(n => batch.update(NOTIF_REF().doc(n.id), { lida: true }));
-    await batch.commit();
-    _notifCache = [];
-    atualizarBadgeNotif(0);
-    renderNotificacoes();
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════════════
-// NOTIFICAÇÕES NATIVAS (quando app está aberto)
-// ═══════════════════════════════════════════════════════
-async function solicitarPermissaoNotificacao() {
-  if (!('Notification' in window)) return false;
-  if (Notification.permission === 'granted') return true;
-  if (Notification.permission === 'denied') return false;
-  const result = await Notification.requestPermission();
-  return result === 'granted';
-}
-
-function dispararNotifNativa(titulo, corpo) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  if (document.visibilityState === 'visible') return; // app está em foco — usa toast
-  try {
-    new Notification(`⚔️ ${titulo}`, {
-      body: corpo,
-      icon: 'https://joaoacamposss.github.io/padawan-arthur/icon-192.png',
-      badge:'https://joaoacamposss.github.io/padawan-arthur/icon-192.png',
-      tag:  'padawan-arthur',
-      requireInteraction: false,
-      silent: false,
-    });
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════════════
-// FCM: PUSH EM BACKGROUND (registro do token)
-// ═══════════════════════════════════════════════════════
-const FCM_VAPID_KEY = '8eRwh0KavTrkzfGqq0skYKafS5Vl9n_OpeUw2T_tU24';
-
-async function registrarFCMToken(userId) {
-  // Carregar SDK de messaging dinamicamente — não bloqueia o carregamento inicial
-  try {
-    if (typeof firebase.messaging === 'undefined') {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js';
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-  } catch(e) {
-    console.info('FCM SDK não disponível:', e.message);
-    return;
-  }
-  try {
-    const messaging = firebase.messaging();
-    // Registrar service worker para FCM
-    if ('serviceWorker' in navigator) {
-      try {
-        const swReg = await navigator.serviceWorker.register(
-          '/padawan-arthur/firebase-messaging-sw.js',
-          { scope: '/padawan-arthur/' }
-        );
-        messaging.useServiceWorker(swReg);
-      } catch(swErr) {
-        console.info('SW FCM não disponível:', swErr.message);
-        return;
-      }
-    }
-    const token = await messaging.getToken({ vapidKey: FCM_VAPID_KEY });
-    if (token) {
-      await FCM_TOKENS_REF().doc(userId).set({
-        token, userId,
-        nome:       GUARDIOES[userId]?.nome || userId,
-        plataforma: /iPhone|iPad/.test(navigator.userAgent) ? 'ios' : 'web',
-        ts: Date.now(),
-      });
-    }
-    messaging.onMessage(payload => {
-      const { title, body } = payload.notification || {};
-      if (title) showToast(`🔔 ${title}`);
-    });
-  } catch(e) {
-    console.info('FCM (opcional):', e.message);
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// HOOK: chamar após fazerLogin
-// ═══════════════════════════════════════════════════════
-async function iniciarSistemaNotificacoes(userId) {
-  await registrarPresenca(userId);
-  ouvirPresencaOutro(userId);
-  ouvirNotificacoes(userId);
-  // Solicitar permissão de notificação após 3s (não interromper login)
-  setTimeout(async () => {
-    const ok = await solicitarPermissaoNotificacao();
-    if (ok) await registrarFCMToken(userId);
-  }, 3000);
-}
 </script>
+<!-- OVERLAY NOTIFICAÇÕES -->
+<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
 
+<!-- GAVETA DE NOTIFICAÇÕES -->
+<div id="notif-drawer">
+  <div class="notif-drawer-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.3rem">🔔</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
+      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notif-lista"></div>
+</div>
+<!-- OVERLAY DICA IA -->
+<div id="ia-dica-overlay" onclick="fecharDicaIA()"></div>
+
+<!-- MODAL BOTTOM SHEET DICA IA -->
+<div id="ia-dica-modal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.4rem">💡</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#d4a8ff;letter-spacing:0.09em" id="ia-dica-titulo">DICA DA FORÇA</div>
+        <div style="font-size:0.6rem;color:rgba(212,168,255,0.5);margin-top:1px">análise personalizada do Oráculo</div>
+      </div>
+    </div>
+    <button onclick="fecharDicaIA()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div id="ia-dica-loading" style="display:none;align-items:center;gap:10px;padding:10px 0">
+    <span>🔮</span>
+    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">CONSULTANDO O ORÁCULO...</span>
+    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
+  </div>
+  <div id="ia-dica-content" style="font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.75"></div>
+</div>
 <!-- MODAL CONFIGURAR ORÁCULO -->
 <div id="modal-oraculo-config" class="modal-overlay" style="display:none;z-index:999999">
   <div class="modal-box" style="background:linear-gradient(145deg,rgba(30,0,70,0.98),rgba(10,0,40,0.99));border-color:rgba(180,100,255,0.4);max-width:340px">
@@ -10669,32 +10455,90 @@ async function iniciarSistemaNotificacoes(userId) {
 </div>
 
 
-<!-- OVERLAY DICA IA -->
-<div id="ia-dica-overlay" onclick="fecharDicaIA()"></div>
 
-<!-- MODAL BOTTOM SHEET DICA IA -->
-<div id="ia-dica-modal">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:1.4rem">💡</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#d4a8ff;letter-spacing:0.09em" id="ia-dica-titulo">DICA DA FORÇA</div>
-        <div style="font-size:0.6rem;color:rgba(212,168,255,0.5);margin-top:1px">análise personalizada do Oráculo</div>
-      </div>
-    </div>
-    <button onclick="fecharDicaIA()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
-  </div>
-  <div id="ia-dica-loading" style="display:none;align-items:center;gap:10px;padding:10px 0">
-    <span>🔮</span>
-    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">CONSULTANDO O ORÁCULO...</span>
-    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
-  </div>
-  <div id="ia-dica-content" style="font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.75"></div>
-</div>
+<script>
+// ══════════════════════════════════════════════════════════════
+// MOTOR PDF — html2pdf.js (geração direta, sem diálogo de impressão)
+// ══════════════════════════════════════════════════════════════
+async function _carregarHtml2pdf() {
+  if (window.html2pdf) return true;
+  return new Promise(function(resolve) {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.onload  = function() { resolve(true); };
+    s.onerror = function() { resolve(false); };
+    document.head.appendChild(s);
+  });
+}
+
+async function _gerarPDF(htmlContent, nomeArquivo) {
+  showToast('⏳ Preparando PDF...');
+  var ok = await _carregarHtml2pdf();
+  if (!ok) {
+    // Fallback: window.print()
+    var area = document.getElementById('relatorio-print-area');
+    if (!area) {
+      area = document.createElement('div');
+      area.id = 'relatorio-print-area';
+      document.body.appendChild(area);
+    }
+    area.style.display = 'block';
+    area.innerHTML = htmlContent;
+    setTimeout(function() { window.print(); area.style.display = 'none'; }, 150);
+    return;
+  }
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:190mm;background:#fff;color:#000;font-family:Arial,sans-serif;font-size:10pt;padding:10mm;box-sizing:border-box';
+  wrap.innerHTML = htmlContent;
+  document.body.appendChild(wrap);
+  try {
+    await html2pdf().set({
+      margin:      [8, 8, 8, 8],
+      filename:    nomeArquivo,
+      image:       { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:   { mode: ['avoid-all', 'css'] },
+    }).from(wrap).save();
+    showToast('📄 PDF salvo com sucesso!');
+  } catch(e) {
+    console.warn('html2pdf erro:', e);
+    showToast('⚠️ Erro no PDF — usando impressão');
+    window.print();
+  } finally {
+    document.body.removeChild(wrap);
+  }
+}
+
+function _htmlBase(titulo, sub, data, corpo) {
+  return '<div style="font-family:Arial,sans-serif;color:#000;background:#fff;max-width:100%">' +
+    '<div style="border-bottom:3px solid #1a237e;padding-bottom:10px;margin-bottom:14px">' +
+    '<div style="font-size:16pt;font-weight:bold;color:#1a237e">&#9876; ' + titulo + '</div>' +
+    '<div style="font-size:10pt;color:#333;margin-top:2px">' + sub + '</div>' +
+    '<div style="font-size:8pt;color:#666">' + data + '</div></div>' +
+    corpo +
+    '<div style="margin-top:14px;border-top:1px solid #ddd;padding-top:5px;font-size:7pt;color:#999;text-align:center">' +
+    'Padawan Arthur · Arquivos do Templo Jedi · ' + new Date().toLocaleString('pt-BR') + '</div></div>';
+}
+
+function _limparCss(html) {
+  if (!html) return '';
+  return html
+    .replace(/var\(--[^)]+\)/g, '#333')
+    .replace(/rgba?\([^)]+\)/g, '#333')
+    .replace(/linear-gradient\([^)]+\)/g, '#f5f5f5')
+    .replace(/border:\s*[0-9.]+px\s+solid\s+#333/g, 'border:1px solid #ccc')
+    .replace(/color:\s*#333;/g, 'color:#000;');
+}
+</script>
+
+<div id="relatorio-print-area" style="display:none"></div>
 
 
-<!-- DRAWER "MAIS" -->
+<!-- OVERLAY MAIS -->
 <div id="mais-drawer-overlay" onclick="fecharMenuMais()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99050"></div>
+
+<!-- DRAWER MAIS -->
 <div id="mais-drawer" style="position:fixed;bottom:0;left:0;right:0;z-index:99051;background:linear-gradient(0deg,rgba(0,10,35,0.99),rgba(0,15,45,0.98));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:12px 16px 30px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.16,1,0.3,1)">
   <div style="width:36px;height:3px;background:rgba(0,180,255,0.2);border-radius:2px;margin:0 auto 14px"></div>
   <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:12px;text-align:center">MÓDULOS DA ORDEM</div>
@@ -10723,11 +10567,11 @@ async function iniciarSistemaNotificacoes(userId) {
 </div>
 
 
-<!-- OVERLAY RELATÓRIO -->
-<div id="relatorio-overlay" onclick="fecharRelatorio()"></div>
+<!-- OVERLAY RELATÓRIO CONSULTA -->
+<div id="relatorio-overlay" onclick="fecharRelatorioConsulta()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99299"></div>
 
-<!-- MODAL RELATÓRIO -->
-<div id="relatorio-modal">
+<!-- MODAL RELATÓRIO CONSULTA (Proposta 06) -->
+<div id="relatorio-modal" style="position:fixed;bottom:0;left:0;right:0;z-index:99300;background:linear-gradient(160deg,rgba(0,15,45,0.99),rgba(5,0,30,0.99));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:18px 16px 32px;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
     <div style="display:flex;align-items:center;gap:8px">
       <span style="font-size:1.3rem">📋</span>
@@ -10736,35 +10580,20 @@ async function iniciarSistemaNotificacoes(userId) {
         <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="relatorio-periodo"></div>
       </div>
     </div>
-    <button onclick="fecharRelatorio()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+    <button onclick="fecharRelatorioConsulta()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
   </div>
-
-  <!-- Dados estruturados -->
   <div id="relatorio-dados" style="font-size:0.74rem;color:rgba(200,220,255,0.85);line-height:1.8;margin-bottom:12px"></div>
-
-  <!-- Loading IA -->
   <div id="relatorio-ia-loading" style="display:none;align-items:center;gap:8px;padding:10px 0">
-    <span>🔮</span>
-    <span style="font-size:0.7rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">GERANDO ANÁLISE...</span>
+    <span>🔮</span><span style="font-size:0.7rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">GERANDO ANÁLISE...</span>
     <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
   </div>
-
-  <!-- Análise IA -->
   <div id="relatorio-ia-texto" style="display:none;background:rgba(80,0,180,0.15);border:1px solid rgba(180,100,255,0.25);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.73rem;color:rgba(220,200,255,0.9);line-height:1.7"></div>
-
-  <!-- Ações -->
   <div style="display:flex;gap:8px;margin-top:4px">
-    <button onclick="imprimirRelatorio()" style="flex:1;background:rgba(0,40,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">📄 PDF</button>
-    <button onclick="compartilharRelatorio()" style="flex:1;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:var(--green-saber);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:0.06em;cursor:pointer">📤 COMPARTILHAR</button>
+    <!-- PDF movido para aba Arquivos -->
+    <button onclick="fecharRelatorioConsulta()" style="flex:1;background:rgba(0,40,100,0.2);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer">✕ Fechar</button>
   </div>
 </div>
-
-<!-- Área invisível para impressão -->
-<div id="relatorio-print-area" style="display:none"></div>
 
 
 </body>
 </html>
-  
-
-
