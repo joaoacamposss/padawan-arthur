@@ -3342,6 +3342,20 @@
       <input type="text" id="edit-m-obs" placeholder="ex: o Padawan adormeceu durante a recarga...">
     </div>
 
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Sintomas pós-recarga</label>
+      <div class="sintomas-wrap" id="edit-m-sintomas-wrap">
+        <div class="sintoma-chip" data-val="regurgitamento" onclick="toggleSintomaEdit(this)">🤮 Regurgitamento</div>
+          <div class="sintoma-chip" data-val="disquesia" onclick="toggleSintomaEdit(this)">😣 Disquesia</div>
+          <div class="sintoma-chip" data-val="soluco" onclick="toggleSintomaEdit(this)">😮 Soluço</div>
+          <div class="sintoma-chip urgente" data-val="colica" onclick="toggleSintomaEdit(this)">😭 Crise de Cólica</div>
+          <div class="sintoma-chip" data-val="arroto" onclick="toggleSintomaEdit(this)">💨 Arroto +2×</div>
+          <div class="sintoma-chip" data-val="tosse" onclick="toggleSintomaEdit(this)">🤧 Tosse</div>
+          <div class="sintoma-chip" data-val="choro" onclick="toggleSintomaEdit(this)">😢 Choro</div>
+      </div>
+      <input type="hidden" id="edit-m-sintomas" value="">
+    </div>
+
     <div class="modal-btns">
       <button class="btn btn-primary" style="flex:1" onclick="salvarEdicaoMamada()">⚡ Atualizar nos Arquivos</button>
       <button class="btn" style="background:rgba(0,50,100,0.5);border:1px solid rgba(0,180,255,0.3);color:var(--text-dim)" onclick="fecharModalEditarMamada()">Abortar</button>
@@ -4893,6 +4907,7 @@ function salvarMamada() {
   document.getElementById('m-ml-peito').value   = '';
   document.getElementById('m-ml-formula').value = '';
   document.getElementById('m-obs').value        = '';
+  limparSintomas();
   document.getElementById('m-hora').value       = nowTime();
   // Esconder campos misto após salvar
   toggleMistoFields('', 'm-misto-fields');
@@ -4964,6 +4979,42 @@ function deleteMamada(id) {
 // ── EDITAR MAMADA ──
 let _editMamadaId = null;
 
+
+// ── Sintomas no modal de EDIÇÃO ─────────────────────────────
+function toggleSintomaEdit(chip) {
+  chip.classList.toggle('sel');
+  var selecionados = Array.from(
+    document.querySelectorAll('#edit-m-sintomas-wrap .sintoma-chip.sel')
+  ).map(function(c) { return c.dataset.val; });
+  var input = document.getElementById('edit-m-sintomas');
+  if (input) input.value = selecionados.join(',');
+}
+
+function limparSintomasEdit() {
+  document.querySelectorAll('#edit-m-sintomas-wrap .sintoma-chip')
+    .forEach(function(c) { c.classList.remove('sel'); });
+  var input = document.getElementById('edit-m-sintomas');
+  if (input) input.value = '';
+}
+
+function carregarSintomasEdit(sintomas) {
+  // Limpar primeiro
+  limparSintomasEdit();
+  if (!sintomas || !sintomas.length) return;
+  // Marcar os chips correspondentes
+  sintomas.forEach(function(val) {
+    var chip = document.querySelector(
+      '#edit-m-sintomas-wrap .sintoma-chip[data-val="' + val + '"]'
+    );
+    if (chip) {
+      chip.classList.add('sel');
+    }
+  });
+  // Atualizar o input hidden
+  var input = document.getElementById('edit-m-sintomas');
+  if (input) input.value = sintomas.join(',');
+}
+
 function abrirModalEditarMamada(id) {
   const m = db.mamadas.find(x => x.id === id);
   if (!m) return;
@@ -4977,6 +5028,8 @@ function abrirModalEditarMamada(id) {
   document.getElementById('edit-m-ml-formula').value = m.ml_formula || '';
   toggleMistoFields(m.tipo, 'edit-m-misto-fields');
   document.getElementById('edit-m-obs').value = m.obs || '';
+  // Carregar sintomas existentes (retrocompatível — mamadas antigas sem sintomas = array vazio)
+  carregarSintomasEdit(m.sintomas || []);
   document.getElementById('modal-editar-mamada').style.display = 'flex';
 }
 
@@ -5004,6 +5057,11 @@ function salvarEdicaoMamada() {
   const mlVal = document.getElementById('edit-m-ml').value;
   m.ml    = mlVal ? parseInt(mlVal) : null;
   m.obs   = document.getElementById('edit-m-obs').value.trim();
+  // Salvar sintomas (retrocompatível)
+  var sintomasEditEl = document.getElementById('edit-m-sintomas');
+  var sintomasEditRaw = sintomasEditEl ? sintomasEditEl.value : '';
+  m.sintomas = sintomasEditRaw ? sintomasEditRaw.split(',').filter(Boolean) : [];
+  if (m.sintomas.length === 0) m.sintomas = undefined;
   saveData(db);
   fecharModalEditarMamada();
   renderMamadas();
