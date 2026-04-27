@@ -4592,19 +4592,42 @@ async function saveData(data) {
 }
 
 // Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
+// Flag que bloqueia onSnapshot enquanto o app está gravando
+let _salvandoAgora = false;
+let _salvandoTimer = null;
+
+function _bloquearSync(ms) {
+  _salvandoAgora = true;
+  clearTimeout(_salvandoTimer);
+  _salvandoTimer = setTimeout(() => { _salvandoAgora = false; }, ms || 4000);
+}
+
 function iniciarSyncTempoReal() {
   verificarHorarioNoite();
   if (!_modoNoiteTimer) _modoNoiteTimer = setInterval(verificarHorarioNoite, 30*60*1000);
-  DOC_REF.onSnapshot(snap => {
+
+  // { includeMetadataChanges: true } permite verificar hasPendingWrites
+  DOC_REF.onSnapshot({ includeMetadataChanges: true }, snap => {
     if (!snap.exists) return;
+
+    // PROTEÇÃO 1: ignorar snapshots de escrita pendente (local write ainda não confirmado)
+    if (snap.metadata.hasPendingWrites) return;
+
+    // PROTEÇÃO 2: ignorar se o app está no meio de uma gravação local
+    if (_salvandoAgora) return;
+
     const novos = snap.data();
-    // Remove metadado antes de comparar — _ultimaAtualizacao não é dado do app
     const { _ultimaAtualizacao: _a, ...dadosNovos } = novos;
     const { _ultimaAtualizacao: _b, ...dadosLocais } = db;
-    const local  = JSON.stringify(dadosLocais);
-    const remoto = JSON.stringify(dadosNovos);
-    // Só atualiza se os dados reais são diferentes (evita loop por _ultimaAtualizacao)
+
+    // PROTEÇÃO 3: verificar se os dados realmente mudaram (evita renderAll desnecessário)
+    // Normaliza undefined → null para comparação justa
+    const normalizar = obj => JSON.parse(JSON.stringify(obj, (k,v) => v === undefined ? null : v));
+    const local  = JSON.stringify(normalizar(dadosLocais));
+    const remoto = JSON.stringify(normalizar(dadosNovos));
+
     if (local !== remoto) {
+      console.log('[Sync] dados atualizados por outro dispositivo');
       db = dadosNovos;
       localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosNovos));
       if (usuarioAtual) renderAll();
@@ -4875,6 +4898,7 @@ function limparSintomas() {
 }
 
 function salvarMamada() {
+  _bloquearSync();
   const data   = document.getElementById('m-data').value;
   const hora   = document.getElementById('m-hora').value;
   const tipo   = document.getElementById('m-tipo').value;
@@ -5039,6 +5063,7 @@ function fecharModalEditarMamada() {
 }
 
 function salvarEdicaoMamada() {
+  _bloquearSync();
   const m = db.mamadas.find(x => x.id === _editMamadaId);
   if (!m) return;
   m.data  = document.getElementById('edit-m-data').value;
@@ -5141,6 +5166,7 @@ function showSubTab(id) {
 
 // ── DÚVIDAS ──
 function salvarDuvida() {
+  _bloquearSync();
   const texto = document.getElementById('d-texto').value.trim();
   const cat = document.getElementById('d-cat').value;
   if (!texto) { alert('Registre a missiva antes de enviar!'); return; }
@@ -5347,6 +5373,7 @@ function initAgendaForm() {
 initAgendaForm();
 
 function salvarEvento() {
+  _bloquearSync();
   const titulo    = document.getElementById('a-titulo').value.trim();
   const data      = document.getElementById('a-data').value;
   const hora      = document.getElementById('a-hora').value;
@@ -5536,6 +5563,7 @@ const MV_CATS = { marco:'⭐ Marco Jedi', presente:'🎁 Tributo da Galáxia', m
 let mvFiltroMes = 'todos';
 
 function salvarMesversario() {
+  _bloquearSync();
   const titulo = document.getElementById('mv-titulo').value.trim();
   const mes    = parseInt(document.getElementById('mv-mes').value);
   const cat    = document.getElementById('mv-cat').value;
@@ -5693,6 +5721,7 @@ function initCrescForm() {
 }
 
 function salvarCrescimento() {
+  _bloquearSync();
   const data   = document.getElementById('cresc-data').value;
   const mes    = parseInt(document.getElementById('cresc-mes').value);
   const pesoRaw   = document.getElementById('cresc-peso').value;
@@ -6306,6 +6335,7 @@ function fecharModalNovaVacina() {
 }
 
 function salvarNovaVacina() {
+  _bloquearSync();
   const nome   = document.getElementById('nv-nome').value.trim();
   const doenca = document.getElementById('nv-doenca').value.trim();
   const obs    = document.getElementById('nv-obs').value.trim();
@@ -6895,6 +6925,7 @@ function initMedForm() {
 }
 
 function salvarMedicacao() {
+  _bloquearSync();
   const nome     = document.getElementById('med-nome').value.trim();
   const generico = document.getElementById('med-generico').value.trim();
   const dose     = document.getElementById('med-dose').value.trim();
@@ -8305,6 +8336,7 @@ function atualizarPreviewValidade() {
 }
 
 function salvarExtracao() {
+  _bloquearSync();
   const data           = document.getElementById('ext-data').value;
   const horaInicio     = document.getElementById('ext-hora-inicio').value;
   const horaFim        = document.getElementById('ext-hora-fim').value;
@@ -8464,7 +8496,8 @@ function renderEstoque() {
   }).join('');
 }
 
-function descartarEstoque(id) {
+function descartarEstoque(
+  id) {
   const item = estoqueLeite.find(i => i.id === id);
   if (item) { item.usado = true; item.ml = 0; saveEstoque(); renderEstoque(); renderEstoqueResumo(); showToast('🗑 Item descartado do banco'); }
 }
@@ -8473,7 +8506,8 @@ loadEstoque();
 
 
 // ── ORÁCULO JEDI — IA Pediátrica ──
-let oraculoHistorico = JSON.parse(localStorage.getItem('oraculo_historico') || '[]');
+// Histórico carregado dinamicamente em initOraculo (após login, quando usuarioAtual é conhecido)
+let oraculoHistorico = [];
 let oraculoCarregando = false;
 let ORACULO_API_KEY    = localStorage.getItem('oraculo_api_key')     || '';
 let ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url')  || '';
@@ -8566,6 +8600,34 @@ function contextArthur() {
   const marcosReg = (db.orbitas||db.mesversarios||[]);
   const ultimoMarco = marcosReg.length > 0 ? marcosReg[0] : null;
 
+  // ── Detalhamento por tipo ───────────────────────────────
+  const tiposCount = { peito:0, formula:0, misto:0 };
+  const tiposMl    = { peito:0, formula:0, misto:0 };
+  m7.forEach(m => {
+    const t = m.tipo || 'peito';
+    tiposCount[t] = (tiposCount[t]||0) + 1;
+    tiposMl[t]    = (tiposMl[t]||0)   + mlReal(m);
+  });
+
+  // ── Sintomas últimos 7 dias ──────────────────────────────
+  const sintomasCount = {};
+  m7.forEach(m => {
+    if (m.sintomas && m.sintomas.length > 0) {
+      m.sintomas.forEach(s => { sintomasCount[s] = (sintomasCount[s]||0) + 1; });
+    }
+  });
+  const sintomasTexto = Object.keys(sintomasCount).length > 0
+    ? Object.entries(sintomasCount).map(([s,n]) => `${s}(${n}x)`).join(', ')
+    : 'nenhum registrado';
+
+  // ── Últimas 10 mamadas com detalhes ─────────────────────
+  const ultimas10 = todasMamadas.slice(0, 10);
+  const ultimas10Texto = ultimas10.map(m => {
+    const sin = (m.sintomas && m.sintomas.length) ? ` [sintomas: ${m.sintomas.join(',')}]` : '';
+    const obs = m.obs ? ` obs: "${m.obs}"` : '';
+    return `${m.data} ${m.hora} ${m.tipo} ${mlReal(m)}ml${sin}${obs}`;
+  }).join('\n  ');
+
   return `DADOS COMPLETOS DO PADAWAN ARTHUR (use para análises personalizadas):
 
 == IDENTIDADE ==
@@ -8577,8 +8639,14 @@ function contextArthur() {
 == ALIMENTAÇÃO ==
 - Mamadas hoje: ${mamadasHoje.length} (${mlHoje}ml)
 - Volume médio diário (7d): ${mlMedioDiario}ml
-- Última mamada: ${ultima ? `${ultima.tipo} · ${ultima.ml||'?'}ml · ${intervaloUltima}` : 'nenhuma registrada'}
+- Última mamada: ${ultima ? `${ultima.tipo} · ${mlReal(ultima)}ml · ${intervaloUltima}` : 'nenhuma registrada'}
 - Mamadas noturnas (22h–6h) nos últimos 7 dias: ${mamNot7d}
+- Tipo de alimentação (7d): Fonte Natural=${tiposCount.peito}x(${tiposMl.peito}ml) · Fórmula=${tiposCount.formula}x(${tiposMl.formula}ml) · Combinação=${tiposCount.misto}x(${tiposMl.misto}ml)
+- Total de mamadas (7d): ${m7.length} mamadas
+- Sintomas pós-mamada (7d): ${sintomasTexto}
+
+== ÚLTIMAS 10 MAMADAS (mais recente primeiro) ==
+  ${ultimas10Texto || 'nenhuma registrada'}
 
 == CRESCIMENTO ==
 - Peso atual: ${pesoAtual ? `${pesoAtual.peso||'?'}kg (${pesoAtual.mes}º mês) — ${percentilPeso}` : 'não registrado'}
@@ -9284,11 +9352,14 @@ function _renderBriefing(texto, ts) {
 }
 
 // ── Persistir histórico do Oráculo ──
+function _oraculoHistKey() {
+  return 'oraculo_historico_' + (usuarioAtual || 'guest');
+}
+
 function salvarOraculoHistorico() {
   try {
-    // Guardar apenas as últimas 30 mensagens (texto, sem re-renderizar)
     const sliced = oraculoHistorico.slice(-30);
-    localStorage.setItem('oraculo_historico', JSON.stringify(sliced));
+    localStorage.setItem(_oraculoHistKey(), JSON.stringify(sliced));
   } catch(e) {}
 }
 // Cada par pergunta/resposta vira um item FAQ
@@ -9466,7 +9537,7 @@ function perguntaRapidaOraculo(btn) {
 
 function limparOraculo() {
   oraculoHistorico = [];
-  localStorage.removeItem('oraculo_historico');
+  localStorage.removeItem(_oraculoHistKey());
   document.getElementById('oraculo-chat').innerHTML = '';
 }
 
@@ -9496,6 +9567,13 @@ function salvarOraculoKeyModal() {
   }
   localStorage.setItem('oraculo_worker_url', url);
   ORACULO_WORKER_URL = url;
+  // Sincronizar Worker URL no Firestore para compartilhar entre dispositivos
+  try {
+    if (typeof EXTRAS_REF !== 'undefined' && EXTRAS_REF) {
+      EXTRAS_REF.doc('oraculo_config').set({ workerUrl: url, updatedAt: Date.now() })
+        .catch(() => {});
+    }
+  } catch(e) {}
   msg.style.color = 'rgba(57,255,20,0.9)';
   msg.textContent = '✅ Worker configurado!';
   const banner = document.getElementById('oraculo-config-status-banner');
@@ -9511,10 +9589,40 @@ function salvarOraculoKeyModal() {
   }, 1200);
 }
 
+
+// ── Sincronizar Worker URL do Firestore (para Nadyne/outros devices) ──
+async function sincronizarOraculoWorkerURL() {
+  // Se já tem URL local, não precisa buscar
+  if (localStorage.getItem('oraculo_worker_url')) return;
+  try {
+    if (typeof EXTRAS_REF === 'undefined' || !EXTRAS_REF) return;
+    const snap = await EXTRAS_REF.doc('oraculo_config').get();
+    if (snap.exists && snap.data()?.workerUrl) {
+      const url = snap.data().workerUrl;
+      localStorage.setItem('oraculo_worker_url', url);
+      ORACULO_WORKER_URL = url;
+      console.log('[Oráculo] Worker URL sincronizado do Firestore');
+      // Se o Oráculo estiver aberto, atualizar a mensagem
+      const chat = document.getElementById('oraculo-chat');
+      if (chat && chat.children.length <= 1) {
+        // Reinicializar com URL agora disponível
+        initOraculo();
+      }
+    }
+  } catch(e) {
+    console.info('[Oráculo] sincronização URL:', e.message);
+  }
+}
+
 function initOraculo() {
   ORACULO_WORKER_URL = localStorage.getItem('oraculo_worker_url') || '';
   const chat = document.getElementById('oraculo-chat');
   if (!chat) return;
+
+  // Carregar histórico do usuário atual (após login)
+  try {
+    oraculoHistorico = JSON.parse(localStorage.getItem(_oraculoHistKey()) || '[]');
+  } catch(e) { oraculoHistorico = []; }
 
   // Restaurar conversa salva
   if (oraculoHistorico.length > 0 && chat.children.length === 0) {
