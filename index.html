@@ -4531,9 +4531,7 @@ window.addEventListener('offline', () => mostrarStatusConexao(false));
 const LOCAL_KEY = 'diario_arthur_offline';
 
 async function loadData() {
-  // Garantir que DOC_REF foi inicializado
   if (!DOC_REF) {
-    console.warn('[Padawan] DOC_REF não inicializado, usando localStorage');
     try {
       const cache = localStorage.getItem(LOCAL_KEY);
       if (cache) return JSON.parse(cache);
@@ -4543,39 +4541,61 @@ async function loadData() {
   try {
     const snap = await DOC_REF.get();
     if (snap.exists) {
-      const { _ultimaAtualizacao, ...dados } = snap.data();
-      localStorage.setItem(LOCAL_KEY, JSON.stringify(dados));
-      return dados;
+      const { _ultimaAtualizacao, ...dadosFirebase } = snap.data();
+
+      // Proteção: não sobrescrever cache local se Firebase tiver menos mamadas
+      // (pode acontecer se último save falhou e Firebase está desatualizado)
+      try {
+        const cacheLocal = JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}');
+        const mamFB    = (dadosFirebase.mamadas || []).length;
+        const mamLocal = (cacheLocal.mamadas   || []).length;
+        if (mamLocal > mamFB) {
+          console.warn('[Padawan] Cache local mais recente que Firebase (' + mamLocal + ' vs ' + mamFB + ') — tentando sincronizar');
+          // Tenta salvar o cache local no Firebase
+          await DOC_REF.set({
+            ...cacheLocal,
+            _ultimaAtualizacao: {
+              ts: Date.now(), autor: 'sync-recuperacao',
+              mamadas: mamLocal, duvidas: (cacheLocal.duvidas||[]).length,
+              eventos: (cacheLocal.eventos||[]).length, mesvers: (cacheLocal.mesversario||[]).length,
+            }
+          }).catch(e2 => console.warn('[Padawan] sync-recuperação falhou:', e2));
+          return cacheLocal;
+        }
+      } catch(e3) {}
+
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosFirebase));
+      return dadosFirebase;
     }
-    // Doc existe mas vazio — tentar cache local
+    // Firebase vazio — usar localStorage
     const cacheEmpty = localStorage.getItem(LOCAL_KEY);
-    if (cacheEmpty) {
-      try { return JSON.parse(cacheEmpty); } catch(e2) {}
-    }
+    if (cacheEmpty) { try { return JSON.parse(cacheEmpty); } catch(e2) {} }
   } catch(e) {
-    // Firebase falhou (offline, CORS, etc) — usar cache local
-    console.warn('[Padawan] Firebase offline, usando cache local:', e.message || e);
+    console.warn('[Padawan] Firebase indisponível, usando cache local:', e.message || e);
     try {
       const cache = localStorage.getItem(LOCAL_KEY);
       if (cache) {
         const parsed = JSON.parse(cache);
         if (parsed && typeof parsed === 'object') return parsed;
       }
-    } catch(e2) {
-      console.warn('[Padawan] Cache local corrompido:', e2);
-    }
+    } catch(e2) {}
   }
   return { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
+}
+
+// Remove undefined recursivamente — Firestore não aceita undefined
+function _sanitizarFirestore(obj) {
+  return JSON.parse(JSON.stringify(obj, (k, v) => (v === undefined ? null : v)));
 }
 
 async function saveData(data) {
   // Sempre salva local imediatamente
   localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
-  // Registra timestamp da última atualização com autor
   const agora = Date.now();
   const autor  = usuarioAtual ? (GUARDIOES[usuarioAtual]?.nome || 'Guardião') : 'Guardião';
   try {
-    await DOC_REF.set({
+    // _sanitizarFirestore garante que nenhum undefined chegue ao Firestore
+    const payload = _sanitizarFirestore({
       ...data,
       _ultimaAtualizacao: {
         ts:      agora,
@@ -4586,54 +4606,43 @@ async function saveData(data) {
         mesvers: (data.mesversario|| []).length,
       }
     });
+    await DOC_REF.set(payload);
   } catch(e) {
-    console.warn('Firebase offline, dados em cache local');
+    // Logar o erro REAL para diagnóstico — não mascarar
+    console.error('[Padawan] saveData FALHOU:', e?.message || e);
+    showToast('⚠️ Erro ao salvar nos arquivos: ' + (e?.message || 'verifique a conexão'));
   }
 }
 
 // Sincronização em TEMPO REAL — quando qualquer guardião salva, todos veem
-// Flag que bloqueia onSnapshot enquanto o app está gravando
-let _salvandoAgora = false;
-let _salvandoTimer = null;
-
-function _bloquearSync(ms) {
-  _salvandoAgora = true;
-  clearTimeout(_salvandoTimer);
-  _salvandoTimer = setTimeout(() => { _salvandoAgora = false; }, ms || 4000);
-}
-
 function iniciarSyncTempoReal() {
   verificarHorarioNoite();
   if (!_modoNoiteTimer) _modoNoiteTimer = setInterval(verificarHorarioNoite, 30*60*1000);
 
-  // { includeMetadataChanges: true } permite verificar hasPendingWrites
-  DOC_REF.onSnapshot({ includeMetadataChanges: true }, snap => {
+  DOC_REF.onSnapshot(snap => {
     if (!snap.exists) return;
-
-    // PROTEÇÃO 1: ignorar snapshots de escrita pendente (local write ainda não confirmado)
-    if (snap.metadata.hasPendingWrites) return;
-
-    // PROTEÇÃO 2: ignorar se o app está no meio de uma gravação local
-    if (_salvandoAgora) return;
-
     const novos = snap.data();
-    const { _ultimaAtualizacao: _a, ...dadosNovos } = novos;
-    const { _ultimaAtualizacao: _b, ...dadosLocais } = db;
+    const { _ultimaAtualizacao: metaNovos, ...dadosNovos } = novos;
+    const { _ultimaAtualizacao: metaLocal, ...dadosLocais } = db;
 
-    // PROTEÇÃO 3: verificar se os dados realmente mudaram (evita renderAll desnecessário)
-    // Normaliza undefined → null para comparação justa
-    const normalizar = obj => JSON.parse(JSON.stringify(obj, (k,v) => v === undefined ? null : v));
-    const local  = JSON.stringify(normalizar(dadosLocais));
-    const remoto = JSON.stringify(normalizar(dadosNovos));
+    // Só atualiza db se outro guardião salvou (autor diferente do atual)
+    // Isso evita que o onSnapshot do próprio save sobrescreva o db
+    if (metaNovos && metaNovos.autor) {
+      const nomeAtual = usuarioAtual ? (GUARDIOES[usuarioAtual]?.nome || usuarioAtual) : '';
+      if (metaNovos.autor === nomeAtual) return; // foi eu mesmo que salvei — ignorar
+    }
 
+    // Comparar dados reais (sem metadado)
+    const local  = JSON.stringify(dadosLocais);
+    const remoto = JSON.stringify(dadosNovos);
     if (local !== remoto) {
-      console.log('[Sync] dados atualizados por outro dispositivo');
       db = dadosNovos;
       localStorage.setItem(LOCAL_KEY, JSON.stringify(dadosNovos));
       if (usuarioAtual) renderAll();
     }
-  }, err => console.warn('Sync error:', err));
+  }, err => console.warn('[Sync] erro:', err));
 }
+
 
 // Carregamento async dos dados
 let db = { mamadas: [], duvidas: [], eventos: [], mesversario: [] };
@@ -4898,7 +4907,6 @@ function limparSintomas() {
 }
 
 function salvarMamada() {
-  _bloquearSync();
   const data   = document.getElementById('m-data').value;
   const hora   = document.getElementById('m-hora').value;
   const tipo   = document.getElementById('m-tipo').value;
@@ -4923,7 +4931,7 @@ function salvarMamada() {
     id: Date.now(), data, hora, tipo,
     ml: ml ? parseInt(ml) : null,
     ml_peito, ml_formula,
-    obs, sintomas: sintomas.length > 0 ? sintomas : undefined, autor: usuarioAtual
+    obs, sintomas: sintomas.length > 0 ? sintomas : [], autor: usuarioAtual
   });
   db.mamadas = ordenarMamadas(db.mamadas);
   saveData(db);
@@ -5063,7 +5071,6 @@ function fecharModalEditarMamada() {
 }
 
 function salvarEdicaoMamada() {
-  _bloquearSync();
   const m = db.mamadas.find(x => x.id === _editMamadaId);
   if (!m) return;
   m.data  = document.getElementById('edit-m-data').value;
@@ -5086,7 +5093,7 @@ function salvarEdicaoMamada() {
   var sintomasEditEl = document.getElementById('edit-m-sintomas');
   var sintomasEditRaw = sintomasEditEl ? sintomasEditEl.value : '';
   m.sintomas = sintomasEditRaw ? sintomasEditRaw.split(',').filter(Boolean) : [];
-  if (m.sintomas.length === 0) m.sintomas = undefined;
+  // Não usar undefined — Firestore não aceita undefined
   saveData(db);
   fecharModalEditarMamada();
   renderMamadas();
@@ -5166,7 +5173,6 @@ function showSubTab(id) {
 
 // ── DÚVIDAS ──
 function salvarDuvida() {
-  _bloquearSync();
   const texto = document.getElementById('d-texto').value.trim();
   const cat = document.getElementById('d-cat').value;
   if (!texto) { alert('Registre a missiva antes de enviar!'); return; }
@@ -5373,7 +5379,6 @@ function initAgendaForm() {
 initAgendaForm();
 
 function salvarEvento() {
-  _bloquearSync();
   const titulo    = document.getElementById('a-titulo').value.trim();
   const data      = document.getElementById('a-data').value;
   const hora      = document.getElementById('a-hora').value;
@@ -5563,7 +5568,6 @@ const MV_CATS = { marco:'⭐ Marco Jedi', presente:'🎁 Tributo da Galáxia', m
 let mvFiltroMes = 'todos';
 
 function salvarMesversario() {
-  _bloquearSync();
   const titulo = document.getElementById('mv-titulo').value.trim();
   const mes    = parseInt(document.getElementById('mv-mes').value);
   const cat    = document.getElementById('mv-cat').value;
@@ -5721,7 +5725,6 @@ function initCrescForm() {
 }
 
 function salvarCrescimento() {
-  _bloquearSync();
   const data   = document.getElementById('cresc-data').value;
   const mes    = parseInt(document.getElementById('cresc-mes').value);
   const pesoRaw   = document.getElementById('cresc-peso').value;
@@ -6335,7 +6338,6 @@ function fecharModalNovaVacina() {
 }
 
 function salvarNovaVacina() {
-  _bloquearSync();
   const nome   = document.getElementById('nv-nome').value.trim();
   const doenca = document.getElementById('nv-doenca').value.trim();
   const obs    = document.getElementById('nv-obs').value.trim();
@@ -6925,7 +6927,6 @@ function initMedForm() {
 }
 
 function salvarMedicacao() {
-  _bloquearSync();
   const nome     = document.getElementById('med-nome').value.trim();
   const generico = document.getElementById('med-generico').value.trim();
   const dose     = document.getElementById('med-dose').value.trim();
@@ -8336,7 +8337,6 @@ function atualizarPreviewValidade() {
 }
 
 function salvarExtracao() {
-  _bloquearSync();
   const data           = document.getElementById('ext-data').value;
   const horaInicio     = document.getElementById('ext-hora-inicio').value;
   const horaFim        = document.getElementById('ext-hora-fim').value;
@@ -8496,8 +8496,7 @@ function renderEstoque() {
   }).join('');
 }
 
-function descartarEstoque(
-  id) {
+function descartarEstoque(id) {
   const item = estoqueLeite.find(i => i.id === id);
   if (item) { item.usado = true; item.ml = 0; saveEstoque(); renderEstoque(); renderEstoqueResumo(); showToast('🗑 Item descartado do banco'); }
 }
