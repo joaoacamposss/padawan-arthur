@@ -3120,7 +3120,7 @@
           <button class="cresc-mtab"        id="cmtab-pc"     onclick="setCrescMetrica('pc',this)">🔵 Escudo Craniano</button>
         </div>
         <div style="position:relative;width:100%;margin-top:10px">
-          <canvas id="cresc-chart" style="width:100%;max-height:280px;display:block"></canvas>
+          <canvas id="cresc-chart" style="width:100%;max-height:380px;display:block"></canvas>
         </div>
         <div id="cresc-legenda" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:0.65rem;font-family:'Orbitron',monospace"></div>
       </div>
@@ -3242,7 +3242,7 @@
     </div>
     <!-- Seletor de período -->
     <div style="display:flex;gap:6px;margin-bottom:10px" id="rel-periodo-btns">
-      <button onclick="setRelPeriodo('dia')"    id="rel-p-dia"    class="rel-periodo-btn active">🌅 Hoje</button>
+      <button onclick="setRelPeriodo('dia')"    id="rel-p-dia"    class="rel-periodo-btn">🌅 Hoje</button>
       <button onclick="setRelPeriodo('semana')" id="rel-p-semana" class="rel-periodo-btn">⚡ 7 órbitas</button>
       <button onclick="setRelPeriodo('mes')"    id="rel-p-mes"    class="rel-periodo-btn">🌌 30 órbitas</button>
     </div>
@@ -4413,7 +4413,7 @@ function initFirebaseRefs() {
   }
   const fs   = firebase.firestore();
   // iOS Safari bloqueia WebSockets — longPolling garante que Firebase funciona
-  try { fs.settings({ experimentalForceLongPolling: true, merge: true }); } catch(e) {}
+  try { fs.settings({ experimentalForceLongPolling: true }); } catch(e) {}
   DOC_REF        = fs.collection('diario').doc('arthur');
   VACINHAS_REF   = fs.collection('diario').doc('arthur_vacinas');
   EXTRAS_REF     = fs.collection('diario').doc('arthur_vacinas_extras');
@@ -4864,6 +4864,8 @@ function showTab(id) {
   renderAll();
   // Se veio de duvidas, abrir sub-aba Missivas automaticamente
   if (id === 'duvidas') setTimeout(() => showSubTabMissoes('missivas'), 50);
+  // Se abriu Arquivos Jedi, garantir renderização com dados atuais
+  if (realId === 'relatorio') setTimeout(() => renderRelatorioTab(), 100);
 }
 
 // ── MAMADAS ──
@@ -5820,13 +5822,13 @@ function renderGraficoCrescimento() {
     .sort((a, b) => a.x - b.x);
 
   const W = canvas.parentElement.offsetWidth || 340;
-  const H = Math.round(Math.min(280, W * 0.68));
+  const H = Math.round(Math.min(380, W * 0.85));
   canvas.width  = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
   // Margens: esquerda maior para Y labels, direita para labels P97/P3
-  const ml = 46, mr = 30, mt = 18, mb = 30;
+  const ml = 52, mr = 42, mt = 24, mb = 38;
   const pw = W - ml - mr;
   const ph = H - mt - mb;
 
@@ -10170,7 +10172,7 @@ initMedForm();
 // ══════════════════════════════════════════════════════════════
 // ABA RELATÓRIO — renderização e exportação
 // ══════════════════════════════════════════════════════════════
-let _relPeriodo = 'dia'; // 'dia' | 'semana' | 'mes'
+let _relPeriodo = 'semana'; // 'dia' | 'semana' | 'mes' — padrão semana
 
 function setRelPeriodo(periodo) {
   _relPeriodo = periodo;
@@ -10206,7 +10208,12 @@ function _renderRelRecargas() {
 
   const mams = (db.mamadas||[]).filter(m => m.data >= dataInicio && m.data <= hoje);
   if (!mams.length) {
-    el.innerHTML = '<div class="rel-empty">Nenhuma recarga no período</div>';
+    const periodoNome = _relPeriodo === 'dia' ? 'hoje' : _relPeriodo === 'semana' ? 'últimos 7 dias' : 'últimos 30 dias';
+    el.innerHTML = `<div class="rel-empty" style="text-align:center;padding:16px">
+      <div style="font-size:1.5rem;margin-bottom:8px">🍼</div>
+      <div>Nenhuma recarga registrada ${periodoNome}</div>
+      <button onclick="setRelPeriodo('mes')" style="margin-top:10px;background:rgba(0,60,140,0.4);border:1px solid rgba(0,180,255,0.3);color:var(--blue-neon);border-radius:8px;padding:6px 14px;font-size:0.7rem;cursor:pointer">Ver 30 órbitas</button>
+    </div>`;
     return;
   }
 
