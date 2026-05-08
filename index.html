@@ -5842,7 +5842,33 @@ function renderGraficoCrescimento() {
   const yMin  = omsMin - yPad;
   const yMax  = omsMax + yPad;
 
-  const scaleX = m => ml + (m / 12) * pw;
+  // ── Escala X dinâmica — zoom nos dados do Arthur ─────────────
+  // xMax: pelo menos 6m, ou máximo dado Arthur + 2m (mostrar futuro próximo)
+  const maxMesArthur = pontosArthur.length > 0
+    ? Math.max(...pontosArthur.map(p => p.x))
+    : 0;
+  const xMax = Math.max(6, maxMesArthur + 3);
+
+  // Garantir 2cm (~76px em 96dpi) entre pontos consecutivos
+  // Se xMax < 6, ajustar para que spacing mínimo seja respeitado
+  const pxPorMes  = pw / xMax;
+  const MIN_SPACING_PX = 76; // ~2cm
+  const spacingOk = pontosArthur.length < 2 ||
+    pontosArthur.every((p, i) => {
+      if (i === 0) return true;
+      return (p.x - pontosArthur[i-1].x) * pxPorMes >= MIN_SPACING_PX;
+    });
+  // Se pontos muito juntos, expandir xMax para forçar espaçamento
+  let xMaxFinal = xMax;
+  if (!spacingOk && pontosArthur.length >= 2) {
+    const minDeltaMes = Math.min(
+      ...pontosArthur.slice(1).map((p,i) => p.x - pontosArthur[i].x).filter(d => d > 0)
+    );
+    xMaxFinal = Math.ceil(pw / MIN_SPACING_PX / minDeltaMes);
+    xMaxFinal = Math.max(xMax, xMaxFinal);
+  }
+
+  const scaleX = m => ml + (m / xMaxFinal) * pw;
   const scaleY = v => mt + ph - ((v - yMin) / (yMax - yMin)) * ph;
 
   // ── Background ────────────────────────────────────────────────────
@@ -5850,13 +5876,14 @@ function renderGraficoCrescimento() {
 
   // ── Zona sombreada P15–P85 ────────────────────────────────────────
   ctx.beginPath();
-  OMS_MESES.forEach((m, i) => {
+  OMS_MESES.filter(m => m <= xMaxFinal).forEach((m, i) => {
     const x = scaleX(m), y = scaleY(oms.p85[i]);
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   });
-  [...OMS_MESES].reverse().forEach((m, i) => {
-    const idx2 = OMS_MESES.length - 1 - i;
-    ctx.lineTo(scaleX(m), scaleY(oms.p15[idx2]));
+  [...OMS_MESES].filter(m => m <= xMaxFinal).reverse().forEach((m, i) => {
+    const filtrados = OMS_MESES.filter(m2 => m2 <= xMaxFinal);
+    const idx2 = filtrados.length - 1 - i;
+    ctx.lineTo(scaleX(filtrados[idx2]), scaleY(oms.p15[OMS_MESES.indexOf(filtrados[idx2])]));
   });
   ctx.closePath();
   ctx.fillStyle = 'rgba(0,180,255,0.055)';
@@ -5866,7 +5893,7 @@ function renderGraficoCrescimento() {
   ctx.strokeStyle = 'rgba(0,180,255,0.07)';
   ctx.lineWidth = 1;
   // Verticais — todos os meses
-  for (let m = 0; m <= 12; m++) {
+  for (let m = 0; m <= xMaxFinal; m++) {
     const x = scaleX(m);
     ctx.beginPath(); ctx.moveTo(x, mt); ctx.lineTo(x, mt + ph); ctx.stroke();
   }
@@ -5919,7 +5946,9 @@ function renderGraficoCrescimento() {
   ];
 
   curvas.forEach(({ key, cor, larg, dash }) => {
-    const pts = OMS_MESES.map((m, i) => ({ x: scaleX(m), y: scaleY(oms[key][i]) }));
+    // Só desenhar OMS até xMaxFinal para alinhar com zoom do eixo X
+    const ptsAll = OMS_MESES.map((m, i) => ({ x: scaleX(m), y: scaleY(oms[key][i]) }));
+    const pts = ptsAll.filter((_, i) => OMS_MESES[i] <= xMaxFinal);
     desenharCurvaSpline(pts, cor, larg, dash);
 
     // Label no final da curva (lado direito)
@@ -5965,20 +5994,34 @@ function renderGraficoCrescimento() {
     ctx.fill();
     ctx.restore();
 
-    // Valor em cima do ponto
-    ctx.fillStyle    = '#fff';
-    ctx.font         = `bold 9px Arial`;
-    ctx.textAlign    = 'center';
-    const valorStr   = p.y + unid;
-    const yTexto     = y < mt + 16 ? y + 17 : y - 9;
+    // Label do ponto — alterna acima/baixo para evitar sobreposição (~2cm)
+    ctx.fillStyle = '#fff';
+    ctx.font      = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    const valorStr = p.y + unid;
+    const _pidx    = pontosArthur.indexOf(p);
+    // Ímpar: acima (+−20px); Par: abaixo (+20px)
+    const _above   = (_pidx % 2 === 0);
+    let yTexto = _above ? y - 20 : y + 20;
+    // Guardrail: não sair da área do canvas
+    if (yTexto < mt + 8)      yTexto = y + 20;
+    if (yTexto > H - mb - 4)  yTexto = y - 20;
     ctx.fillText(valorStr, x, yTexto);
+    // Linha conectora ponto→label (só se offset grande)
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth   = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x, _above ? y - 7 : y + 7);
+    ctx.lineTo(x, _above ? yTexto + 3 : yTexto - 10);
+    ctx.stroke();
   });
 
   // ── Eixo X — meses ───────────────────────────────────────────────
   ctx.fillStyle   = 'rgba(122,179,212,0.8)';
   ctx.font        = '9px Arial';
   ctx.textAlign   = 'center';
-  for (let m = 0; m <= 12; m += 2) {
+  const xStep = xMaxFinal <= 6 ? 1 : xMaxFinal <= 12 ? 2 : 3;
+  for (let m = 0; m <= xMaxFinal; m += xStep) {
     const lbl = m === 0 ? 'Nasc' : m + 'm';
     ctx.fillText(lbl, scaleX(m), H - 5);
   }
@@ -10496,276 +10539,193 @@ function _renderRelAgenda() {
 
 // ── Exportar seção individual como PDF ──────────────────────
 async function exportarSecaoPDF(cardId, titulo) {
-  const ids={
-    'rel-card-recargas':'rel-recargas-conteudo',
-    'rel-card-crescimento':'rel-crescimento-conteudo',
-    'rel-card-vacinas':'rel-vacinas-conteudo',
-    'rel-card-agenda':'rel-agenda-conteudo'};
-  const el   = document.getElementById(ids[cardId]);
-  const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const html = _htmlBase('Arquivos Jedi · '+titulo,'Padawan Arthur',hoje,
-    '<div>'+_limparCss(el?el.innerHTML:'<p>Sem dados</p>')+'</div>');
-  showToast('Gerando PDF...');
-  await _gerarPDF(html,'Padawan-Arthur-'+titulo.replace(/[^a-zA-Z0-9]/g,'-')+'-'+todayISO()+'.pdf');
+  var hojeISO = new Date().toISOString().slice(0,10);
+  var hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var dias = Math.floor((Date.now()-new Date('2026-03-12'))/86400000);
+  var content = [];
+
+  // Cabeçalho da seção
+  content.push({canvas:[{type:'rect',x:0,y:0,w:515,h:3,color:'#1a237e'}]});
+  content.push({text:'Arquivos Jedi · '+titulo, fontSize:16, bold:true, color:'#1a237e', margin:[0,6,0,2]});
+  content.push({text:'Padawan Arthur · '+hoje, fontSize:9, color:'#555', margin:[0,0,0,8]});
+  content.push({canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:0.5,lineColor:'#ccc'}], margin:[0,0,0,10]});
+
+  // Conteúdo por seção
+  var mlR = function(m){ return m.ml||0; };
+  var sinLabels = {regurgitamento:'Regurgitamento',disquesia:'Disquesia',soluco:'Soluco',colica:'Colica',arroto:'Arroto +2x',tosse:'Tosse',choro:'Choro'};
+
+  if (cardId === 'rel-card-recargas') {
+    var desde = _relPeriodo==='dia'?new Date().toISOString().slice(0,10):new Date(Date.now()-(_relPeriodo==='semana'?6:29)*864e5).toISOString().slice(0,10);
+    var mams  = (db.mamadas||[]).filter(function(m){return m.data>=desde&&m.data<=hojeISO;});
+    var mlT   = mams.reduce(function(s,m){return s+mlR(m);},0);
+    var sins  = {};
+    mams.forEach(function(m){(m.sintomas||[]).forEach(function(s){sins[s]=(sins[s]||0)+1;});});
+    var sinTxt = Object.keys(sins).length?Object.entries(sins).map(function(e){return sinLabels[e[0]]+'('+e[1]+'x)';}).join(', '):'Nenhum';
+    content.push({columns:[
+      {width:'*',stack:[{text:String(mams.length),fontSize:22,bold:true,color:'#1a237e',alignment:'center'},{text:'RECARGAS',fontSize:7,color:'#666',alignment:'center'}]},
+      {width:'*',stack:[{text:mlT+'ml',fontSize:22,bold:true,color:'#1a237e',alignment:'center'},{text:'VOLUME TOTAL',fontSize:7,color:'#666',alignment:'center'}]},
+    ], margin:[0,0,0,10]});
+    content.push({text:'Sintomas: '+sinTxt, fontSize:8, color:Object.keys(sins).length?'#c62828':'#2e7d32', margin:[0,0,0,8]});
+    if (mams.length>0) content.push({table:{headerRows:1,widths:[45,30,60,'*',90],body:[[{text:'Data',style:'tHeader'},{text:'Hora',style:'tHeader'},{text:'Tipo',style:'tHeader'},{text:'Vol.',style:'tHeader'},{text:'Sintomas',style:'tHeader'}]].concat(mams.slice(0,30).map(function(m){var d=m.data.split('-').reverse().join('/');return [{text:d,style:'tCell'},{text:m.hora||'-',style:'tCell'},{text:m.tipo==='formula'?'Formula':m.tipo==='peito'?'Natural':'Combinacao',style:'tCell'},{text:(m.ml||'-')+'ml',style:'tCell',alignment:'right'},{text:(m.sintomas||[]).map(function(s){return sinLabels[s]||s;}).join(',')||'-',style:'tCell',fontSize:7}];}))},layout:_PDF_LAYOUT});
+  }
+  else if (cardId === 'rel-card-crescimento') {
+    var p3w=[2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8],p50w=[3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6],p97w=[4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
+    var cRows=(crescData||[]).slice().sort(function(a,b){return a.mes-b.mes;}).map(function(r,i,arr){var ant=i>0?arr[i-1]:null;var g=ant&&ant.peso&&r.peso?'+'+Math.round((r.peso-ant.peso)*1000)+'g':'-';var m=Math.min(r.mes,12);var pc=r.peso<p3w[m]?{t:'<P3',c:'#c62828'}:r.peso<p50w[m]?{t:'P3-P50',c:'#1565c0'}:r.peso<p97w[m]?{t:'P50-P97',c:'#2e7d32'}:{t:'>P97',c:'#e65100'};return [{text:r.mes===0?'Nascimento':r.mes+'a Orbita',style:'tCell'},{text:r.data?r.data.split('-').reverse().join('/'):'',style:'tCell'},{text:r.peso?r.peso+'kg':'-',style:'tCell',alignment:'right'},{text:g,style:'tCell',alignment:'right',color:g.startsWith('+')?'#2e7d32':'#c62828'},{text:r.altura?r.altura+'cm':'-',style:'tCell',alignment:'right'},{text:r.pc?r.pc+'cm':'-',style:'tCell',alignment:'right'},{text:pc.t,style:'tCell',color:pc.c,alignment:'center'}];});
+    if(cRows.length>0)content.push({table:{headerRows:1,widths:[75,55,40,42,40,36,46],body:[[{text:'Orbita',style:'tHeader'},{text:'Data',style:'tHeader'},{text:'Peso',style:'tHeader',alignment:'right'},{text:'Ganho',style:'tHeader',alignment:'right'},{text:'Compr.',style:'tHeader',alignment:'right'},{text:'PC',style:'tHeader',alignment:'right'},{text:'Percentil',style:'tHeader',alignment:'center'}]].concat(cRows)},layout:_PDF_LAYOUT});
+    else content.push({text:'Sem medidas registradas',fontSize:8,color:'#999'});
+  }
+  else if (cardId === 'rel-card-vacinas') {
+    var vSt=typeof vacStatus!=='undefined'?vacStatus:{},vEx=typeof vacExtras!=='undefined'?vacExtras:{};
+    var mA=Math.floor(dias/30.44);
+    var PNI=[{mes:0,id:'bcg',nome:'BCG'},{mes:0,id:'hepb_nasc',nome:'Hepatite B (ao nascer)'},{mes:2,id:'penta_1',nome:'Pentavalente (1a dose)'},{mes:2,id:'vip_1',nome:'VIP/VOP (1a dose)'},{mes:4,id:'penta_2',nome:'Pentavalente (2a dose)'},{mes:6,id:'penta_3',nome:'Pentavalente (3a dose)'},{mes:9,id:'febre_am',nome:'Febre Amarela'},{mes:12,id:'triplice_1',nome:'Triplice Viral'}];
+    var vRows=PNI.map(function(p){var st=vSt[p.id];var f=st&&st.feita;var pd=!f&&p.mes<=mA;return [{text:p.nome,style:'tCell'},{text:p.mes+'m',style:'tCell',alignment:'center'},{text:f?(st.data||'registrada'):pd?'PENDENTE':'~'+p.mes+'m',style:'tCell',alignment:'center',color:f?'#2e7d32':pd?'#c62828':'#888',bold:f||pd}];});
+    content.push({table:{headerRows:1,widths:[230,40,120],body:[[{text:'Vacina',style:'tHeader'},{text:'Idade',style:'tHeader',alignment:'center'},{text:'Status',style:'tHeader',alignment:'center'}]].concat(vRows)},layout:_PDF_LAYOUT});
+  }
+  else if (cardId === 'rel-card-agenda') {
+    var hISO=new Date().toISOString().slice(0,10);
+    var evF=(db.eventos||[]).filter(function(e){return e.data>=hISO;}).sort(function(a,b){return a.data.localeCompare(b.data);});
+    var evP=(db.eventos||[]).filter(function(e){return e.data<hISO;}).sort(function(a,b){return b.data.localeCompare(a.data);}).slice(0,5);
+    var evH=[{text:'Data',style:'tHeader'},{text:'Hora',style:'tHeader'},{text:'Tipo',style:'tHeader'},{text:'Profissional',style:'tHeader'}];
+    var evR=function(e){return [{text:e.data.split('-').reverse().join('/'),style:'tCell'},{text:e.hora||'-',style:'tCell'},{text:e.titulo||'Consulta',style:'tCell'},{text:e.profissional||'-',style:'tCell',fontSize:7}];};
+    if(evF.length)content.push({stack:[{text:'Proximas consultas',fontSize:10,bold:true,color:'#1565c0',margin:[0,0,0,4]},{table:{headerRows:1,widths:[50,32,'*',140],body:[evH].concat(evF.map(evR))},layout:_PDF_LAYOUT}]});
+    if(evP.length)content.push({stack:[{text:'Consultas anteriores',fontSize:10,bold:true,color:'#555',margin:[0,8,0,4]},{table:{headerRows:1,widths:[50,32,'*',140],body:[evH].concat(evP.map(evR))},layout:_PDF_LAYOUT}]});
+    if(!evF.length&&!evP.length)content.push({text:'Nenhuma consulta registrada',fontSize:8,color:'#999'});
+  }
+
+  content.push({text:'Padawan Arthur · Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,14,0,0]});
+
+  await _gerarPDF({content:content, styles:_PDF_ESTILOS, defaultStyle:{font:'Roboto',fontSize:9,color:'#222'}, pageSize:'A4', pageMargins:[40,40,40,40]}, 'Padawan-Arthur-'+titulo.replace(/[^a-zA-Z0-9]/g,'-')+'-'+hojeISO+'.pdf');
 }
 
 
-// ── Exportar relatório completo ──────────────────────────────
 async function exportarRelatorioCompleto() {
-  const pAntes = _relPeriodo; _relPeriodo='semana'; renderRelatorioTab();
-  await new Promise(r=>setTimeout(r,80));
+  // Garantir dados renderizados (período semana)
+  const pAntes = _relPeriodo;
+  _relPeriodo = 'semana';
+  renderRelatorioTab();
+  await new Promise(function(r){ setTimeout(r, 100); });
+
   const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const dias = Math.floor((Date.now()-new Date('2026-03-12'))/86400000);
-  const ids  = {recargas:'rel-recargas-conteudo',crescimento:'rel-crescimento-conteudo',vacinas:'rel-vacinas-conteudo',agenda:'rel-agenda-conteudo'};
-  const titulos = {'recargas':'Recargas (7 orbitas)','crescimento':'Crescimento','vacinas':'Escudos da Forca','agenda':'Missoes e Elixires'};
-  let corpo = '';
-  for (const [k,id] of Object.entries(ids)) {
-    const el = document.getElementById(id);
-    corpo += '<div style="page-break-inside:avoid;margin-bottom:18px">' +
-      '<h3 style="font-size:11pt;color:#1a237e;border-bottom:1.5px solid #1a237e;padding-bottom:3px;margin:0 0 6px">' + titulos[k] + '</h3>' +
-      _limparCss(el ? el.innerHTML : '<p>Sem dados</p>') + '</div>';
-  }
-  const html = _htmlBase('Arquivos do Templo Jedi','Padawan Arthur · ' + dias + ' dias de vida',hoje,corpo);
-  showToast('Gerando Holocron PDF...');
-  await _gerarPDF(html,'Padawan-Arthur-Holocron-'+todayISO()+'.pdf');
-  _relPeriodo=pAntes;
-  ['dia','semana','mes'].forEach(p=>{const b=document.getElementById('rel-p-'+p);if(b)b.classList.toggle('active',p===pAntes);});
-}
+  const dias  = Math.floor((Date.now() - new Date('2026-03-12'))/86400000);
 
-</script>
-<!-- OVERLAY NOTIFICAÇÕES -->
-<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
+  // ── Seção Recargas ──────────────────────────────────────────
+  const m7  = (db.mamadas||[]).slice().sort((a,b)=>b.id-a.id).slice(0,50);
+  const mlR  = function(m){ return m.ml||0; };
+  const total= m7.length;
+  const mlT  = m7.reduce(function(s,m){ return s+mlR(m); },0);
+  const tipos= { peito:0, formula:0, misto:0 };
+  m7.forEach(function(m){ tipos[m.tipo]=(tipos[m.tipo]||0)+1; });
+  const sins = {};
+  m7.forEach(function(m){ (m.sintomas||[]).forEach(function(s){ sins[s]=(sins[s]||0)+1; }); });
+  const sinLabels = {regurgitamento:'Regurgitamento',disquesia:'Disquesia',soluco:'Soluco',colica:'Colica',arroto:'Arroto +2x',tosse:'Tosse',choro:'Choro'};
+  const sinTxt = Object.keys(sins).length
+    ? Object.entries(sins).map(function(e){ return sinLabels[e[0]]+'('+e[1]+'x)'; }).join(', ')
+    : 'Nenhum registrado';
 
-<!-- GAVETA DE NOTIFICAÇÕES -->
-<div id="notif-drawer">
-  <div class="notif-drawer-header">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:1.3rem">🔔</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
-        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
-      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
-    </div>
-  </div>
-  <div class="notif-list" id="notif-lista"></div>
-</div>
-<!-- OVERLAY DICA IA -->
-<div id="ia-dica-overlay" onclick="fecharDicaIA()"></div>
-
-<!-- MODAL BOTTOM SHEET DICA IA -->
-<div id="ia-dica-modal">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:1.4rem">💡</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#d4a8ff;letter-spacing:0.09em" id="ia-dica-titulo">DICA DA FORÇA</div>
-        <div style="font-size:0.6rem;color:rgba(212,168,255,0.5);margin-top:1px">análise personalizada do Oráculo</div>
-      </div>
-    </div>
-    <button onclick="fecharDicaIA()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
-  </div>
-  <div id="ia-dica-loading" style="display:none;align-items:center;gap:10px;padding:10px 0">
-    <span>🔮</span>
-    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">CONSULTANDO O ORÁCULO...</span>
-    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
-  </div>
-  <div id="ia-dica-content" style="font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.75"></div>
-</div>
-<!-- MODAL CONFIGURAR ORÁCULO -->
-<div id="modal-oraculo-config" class="modal-overlay" style="display:none;z-index:999999">
-  <div class="modal-box" style="background:linear-gradient(145deg,rgba(30,0,70,0.98),rgba(10,0,40,0.99));border-color:rgba(180,100,255,0.4);max-width:340px">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-size:1.8rem">🔮</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#d4a8ff;letter-spacing:0.1em">ORÁCULO JEDI</div>
-        <div style="font-size:0.62rem;color:rgba(212,168,255,0.6);margin-top:2px">Configuração via Cloudflare Worker</div>
-      </div>
-    </div>
-    <div id="oraculo-config-status-banner" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:8px;font-size:0.72rem;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#7fff60">✅ Oráculo ativo</div>
-    <div style="font-size:0.7rem;color:rgba(212,168,255,0.8);line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
-      <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);margin-bottom:6px;letter-spacing:0.08em">📋 COMO CONFIGURAR</div>
-      <div>1. Acesse <strong style="color:#d4a8ff">workers.cloudflare.com</strong> → conta gratuita</div>
-      <div>2. Crie um Worker → cole o código disponibilizado</div>
-      <div>3. Adicione variável: <strong style="color:#d4a8ff">ANTHROPIC_API_KEY</strong></div>
-      <div>4. Cole a URL do Worker abaixo e ative</div>
-    </div>
-    <div class="form-group" style="margin-bottom:10px">
-      <label style="color:#d4a8ff">URL do Worker</label>
-      <input type="url" id="oraculo-worker-input" placeholder="https://oraculo.seuusuario.workers.dev" style="font-size:13px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#d4a8ff" oninput="document.getElementById('oraculo-worker-input').style.borderColor=this.value.startsWith('https://')?'rgba(57,255,20,0.5)':'rgba(180,100,255,0.3)'">
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="salvarOraculoKeyModal()" style="flex:1;background:linear-gradient(135deg,rgba(100,0,200,0.6),rgba(60,0,140,0.8));border:1px solid rgba(180,100,255,0.5);color:#d4a8ff;border-radius:10px;padding:12px;font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;letter-spacing:0.06em">✓ ATIVAR</button>
-      <button onclick="document.getElementById('modal-oraculo-config').style.display='none'" style="background:rgba(0,20,60,0.5);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);border-radius:10px;padding:12px 16px;font-size:0.8rem;cursor:pointer">✕</button>
-    </div>
-    <div id="oraculo-config-msg" style="font-size:0.65rem;margin-top:8px;text-align:center;min-height:16px"></div>
-  </div>
-</div>
-
-<!-- OVERLAY NOTIFICAÇÕES -->
-<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
-
-<!-- GAVETA DE NOTIFICAÇÕES -->
-<div id="notif-drawer">
-  <div class="notif-drawer-header">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:1.3rem">🔔</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
-        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
-      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
-    </div>
-  </div>
-  <div class="notif-list" id="notif-lista"></div>
-</div>
-
-
-
-<script>
-// ══════════════════════════════════════════════════════════════
-// MOTOR PDF — html2pdf.js (geração direta, sem diálogo de impressão)
-// ══════════════════════════════════════════════════════════════
-async function _carregarHtml2pdf() {
-  if (window.html2pdf) return true;
-  return new Promise(function(resolve) {
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    s.onload  = function() { resolve(true); };
-    s.onerror = function() { resolve(false); };
-    document.head.appendChild(s);
+  const rowsRec = m7.slice(0,20).map(function(m){
+    var d=m.data?m.data.split('-').reverse().join('/'):'-';
+    var t=m.tipo==='formula'?'Formula':m.tipo==='peito'?'Fonte Natural':'Combinacao';
+    return [{text:d,style:'tCell'},{text:m.hora||'-',style:'tCell'},{text:t,style:'tCell'},{text:(m.ml||'-')+'ml',style:'tCell',alignment:'right'},{text:(m.sintomas||[]).map(function(s){return sinLabels[s]||s;}).join(',')||'-',style:'tCell',fontSize:7}];
   });
-}
 
-async function _gerarPDF(htmlContent, nomeArquivo) {
-  showToast('⏳ Preparando PDF...');
-  var ok = await _carregarHtml2pdf();
-  if (!ok) {
-    // Fallback: window.print()
-    var area = document.getElementById('relatorio-print-area');
-    if (!area) {
-      area = document.createElement('div');
-      area.id = 'relatorio-print-area';
-      document.body.appendChild(area);
-    }
-    area.style.display = 'block';
-    area.innerHTML = htmlContent;
-    setTimeout(function() { window.print(); area.style.display = 'none'; }, 150);
-    return;
-  }
-  var wrap = document.createElement('div');
-  wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:190mm;background:#fff;color:#000;font-family:Arial,sans-serif;font-size:10pt;padding:10mm;box-sizing:border-box';
-  wrap.innerHTML = htmlContent;
-  document.body.appendChild(wrap);
-  try {
-    await html2pdf().set({
-      margin:      [8, 8, 8, 8],
-      filename:    nomeArquivo,
-      image:       { type: 'jpeg', quality: 0.95 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
-      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:   { mode: ['avoid-all', 'css'] },
-    }).from(wrap).save();
-    showToast('📄 PDF salvo com sucesso!');
-  } catch(e) {
-    console.warn('html2pdf erro:', e);
-    showToast('⚠️ Erro no PDF — usando impressão');
-    window.print();
-  } finally {
-    document.body.removeChild(wrap);
-  }
-}
+  // ── Seção Crescimento ────────────────────────────────────────
+  const p3w  = [2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8];
+  const p50w = [3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6];
+  const p97w = [4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
+  const crescRows = (crescData||[]).slice().sort(function(a,b){return a.mes-b.mes;}).map(function(r,i,arr){
+    var ant = i>0?arr[i-1]:null;
+    var ganho = ant&&ant.peso&&r.peso ? '+'+Math.round((r.peso-ant.peso)*1000)+'g' : '-';
+    var m=Math.min(r.mes,12);
+    var pc = r.peso<p3w[m]?{t:'< P3',c:'#c62828'}:r.peso<p50w[m]?{t:'P3-P50',c:'#1565c0'}:r.peso<p97w[m]?{t:'P50-P97',c:'#2e7d32'}:{t:'> P97',c:'#e65100'};
+    return [
+      {text:(r.mes===0?'Nascimento':r.mes+'a Orbita'),style:'tCell'},
+      {text:r.data?r.data.split('-').reverse().join('/'):'-',style:'tCell'},
+      {text:r.peso?r.peso+'kg':'-',style:'tCell',alignment:'right'},
+      {text:ganho,style:'tCell',alignment:'right',color:ganho.startsWith('+')?'#2e7d32':'#c62828'},
+      {text:r.altura?r.altura+'cm':'-',style:'tCell',alignment:'right'},
+      {text:r.pc?r.pc+'cm':'-',style:'tCell',alignment:'right'},
+      {text:pc.t,style:'tCell',color:pc.c,alignment:'center'},
+    ];
+  });
 
-function _htmlBase(titulo, sub, data, corpo) {
-  return '<div style="font-family:Arial,sans-serif;color:#000;background:#fff;max-width:100%">' +
-    '<div style="border-bottom:3px solid #1a237e;padding-bottom:10px;margin-bottom:14px">' +
-    '<div style="font-size:16pt;font-weight:bold;color:#1a237e">&#9876; ' + titulo + '</div>' +
-    '<div style="font-size:10pt;color:#333;margin-top:2px">' + sub + '</div>' +
-    '<div style="font-size:8pt;color:#666">' + data + '</div></div>' +
-    corpo +
-    '<div style="margin-top:14px;border-top:1px solid #ddd;padding-top:5px;font-size:7pt;color:#999;text-align:center">' +
-    'Padawan Arthur · Arquivos do Templo Jedi · ' + new Date().toLocaleString('pt-BR') + '</div></div>';
-}
+  // ── Seção Vacinas ────────────────────────────────────────────
+  var vStatus = typeof vacStatus!=='undefined'?vacStatus:{};
+  var vExtras = typeof vacExtras!=='undefined'?vacExtras:{};
+  var mesAtual= Math.floor(dias/30.44);
+  var PNI = [
+    {mes:0,id:'bcg',nome:'BCG'},{mes:0,id:'hepb_nasc',nome:'Hepatite B (ao nascer)'},
+    {mes:2,id:'penta_1',nome:'Pentavalente (1a dose)'},{mes:2,id:'vip_1',nome:'VIP/VOP (1a dose)'},
+    {mes:2,id:'pneumo_1',nome:'Pneumococica 10V (1a dose)'},{mes:4,id:'penta_2',nome:'Pentavalente (2a dose)'},
+    {mes:4,id:'vip_2',nome:'VIP/VOP (2a dose)'},{mes:6,id:'penta_3',nome:'Pentavalente (3a dose)'},
+    {mes:9,id:'febre_am',nome:'Febre Amarela'},{mes:12,id:'triplice_1',nome:'Triplice Viral (1a dose)'},
+  ];
+  var vacRows = PNI.map(function(p){
+    var st=vStatus[p.id];
+    var feita=st&&st.feita;
+    var pend=!feita&&p.mes<=mesAtual;
+    return [
+      {text:p.nome,style:'tCell'},
+      {text:p.mes+'m',style:'tCell',alignment:'center'},
+      {text:feita?(st.data||'registrada'):pend?'PENDENTE':'~'+p.mes+'m',style:'tCell',alignment:'center',color:feita?'#2e7d32':pend?'#c62828':'#888',bold:feita||pend},
+    ];
+  });
+  var extrasRows = Object.values(vExtras).flat().map(function(v){
+    return [{text:v.nome||'?',style:'tCell'},{text:'-',style:'tCell'},{text:'registrada',style:'tCell',color:'#2e7d32'}];
+  });
+  var totalVac = Object.values(vStatus).filter(function(v){return v&&v.feita;}).length + Object.values(vExtras).flat().length;
 
-function _limparCss(html) {
-  if (!html) return '';
-  return html
-    .replace(/var\(--[^)]+\)/g, '#333')
-    .replace(/rgba?\([^)]+\)/g, '#333')
-    .replace(/linear-gradient\([^)]+\)/g, '#f5f5f5')
-    .replace(/border:\s*[0-9.]+px\s+solid\s+#333/g, 'border:1px solid #ccc')
-    .replace(/color:\s*#333;/g, 'color:#000;');
+  // ── Seção Agenda ─────────────────────────────────────────────
+  var hojeISO = new Date().toISOString().slice(0,10);
+  var evFut = (db.eventos||[]).filter(function(e){return e.data>=hojeISO;}).sort(function(a,b){return a.data.localeCompare(b.data);});
+  var evPas = (db.eventos||[]).filter(function(e){return e.data<hojeISO;}).sort(function(a,b){return b.data.localeCompare(a.data);}).slice(0,5);
+  function evRow(e){ return [{text:e.data.split('-').reverse().join('/'),style:'tCell'},{text:e.hora||'-',style:'tCell'},{text:e.titulo||'Consulta',style:'tCell'},{text:e.profissional||'-',style:'tCell',fontSize:7}]; }
+  var evHeader = [{text:'Data',style:'tHeader'},{text:'Hora',style:'tHeader'},{text:'Tipo',style:'tHeader'},{text:'Profissional',style:'tHeader'}];
+
+  // ── Montar documento ─────────────────────────────────────────
+  var doc = {
+    content: [
+      // Capa
+      {canvas:[{type:'rect',x:0,y:0,w:515,h:4,color:'#1a237e'}]},
+      {text:'Arquivos do Templo Jedi', fontSize:20, bold:true, color:'#1a237e', margin:[0,8,0,2]},
+      {text:'Padawan Arthur · Cronicas da Forca', fontSize:12, color:'#333', margin:[0,0,0,2]},
+      {text:hoje+' · '+dias+' dias de vida', fontSize:9, color:'#666', margin:[0,0,0,12]},
+      {canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:0.5,lineColor:'#ccc'}], margin:[0,0,0,18]},
+
+      // Recargas
+      {text:'Camara das Recargas — 7 orbitas', fontSize:13, bold:true, color:'#1a237e', margin:[0,0,0,6]},
+      {columns:[
+        {width:'*',stack:[{text:String(total),fontSize:20,bold:true,color:'#1a237e',alignment:'center'},{text:'RECARGAS',fontSize:7,color:'#666',alignment:'center'}]},
+        {width:'*',stack:[{text:mlT+'ml',fontSize:20,bold:true,color:'#1a237e',alignment:'center'},{text:'VOLUME TOTAL',fontSize:7,color:'#666',alignment:'center'}]},
+        {width:'*',stack:[{text:tipos.formula+'x formula',fontSize:9,color:'#333',alignment:'center'},{text:tipos.peito+'x natural · '+tipos.misto+'x combinacao',fontSize:8,color:'#666',alignment:'center'}]},
+      ], margin:[0,0,0,8]},
+      {text:'Sintomas: '+sinTxt, fontSize:8, color:Object.keys(sins).length?'#c62828':'#2e7d32', margin:[0,0,0,8]},
+      total>0?{table:{headerRows:1,widths:[45,30,60,'*',90],body:[[{text:'Data',style:'tHeader'},{text:'Hora',style:'tHeader'},{text:'Tipo',style:'tHeader'},{text:'Vol.',style:'tHeader'},{text:'Sintomas',style:'tHeader'}]].concat(rowsRec)},layout:_PDF_LAYOUT,margin:[0,0,0,0]}:{text:'Sem dados no periodo',fontSize:8,color:'#999'},
+
+      // Crescimento
+      {text:'Cronicas de Crescimento', fontSize:13, bold:true, color:'#1a237e', margin:[0,16,0,6], pageBreak: crescRows.length>0&&total>10?'before':undefined},
+      crescRows.length>0?{table:{headerRows:1,widths:[75,55,40,42,40,36,46],body:[[{text:'Orbita',style:'tHeader'},{text:'Data',style:'tHeader'},{text:'Peso',style:'tHeader',alignment:'right'},{text:'Ganho',style:'tHeader',alignment:'right'},{text:'Compr.',style:'tHeader',alignment:'right'},{text:'PC',style:'tHeader',alignment:'right'},{text:'Percentil',style:'tHeader',alignment:'center'}]].concat(crescRows)},layout:_PDF_LAYOUT}:{text:'Sem medidas registradas',fontSize:8,color:'#999'},
+
+      // Vacinas
+      {text:'Escudos da Forca (PNI) — '+totalVac+' ativado(s)', fontSize:13, bold:true, color:'#1a237e', margin:[0,16,0,6]},
+      {table:{headerRows:1,widths:[230,40,120],body:[[{text:'Vacina',style:'tHeader'},{text:'Idade',style:'tHeader',alignment:'center'},{text:'Status',style:'tHeader',alignment:'center'}]].concat(vacRows).concat(extrasRows.length?[[{text:'Extras:',style:'tCell',bold:true,colSpan:3},'','']].concat(extrasRows):[])},layout:_PDF_LAYOUT},
+
+      // Agenda
+      {text:'Missoes e Elixires', fontSize:13, bold:true, color:'#1a237e', margin:[0,16,0,6]},
+      evFut.length>0?{stack:[{text:'Proximas consultas',fontSize:10,bold:true,color:'#1565c0',margin:[0,0,0,4]},{table:{headerRows:1,widths:[50,32,'*',140],body:[evHeader].concat(evFut.map(evRow))},layout:_PDF_LAYOUT}]}:{text:'Nenhuma consulta futura',fontSize:8,color:'#999'},
+      evPas.length>0?{stack:[{text:'Consultas realizadas (ultimas 5)',fontSize:10,bold:true,color:'#555',margin:[0,8,0,4]},{table:{headerRows:1,widths:[50,32,'*',140],body:[evHeader].concat(evPas.map(evRow))},layout:_PDF_LAYOUT}]}:{},
+
+      // Rodapé
+      {text:'Padawan Arthur · Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,16,0,0]},
+    ],
+    styles: _PDF_ESTILOS,
+    defaultStyle:{ font:'Roboto', fontSize:9, color:'#222' },
+    pageSize:'A4', pageMargins:[40,40,40,40],
+  };
+
+  await _gerarPDF(doc, 'Padawan-Arthur-Holocron-'+hojeISO+'.pdf');
+  _relPeriodo = pAntes;
+  ['dia','semana','mes'].forEach(function(p){ var b=document.getElementById('rel-p-'+p); if(b)b.classList.toggle('active',p===pAntes); });
 }
 </script>
-
-<div id="relatorio-print-area" style="display:none"></div>
-
-
-<!-- OVERLAY MAIS -->
-<div id="mais-drawer-overlay" onclick="fecharMenuMais()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99050"></div>
-
-<!-- DRAWER MAIS -->
-<div id="mais-drawer" style="position:fixed;bottom:0;left:0;right:0;z-index:99051;background:linear-gradient(0deg,rgba(0,10,35,0.99),rgba(0,15,45,0.98));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:12px 16px 30px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.16,1,0.3,1)">
-  <div style="width:36px;height:3px;background:rgba(0,180,255,0.2);border-radius:2px;margin:0 auto 14px"></div>
-  <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:12px;text-align:center">MÓDULOS DA ORDEM</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    <button onclick="showTabFromMais('mesversario')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
-      <span style="font-size:1.5rem">🌙</span>
-      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Jornada</span>
-      <span style="font-size:0.58rem;color:var(--text-dim)">Marcos · Crescimento</span>
-    </button>
-    <button onclick="showTabFromMais('vacinas')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
-      <span style="font-size:1.5rem">🛡️</span>
-      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Escudos</span>
-      <span style="font-size:0.58rem;color:var(--text-dim)">Vacinas PNI</span>
-    </button>
-    <button onclick="showTabFromMais('mesversario');showOrbitasTab('oraculo')" style="background:linear-gradient(135deg,rgba(80,0,180,0.3),rgba(40,0,100,0.4));border:1px solid rgba(180,100,255,0.3);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
-      <span style="font-size:1.5rem">🔮</span>
-      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--purple)">Oráculo</span>
-      <span style="font-size:0.58rem;color:rgba(212,168,255,0.5)">IA Pediátrica</span>
-    </button>
-    <button onclick="showTabFromMais('mesversario');showOrbitasTab('sabedoria')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
-      <span style="font-size:1.5rem">📚</span>
-      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Sabedoria</span>
-      <span style="font-size:0.58rem;color:var(--text-dim)">43 artigos SBP</span>
-    </button>
-  </div>
-</div>
-
-
-<!-- OVERLAY RELATÓRIO CONSULTA -->
-<div id="relatorio-overlay" onclick="fecharRelatorioConsulta()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99299"></div>
-
-<!-- MODAL RELATÓRIO CONSULTA (Proposta 06) -->
-<div id="relatorio-modal" style="position:fixed;bottom:0;left:0;right:0;z-index:99300;background:linear-gradient(160deg,rgba(0,15,45,0.99),rgba(5,0,30,0.99));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:18px 16px 32px;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:1.3rem">📋</span>
-      <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--white);letter-spacing:0.08em">RELATÓRIO PARA CONSULTA</div>
-        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="relatorio-periodo"></div>
-      </div>
-    </div>
-    <button onclick="fecharRelatorioConsulta()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
-  </div>
-  <div id="relatorio-dados" style="font-size:0.74rem;color:rgba(200,220,255,0.85);line-height:1.8;margin-bottom:12px"></div>
-  <div id="relatorio-ia-loading" style="display:none;align-items:center;gap:8px;padding:10px 0">
-    <span>🔮</span><span style="font-size:0.7rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">GERANDO ANÁLISE...</span>
-    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
-  </div>
-  <div id="relatorio-ia-texto" style="display:none;background:rgba(80,0,180,0.15);border:1px solid rgba(180,100,255,0.25);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.73rem;color:rgba(220,200,255,0.9);line-height:1.7"></div>
-  <div style="display:flex;gap:8px;margin-top:4px">
-    <!-- PDF movido para aba Arquivos -->
-    <button onclick="fecharRelatorioConsulta()" style="flex:1;background:rgba(0,40,100,0.2);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer">✕ Fechar</button>
-  </div>
-</div>
-
-
 </body>
 </html>
