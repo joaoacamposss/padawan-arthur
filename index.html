@@ -10727,5 +10727,221 @@ async function exportarRelatorioCompleto() {
   ['dia','semana','mes'].forEach(function(p){ var b=document.getElementById('rel-p-'+p); if(b)b.classList.toggle('active',p===pAntes); });
 }
 </script>
+
+<!-- OVERLAY MAIS -->
+<div id="mais-drawer-overlay" onclick="fecharMenuMais()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99050"></div>
+
+<!-- DRAWER MAIS -->
+<div id="mais-drawer" style="position:fixed;bottom:0;left:0;right:0;z-index:99051;background:linear-gradient(0deg,rgba(0,10,35,0.99),rgba(0,15,45,0.98));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:12px 16px 30px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.16,1,0.3,1)">
+  <div style="width:36px;height:3px;background:rgba(0,180,255,0.2);border-radius:2px;margin:0 auto 14px"></div>
+  <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:12px;text-align:center">MÓDULOS DA ORDEM</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <button onclick="showTabFromMais('mesversario')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">🌙</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Jornada</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">Marcos · Crescimento</span>
+    </button>
+    <button onclick="showTabFromMais('vacinas')" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">🛡️</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Escudos</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">Vacinas PNI</span>
+    </button>
+    <button onclick="showTabFromMais('mesversario');setTimeout(()=>showOrbitasTab('oraculo'),150)" style="background:linear-gradient(135deg,rgba(80,0,180,0.3),rgba(40,0,100,0.4));border:1px solid rgba(180,100,255,0.3);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+      <span style="font-size:1.5rem">🔮</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--purple)">Oráculo</span>
+      <span style="font-size:0.58rem;color:rgba(212,168,255,0.5)">IA Pediátrica</span>
+    </button>
+    <button onclick="showTabFromMais('mesversario');setTimeout(()=>showOrbitasTab('sabedoria'),150)" style="background:rgba(0,20,60,0.7);border:1px solid rgba(0,180,255,0.2);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text-dim)">
+      <span style="font-size:1.5rem">📚</span>
+      <span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.06em;color:var(--white)">Sabedoria</span>
+      <span style="font-size:0.58rem;color:var(--text-dim)">43 artigos SBP</span>
+    </button>
+  </div>
+</div>
+
+
+<!-- OVERLAY NOTIFICAÇÕES -->
+<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
+
+<!-- GAVETA DE NOTIFICAÇÕES -->
+<div id="notif-drawer">
+  <div class="notif-drawer-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.3rem">🔔</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
+      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notif-lista"></div>
+</div>
+
+
+
+
+<!-- OVERLAY DICA IA -->
+<div id="ia-dica-overlay" onclick="fecharDicaIA()"></div>
+
+<!-- MODAL BOTTOM SHEET DICA IA -->
+<div id="ia-dica-modal">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.4rem">💡</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:#d4a8ff;letter-spacing:0.09em" id="ia-dica-titulo">DICA DA FORÇA</div>
+        <div style="font-size:0.6rem;color:rgba(212,168,255,0.5);margin-top:1px">análise personalizada do Oráculo</div>
+      </div>
+    </div>
+    <button onclick="fecharDicaIA()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer;padding:4px">✕</button>
+  </div>
+  <div id="ia-dica-loading" style="display:none;align-items:center;gap:10px;padding:10px 0">
+    <span>🔮</span>
+    <span style="font-size:0.72rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">CONSULTANDO O ORÁCULO...</span>
+    <div class="oraculo-dot"></div><div class="oraculo-dot"></div><div class="oraculo-dot"></div>
+  </div>
+  <div id="ia-dica-content" style="font-size:0.82rem;color:rgba(220,200,255,0.9);line-height:1.75"></div>
+</div>
+
+
+
+<!-- MODAL CONFIGURAR ORÁCULO -->
+<div id="modal-oraculo-config" class="modal-overlay" style="display:none;z-index:999999">
+  <div class="modal-box" style="background:linear-gradient(145deg,rgba(30,0,70,0.98),rgba(10,0,40,0.99));border-color:rgba(180,100,255,0.4);max-width:340px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:1.8rem">🔮</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.8rem;color:#d4a8ff;letter-spacing:0.1em">ORÁCULO JEDI</div>
+        <div style="font-size:0.62rem;color:rgba(212,168,255,0.6);margin-top:2px">Configuração via Cloudflare Worker</div>
+      </div>
+    </div>
+    <div id="oraculo-config-status-banner" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:8px;font-size:0.72rem;background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);color:#7fff60">✅ Oráculo ativo</div>
+    <div style="font-size:0.7rem;color:rgba(212,168,255,0.8);line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;border-left:3px solid rgba(180,100,255,0.5)">
+      <div style="font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--gold);margin-bottom:6px;letter-spacing:0.08em">📋 COMO CONFIGURAR</div>
+      <div>1. Acesse <strong style="color:#d4a8ff">workers.cloudflare.com</strong> → conta gratuita</div>
+      <div>2. Crie um Worker → cole o código disponibilizado</div>
+      <div>3. Adicione variável: <strong style="color:#d4a8ff">ANTHROPIC_API_KEY</strong></div>
+      <div>4. Cole a URL do Worker abaixo e ative</div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label style="color:#d4a8ff">URL do Worker</label>
+      <input type="url" id="oraculo-worker-input" placeholder="https://oraculo.seuusuario.workers.dev" style="font-size:13px;background:rgba(0,0,20,0.6);border-color:rgba(180,100,255,0.3);color:#d4a8ff" oninput="document.getElementById('oraculo-worker-input').style.borderColor=this.value.startsWith('https://')?'rgba(57,255,20,0.5)':'rgba(180,100,255,0.3)'">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="salvarOraculoKeyModal()" style="flex:1;background:linear-gradient(135deg,rgba(100,0,200,0.6),rgba(60,0,140,0.8));border:1px solid rgba(180,100,255,0.5);color:#d4a8ff;border-radius:10px;padding:12px;font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;letter-spacing:0.06em">✓ ATIVAR</button>
+      <button onclick="document.getElementById('modal-oraculo-config').style.display='none'" style="background:rgba(0,20,60,0.5);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);border-radius:10px;padding:12px 16px;font-size:0.8rem;cursor:pointer">✕</button>
+    </div>
+    <div id="oraculo-config-msg" style="font-size:0.65rem;margin-top:8px;text-align:center;min-height:16px"></div>
+  </div>
+</div>
+
+<!-- OVERLAY NOTIFICAÇÕES -->
+<div id="notif-drawer-overlay" onclick="fecharNotificacoes()"></div>
+
+<!-- GAVETA DE NOTIFICAÇÕES -->
+<div id="notif-drawer">
+  <div class="notif-drawer-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1.3rem">🔔</span>
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--white);letter-spacing:0.08em">TRANSMISSÕES</div>
+        <div style="font-size:0.6rem;color:var(--text-dim);margin-top:1px" id="notif-count-label">Carregando...</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="marcarTodasLidas()" style="font-size:0.6rem;color:var(--blue-neon);background:none;border:none;cursor:pointer;font-family:'Orbitron',monospace">✓ TODAS LIDAS</button>
+      <button onclick="fecharNotificacoes()" style="font-size:1.1rem;background:none;border:none;color:var(--text-dim);cursor:pointer">✕</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notif-lista"></div>
+</div>
+
+
+
+
+<!-- OVERLAY RELATÓRIO CONSULTA -->
+<div id="relatorio-overlay" onclick="fecharRelatorioConsulta()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99299"></div>
+
+<!-- MODAL RELATÓRIO CONSULTA -->
+<div id="relatorio-modal" style="position:fixed;bottom:0;left:0;right:0;z-index:99300;background:linear-gradient(160deg,rgba(0,15,45,0.99),rgba(5,0,30,0.99));border-top:1.5px solid rgba(0,180,255,0.2);border-radius:20px 20px 0 0;padding:18px 16px 32px;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div style="font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--white);letter-spacing:0.08em">📋 RELATÓRIO PARA CONSULTA</div>
+    <button onclick="fecharRelatorioConsulta()" style="background:none;border:none;color:var(--text-dim);font-size:1.2rem;cursor:pointer">✕</button>
+  </div>
+  <div id="relatorio-dados" style="font-size:0.74rem;color:rgba(200,220,255,0.85);line-height:1.8;margin-bottom:12px"></div>
+  <div id="relatorio-ia-loading" style="display:none;align-items:center;gap:8px;padding:10px 0">
+    <span>🔮</span><span style="font-size:0.7rem;color:rgba(180,100,255,0.7);font-family:'Orbitron',monospace">GERANDO ANÁLISE...</span>
+  </div>
+  <div id="relatorio-ia-texto" style="display:none;background:rgba(80,0,180,0.15);border:1px solid rgba(180,100,255,0.25);border-radius:10px;padding:12px;margin-bottom:12px;font-size:0.73rem;color:rgba(220,200,255,0.9);line-height:1.7"></div>
+  <button onclick="fecharRelatorioConsulta()" style="width:100%;background:rgba(0,40,100,0.2);border:1px solid rgba(0,180,255,0.2);color:var(--text-dim);border-radius:10px;padding:11px;font-family:'Orbitron',monospace;font-size:0.62rem;cursor:pointer;margin-top:4px">✕ Fechar</button>
+</div>
+
+
+<!-- Área de impressão PDF -->
+<div id="relatorio-print-area" style="display:none"></div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// MOTOR PDF — pdfmake
+// ══════════════════════════════════════════════════════════════
+async function _carregarPdfmake() {
+  if (window.pdfMake) return true;
+  return new Promise(function(resolve) {
+    var s1 = document.createElement('script');
+    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.9/pdfmake.min.js';
+    s1.onload = function() {
+      var s2 = document.createElement('script');
+      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.9/vfs_fonts.js';
+      s2.onload  = function() { resolve(true); };
+      s2.onerror = function() { resolve(false); };
+      document.head.appendChild(s2);
+    };
+    s1.onerror = function() { resolve(false); };
+    document.head.appendChild(s1);
+  });
+}
+const _PDF_ESTILOS = {
+  header:   { fontSize:16, bold:true, color:'#1a237e', margin:[0,0,0,4] },
+  sub:      { fontSize:9,  color:'#444', margin:[0,0,0,10] },
+  secTitle: { fontSize:11, bold:true, color:'#1a237e', margin:[0,10,0,5], decoration:'underline', decorationColor:'#1a237e' },
+  tHeader:  { fontSize:8,  bold:true, fillColor:'#1a237e', color:'white' },
+  tCell:    { fontSize:8,  margin:[3,3,3,3] },
+  footer:   { fontSize:7,  color:'#999', italics:true },
+};
+const _PDF_LAYOUT = {
+  hLineWidth: function(i,n) { return (i===0||i===1||i===n.table.body.length)?1:0.3; },
+  vLineWidth: function()    { return 0; },
+  hLineColor: function(i)   { return i<=1?'#1a237e':'#ddd'; },
+  fillColor:  function(r)   { return r%2===0&&r>0?'#f5f7ff':null; },
+};
+async function _gerarPDF(docDef, nomeArquivo) {
+  showToast('Gerando PDF...');
+  var ok = await _carregarPdfmake();
+  if (!ok) { showToast('PDF indisponivel. Verifique a conexao.'); return; }
+  try {
+    if (!docDef.styles)       docDef.styles       = _PDF_ESTILOS;
+    if (!docDef.defaultStyle) docDef.defaultStyle = { font:'Roboto', fontSize:9, color:'#222' };
+    if (!docDef.pageSize)     docDef.pageSize     = 'A4';
+    if (!docDef.pageMargins)  docDef.pageMargins  = [40,40,40,40];
+    pdfMake.createPdf(docDef).open({}, window);
+    showToast('PDF aberto!');
+  } catch(e) {
+    showToast('Erro PDF: ' + (e.message||String(e)));
+  }
+}
+function _limparCss(html) {
+  if (!html) return '';
+  return html
+    .replace(/var\(--[^)]+\)/g,'#333')
+    .replace(/rgba?\([^)]+\)/g,'#555')
+    .replace(/linear-gradient\([^)]+\)/g,'#f5f5f5');
+}
+</script>
+
 </body>
 </html>
