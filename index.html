@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Padawan Arthur">
+<meta name="apple-mobile-web-app-title" content="Arthur">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#020b18">
 <meta name="format-detection" content="telephone=no">
@@ -3724,7 +3724,7 @@ if (!IS_CAPACITOR) {
   // Manifest com PNG
   const manifest = {
     name: 'Crônicas do Padawan Arthur',
-    short_name: 'Padawan Arthur',
+    short_name: 'Arthur',
     description: 'Arquivos da Ordem Jedi · Diário do Padawan Arthur',
     start_url: '.',
     display: 'standalone',
@@ -3922,7 +3922,7 @@ async function registrarFaceID(guardiao_id) {
     const cred = await navigator.credentials.create({
       publicKey: {
         challenge,
-        rp: { name: 'Padawan Arthur', id: location.hostname || 'localhost' },
+        rp: { name: 'Arthur', id: location.hostname || 'localhost' },
         user: { id: userId, name: guardiao_id, displayName: GUARDIOES[guardiao_id]?.nome || guardiao_id },
         pubKeyCredParams: [
           { type: 'public-key', alg: -7  },  // ES256
@@ -7985,7 +7985,7 @@ async function imprimirRelatorioOriginal() {
   const el  = document.getElementById('rel-conteudo');
   const tit = document.getElementById('rel-data-titulo');
   if (!el) return;
-  const html = _htmlBase('Relatorio do Ciclo Galactico','Padawan Arthur',tit?tit.textContent:'',
+  const html = _htmlBase('Relatorio do Ciclo Galactico','Arthur',tit?tit.textContent:'',
     _limparCss(el.innerHTML));
   showToast('Gerando PDF do ciclo...');
   await _gerarPDF(html,'Padawan-Arthur-Ciclo-'+(document.getElementById('rel-data-input')?.value||todayISO())+'.pdf');
@@ -10538,6 +10538,186 @@ function _renderRelAgenda() {
 }
 
 // ── Exportar seção individual como PDF ──────────────────────
+// Gera grafico OMS como imagem PNG base64 para embutir no PDF (pdfmake)
+function _gerarGraficoOMS(cData, metrica) {
+  try {
+    var cv=document.createElement('canvas'); cv.width=1030; cv.height=440;
+    var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,ml=90,mr=76,mt=32,mb=60,pw=W-ml-mr,ph=H-mt-mb;
+    var omsMap={
+      peso:{p3:[2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8],p15:[2.9,3.9,4.9,5.7,6.2,6.7,7.1,7.4,7.7,7.9,8.2,8.4,8.6],p50:[3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6],p85:[3.9,5.1,6.3,7.2,7.8,8.4,8.8,9.2,9.6,9.9,10.2,10.5,10.8],p97:[4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8],titulo:'PESO (kg) · OMS',unidade:'kg'},
+      altura:{p3:[46.1,50.8,54.4,57.3,59.7,61.7,63.3,64.8,66.2,67.5,68.7,69.9,71.0],p15:[47.5,52.2,55.9,58.9,61.3,63.4,65.1,66.7,68.1,69.4,70.7,71.9,73.1],p50:[49.9,54.7,58.4,61.4,63.9,65.9,67.6,69.2,70.6,72.0,73.3,74.5,75.7],p85:[52.3,57.2,61.0,64.0,66.5,68.6,70.4,72.1,73.6,75.0,76.4,77.7,78.9],p97:[53.7,58.7,62.6,65.7,68.3,70.4,72.3,74.0,75.6,77.1,78.5,79.9,81.2],titulo:'COMPRIMENTO (cm) · OMS',unidade:'cm'},
+      pc:{p3:[31.7,34.3,36.0,37.3,38.3,39.1,39.8,40.4,40.9,41.4,41.8,42.2,42.6],p15:[32.4,35.0,36.7,38.1,39.1,39.9,40.7,41.3,41.9,42.4,42.8,43.2,43.6],p50:[34.5,37.3,39.1,40.5,41.6,42.6,43.3,44.0,44.5,45.0,45.6,46.0,46.5],p85:[36.0,38.8,40.7,42.1,43.2,44.2,44.9,45.6,46.2,46.7,47.2,47.6,48.1],p97:[37.0,39.8,41.7,43.1,44.3,45.3,46.0,46.7,47.3,47.8,48.3,48.7,49.2],titulo:'PC (cm) · OMS',unidade:'cm'},
+    };
+    var oms=omsMap[metrica||'peso']||omsMap.peso;
+    var MESES=[0,1,2,3,4,5,6,7,8,9,10,11,12];
+    var pts=(cData||[]).filter(function(r){return r[metrica||'peso']!=null;}).map(function(r){return {m:Number(r.mes),v:Number(r[metrica||'peso'])};}).sort(function(a,b){return a.m-b.m;});
+    var maxM=pts.length>0?Math.max.apply(null,pts.map(function(p){return p.m;})):0;
+    var xMax=Math.max(5,maxM+3);
+    var allV=[].concat(oms.p3,oms.p97),yMin=Math.min.apply(null,allV)*0.95,yMax=Math.max.apply(null,allV)*1.06;
+    var sx=function(m){return ml+(m/xMax)*pw;},sy=function(v){return mt+ph-((v-yMin)/(yMax-yMin))*ph;};
+    var msFilt=MESES.filter(function(m){return m<=xMax;});
+    ctx.fillStyle='#f8f9ff'; ctx.fillRect(0,0,W,H);
+    // Zona P15-P85
+    ctx.beginPath(); msFilt.forEach(function(m,i){var x=sx(m),y=sy(oms.p85[i]);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    for(var ri=msFilt.length-1;ri>=0;ri--){ctx.lineTo(sx(msFilt[ri]),sy(oms.p15[ri]));}
+    ctx.closePath(); ctx.fillStyle='rgba(255,235,59,0.12)'; ctx.fill();
+    // Grid
+    ctx.strokeStyle='#e0e4f0'; ctx.lineWidth=0.8;
+    var yr=yMax-yMin,ys=yr>10?5:yr>4?1:0.5,xs=xMax<=6?1:2;
+    for(var v=Math.ceil(yMin/ys)*ys;v<=yMax;v+=ys){var gy=sy(v);ctx.beginPath();ctx.moveTo(ml,gy);ctx.lineTo(W-mr,gy);ctx.stroke();}
+    for(var m2=0;m2<=xMax;m2+=xs){var gx=sx(m2);ctx.beginPath();ctx.moveTo(gx,mt);ctx.lineTo(gx,H-mb);ctx.stroke();}
+    // Curvas OMS
+    [{key:'p3',cor:'rgba(229,57,53,0.65)',lw:2.2,dash:[8,5],lbl:'P3'},{key:'p15',cor:'rgba(253,180,30,0.8)',lw:1.8,dash:[6,4],lbl:'P15'},{key:'p50',cor:'rgba(56,142,60,0.95)',lw:4.0,dash:[],lbl:'P50'},{key:'p85',cor:'rgba(253,180,30,0.8)',lw:1.8,dash:[6,4],lbl:'P85'},{key:'p97',cor:'rgba(229,57,53,0.65)',lw:2.2,dash:[8,5],lbl:'P97'}].forEach(function(cv2){
+      var ps=msFilt.map(function(m,i){return {x:sx(m),y:sy(oms[cv2.key][i])};});
+      ctx.beginPath();ctx.strokeStyle=cv2.cor;ctx.lineWidth=cv2.lw;ctx.setLineDash(cv2.dash);
+      ps.forEach(function(p,i){i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);});ctx.stroke();ctx.setLineDash([]);
+      var u=ps[ps.length-1];ctx.fillStyle=cv2.cor;ctx.font='bold 16px Arial';ctx.textAlign='left';ctx.fillText(cv2.lbl,u.x+4,u.y+4);
+    });
+    // Linha Arthur
+    if(pts.length>=2){var ppx=pts.map(function(p){return {x:sx(p.m),y:sy(p.v)};});ctx.beginPath();ctx.strokeStyle='#3949ab';ctx.lineWidth=4.0;ppx.forEach(function(p,i){if(i===0){ctx.moveTo(p.x,p.y);return;}var pv=ppx[i-1],cpx=(pv.x+p.x)/2;ctx.bezierCurveTo(cpx,pv.y,cpx,p.y,p.x,p.y);});ctx.stroke();}
+    // Pontos e labels Arthur
+    pts.forEach(function(p,i){
+      var x=sx(p.m),y=sy(p.v);
+      ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fillStyle='#3949ab';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+      var off=i%2===0?-38:38,ly=y+off;if(ly<mt+12)ly=y+38;if(ly>H-mb-10)ly=y-38;
+      ctx.strokeStyle='rgba(57,73,171,0.35)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,i%2===0?y-11:y+11);ctx.lineTo(x,i%2===0?ly+4:ly-18);ctx.stroke();
+      ctx.fillStyle='#1a237e';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(i===0?'Nasc.':p.m+'m',x,ly);
+      ctx.fillStyle='#424242';ctx.font='14px Arial';ctx.fillText(p.v+oms.unidade,x,ly+(i%2===0?18:-4));
+    });
+    // Eixos
+    ctx.fillStyle='#546e7a';ctx.font='15px Arial';ctx.textAlign='center';
+    for(var mx=0;mx<=xMax;mx+=xs){ctx.fillText(mx===0?'Nasc.':mx+'m',sx(mx),H-16);}
+    ctx.textAlign='right';
+    for(var vx=Math.ceil(yMin/ys)*ys;vx<=yMax;vx+=ys){var gy2=sy(vx);if(gy2>mt&&gy2<H-mb){ctx.fillStyle='#78909c';ctx.font='13px Arial';ctx.fillText(vx%1===0?String(vx):vx.toFixed(1),ml-8,gy2+4);}}
+    ctx.fillStyle='#1a237e';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText(oms.titulo,W/2,20);
+    return cv.toDataURL('image/png');
+  } catch(e){console.warn('[OMS chart PDF]',e);return null;}
+}
+
+
+// Gera imagem base64 do gráfico OMS para incluir no PDF
+function _gerarGraficoOMSBase64(metrica, largura, altura) {
+  var cv = document.createElement('canvas');
+  cv.width  = largura  || 515;
+  cv.height = altura   || 260;
+  var W = cv.width, H = cv.height;
+  var ctx2 = cv.getContext('2d');
+  var omsDados = OMS_MAP[metrica || 'peso'];
+  var unid     = CRESC_UNIDADE[metrica || 'peso'];
+  var labelTit = CRESC_LABEL[metrica || 'peso'];
+
+  if (!omsDados || !crescData || crescData.length === 0) return null;
+
+  // Pontos do Arthur
+  var pontosA = crescData
+    .filter(function(r){ return r[metrica||'peso'] != null; })
+    .map(function(r){ return { x: Number(r.mes), y: Number(r[metrica||'peso']) }; })
+    .sort(function(a,b){ return a.x - b.x; });
+
+  var OMS_MESES_L = [0,1,2,3,4,5,6,7,8,9,10,11,12];
+  var ml=48, mr=40, mt=22, mb=34;
+  var pw=W-ml-mr, ph=H-mt-mb;
+
+  // Eixo X dinâmico
+  var maxMes = pontosA.length > 0 ? Math.max.apply(null, pontosA.map(function(p){return p.x;})) : 0;
+  var xMax   = Math.max(5, maxMes + 3);
+  xMax       = Math.min(xMax, 12);
+
+  // Escala Y baseada nas OMS
+  var omsVals = [].concat(omsDados.p3||[]).concat(omsDados.p97||[]);
+  var yMin = Math.min.apply(null,omsVals) * 0.94;
+  var yMax = Math.max.apply(null,omsVals) * 1.04;
+
+  var sx = function(m){ return ml + (m/xMax)*pw; };
+  var sy = function(v){ return mt + ph - ((v-yMin)/(yMax-yMin))*ph; };
+
+  // Fundo branco
+  ctx2.fillStyle = '#f8f9ff';
+  ctx2.fillRect(0,0,W,H);
+
+  // Grid
+  ctx2.strokeStyle = '#e0e4f0'; ctx2.lineWidth = 0.5;
+  for (var v2 = Math.ceil(yMin*2)/2; v2 <= yMax; v2+=0.5) {
+    var gy = sy(v2);
+    ctx2.beginPath(); ctx2.moveTo(ml,gy); ctx2.lineTo(W-mr,gy); ctx2.stroke();
+  }
+  for (var gm = 0; gm <= xMax; gm++) {
+    var gx = sx(gm);
+    ctx2.beginPath(); ctx2.moveTo(gx,mt); ctx2.lineTo(gx,H-mb); ctx2.stroke();
+  }
+
+  // Zona sombreada P15-P85
+  var msFilt = OMS_MESES_L.filter(function(m){ return m <= xMax; });
+  ctx2.beginPath();
+  msFilt.forEach(function(m,i){ var x=sx(m),y=sy((omsDados.p85||omsDados.p50)[i]); i===0?ctx2.moveTo(x,y):ctx2.lineTo(x,y); });
+  msFilt.slice().reverse().forEach(function(m){ var i=OMS_MESES_L.indexOf(m); ctx2.lineTo(sx(m),sy((omsDados.p15||omsDados.p50)[i])); });
+  ctx2.closePath(); ctx2.fillStyle='rgba(253,216,53,0.12)'; ctx2.fill();
+
+  // Curvas OMS
+  var curvas2 = [
+    {key:'p3', cor:'rgba(229,57,53,0.6)',lw:1.1,dash:[4,3]},
+    {key:'p15',cor:'rgba(253,180,30,0.75)',lw:0.9,dash:[3,2]},
+    {key:'p50',cor:'rgba(56,142,60,0.95)',lw:2.0,dash:[]},
+    {key:'p85',cor:'rgba(253,180,30,0.75)',lw:0.9,dash:[3,2]},
+    {key:'p97',cor:'rgba(229,57,53,0.6)',lw:1.1,dash:[4,3]},
+  ];
+  curvas2.forEach(function(cu){
+    if (!omsDados[cu.key]) return;
+    var pts2 = msFilt.map(function(m,i){ return {x:sx(m),y:sy(omsDados[cu.key][i])}; });
+    ctx2.beginPath(); ctx2.strokeStyle=cu.cor; ctx2.lineWidth=cu.lw; ctx2.setLineDash(cu.dash);
+    pts2.forEach(function(p,i){ i===0?ctx2.moveTo(p.x,p.y):ctx2.lineTo(p.x,p.y); });
+    ctx2.stroke(); ctx2.setLineDash([]);
+    var ult=pts2[pts2.length-1];
+    var lbl={p3:'P3',p15:'P15',p50:'P50',p85:'P85',p97:'P97'}[cu.key];
+    ctx2.fillStyle=cu.cor; ctx2.font='bold 8px Arial'; ctx2.textAlign='left';
+    ctx2.fillText(lbl,ult.x+3,ult.y+3);
+  });
+
+  // Linha do Arthur
+  if (pontosA.length >= 2) {
+    var ptA2 = pontosA.map(function(p){ return {x:sx(p.x),y:sy(p.y)}; });
+    ctx2.beginPath(); ctx2.strokeStyle='#3949ab'; ctx2.lineWidth=2.2; ctx2.setLineDash([]);
+    ptA2.forEach(function(p,i){
+      if(i===0){ctx2.moveTo(p.x,p.y);return;}
+      var pv=ptA2[i-1],cpx=(pv.x+p.x)/2;
+      ctx2.bezierCurveTo(cpx,pv.y,cpx,p.y,p.x,p.y);
+    });
+    ctx2.stroke();
+  }
+
+  // Pontos do Arthur com labels alternados
+  pontosA.forEach(function(p,i){
+    var x=sx(p.x), y=sy(p.y);
+    ctx2.beginPath(); ctx2.arc(x,y,5,0,Math.PI*2);
+    ctx2.fillStyle='#3949ab'; ctx2.fill();
+    ctx2.strokeStyle='#fff'; ctx2.lineWidth=1.5; ctx2.stroke();
+    var offY = i%2===0 ? -22 : 22;
+    var ly = y+offY;
+    if(ly<mt+10) ly=y+22; if(ly>H-mb-8) ly=y-22;
+    ctx2.strokeStyle='rgba(92,107,192,0.3)'; ctx2.lineWidth=0.7; ctx2.beginPath();
+    ctx2.moveTo(x,i%2===0?y-7:y+7); ctx2.lineTo(x,i%2===0?ly+2:ly-10); ctx2.stroke();
+    var mesNome = p.x===0?'Nasc.': p.x+'m';
+    ctx2.fillStyle='#1a237e'; ctx2.font='bold 8px Arial'; ctx2.textAlign='center';
+    ctx2.fillText(mesNome, x, ly);
+    ctx2.fillStyle='#333'; ctx2.font='7.5px Arial';
+    ctx2.fillText(p.y+unid, x, ly+(i%2===0?10:-2));
+  });
+
+  // Eixos
+  ctx2.fillStyle='#546e7a'; ctx2.font='8px Arial'; ctx2.textAlign='center';
+  for(var axm=0;axm<=xMax;axm++){ctx2.fillText(axm===0?'Nasc.':axm+'m',sx(axm),H-7);}
+  ctx2.textAlign='right';
+  for(var axv=Math.ceil(yMin*2)/2;axv<=yMax;axv+=0.5){
+    var axy=sy(axv);
+    if(axy>mt&&axy<H-mb){ctx2.fillStyle='#78909c';ctx2.font='7.5px Arial';ctx2.fillText(axv.toFixed(1),ml-4,axy+3);}
+  }
+  // Título interno
+  ctx2.fillStyle='#1a237e'; ctx2.font='bold 8.5px Arial'; ctx2.textAlign='center';
+  ctx2.fillText((labelTit||'PESO').toUpperCase()+' ('+unid+') · OMS', W/2, 13);
+
+  return cv.toDataURL('image/png');
+}
+
 async function exportarSecaoPDF(cardId, titulo) {
   var hojeISO = new Date().toISOString().slice(0,10);
   var hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -10547,7 +10727,7 @@ async function exportarSecaoPDF(cardId, titulo) {
   // Cabeçalho da seção
   content.push({canvas:[{type:'rect',x:0,y:0,w:515,h:3,color:'#1a237e'}]});
   content.push({text:'Arquivos Jedi · '+titulo, fontSize:16, bold:true, color:'#1a237e', margin:[0,6,0,2]});
-  content.push({text:'Padawan Arthur · '+hoje, fontSize:9, color:'#555', margin:[0,0,0,8]});
+  content.push({text:'Arthur · '+hoje, fontSize:9, color:'#555', margin:[0,0,0,8]});
   content.push({canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:0.5,lineColor:'#ccc'}], margin:[0,0,0,10]});
 
   // Conteúdo por seção
@@ -10569,10 +10749,58 @@ async function exportarSecaoPDF(cardId, titulo) {
     if (mams.length>0) content.push({table:{headerRows:1,widths:[45,30,60,'*',90],body:[[{text:'Data',style:'tHeader'},{text:'Hora',style:'tHeader'},{text:'Tipo',style:'tHeader'},{text:'Vol.',style:'tHeader'},{text:'Sintomas',style:'tHeader'}]].concat(mams.slice(0,30).map(function(m){var d=m.data.split('-').reverse().join('/');return [{text:d,style:'tCell'},{text:m.hora||'-',style:'tCell'},{text:m.tipo==='formula'?'Formula':m.tipo==='peito'?'Natural':'Combinacao',style:'tCell'},{text:(m.ml||'-')+'ml',style:'tCell',alignment:'right'},{text:(m.sintomas||[]).map(function(s){return sinLabels[s]||s;}).join(',')||'-',style:'tCell',fontSize:7}];}))},layout:_PDF_LAYOUT});
   }
   else if (cardId === 'rel-card-crescimento') {
-    var p3w=[2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8],p50w=[3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6],p97w=[4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
-    var cRows=(crescData||[]).slice().sort(function(a,b){return a.mes-b.mes;}).map(function(r,i,arr){var ant=i>0?arr[i-1]:null;var g=ant&&ant.peso&&r.peso?'+'+Math.round((r.peso-ant.peso)*1000)+'g':'-';var m=Math.min(r.mes,12);var pc=r.peso<p3w[m]?{t:'<P3',c:'#c62828'}:r.peso<p50w[m]?{t:'P3-P50',c:'#1565c0'}:r.peso<p97w[m]?{t:'P50-P97',c:'#2e7d32'}:{t:'>P97',c:'#e65100'};return [{text:r.mes===0?'Nascimento':r.mes+'a Orbita',style:'tCell'},{text:r.data?r.data.split('-').reverse().join('/'):'',style:'tCell'},{text:r.peso?r.peso+'kg':'-',style:'tCell',alignment:'right'},{text:g,style:'tCell',alignment:'right',color:g.startsWith('+')?'#2e7d32':'#c62828'},{text:r.altura?r.altura+'cm':'-',style:'tCell',alignment:'right'},{text:r.pc?r.pc+'cm':'-',style:'tCell',alignment:'right'},{text:pc.t,style:'tCell',color:pc.c,alignment:'center'}];});
-    if(cRows.length>0)content.push({table:{headerRows:1,widths:[75,55,40,42,40,36,46],body:[[{text:'Orbita',style:'tHeader'},{text:'Data',style:'tHeader'},{text:'Peso',style:'tHeader',alignment:'right'},{text:'Ganho',style:'tHeader',alignment:'right'},{text:'Compr.',style:'tHeader',alignment:'right'},{text:'PC',style:'tHeader',alignment:'right'},{text:'Percentil',style:'tHeader',alignment:'center'}]].concat(cRows)},layout:_PDF_LAYOUT});
-    else content.push({text:'Sem medidas registradas',fontSize:8,color:'#999'});
+    var p3w=[2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8];
+    var p50w=[3.3,4.5,5.6,6.4,7.0,7.5,7.9,8.3,8.6,8.9,9.2,9.4,9.6];
+    var p97w=[4.4,5.7,7.1,8.0,8.7,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8];
+    var cData = (crescData||[]).slice().sort(function(a,b){return a.mes-b.mes;});
+
+    // KPIs
+    var ganhoPeso = (cData.length>=2&&cData[0].peso&&cData[cData.length-1].peso)
+      ? '+'+Math.round((cData[cData.length-1].peso-cData[0].peso)*1000)+'g' : '-';
+    var ult = cData[cData.length-1];
+    var percAtual = '-';
+    if (ult && ult.peso) {
+      var m=Math.min(ult.mes,12);
+      percAtual = ult.peso<p3w[m]?'< P3':ult.peso<p50w[m]?'P3-P50':ult.peso<p97w[m]?'P50-P97':'> P97';
+    }
+    content.push({
+      columns:[
+        {width:'*',stack:[{text:String(cData.length),fontSize:20,bold:true,color:'#1a237e',alignment:'center'},{text:'MEDIDAS',fontSize:7,color:'#666',alignment:'center'}]},
+        {width:'*',stack:[{text:ganhoPeso,fontSize:20,bold:true,color:'#2e7d32',alignment:'center'},{text:'GANHO TOTAL',fontSize:7,color:'#666',alignment:'center'}]},
+        {width:'*',stack:[{text:percAtual,fontSize:13,bold:true,color:'#1565c0',alignment:'center'},{text:'FAIXA ATUAL',fontSize:7,color:'#666',alignment:'center'}]},
+      ], margin:[0,0,0,12]
+    });
+
+    // Tabela de medidas
+    var cRows=cData.map(function(r,i,arr){
+      var ant=i>0?arr[i-1]:null;
+      var g=ant&&ant.peso&&r.peso?'+'+Math.round((r.peso-ant.peso)*1000)+'g':'-';
+      var mi=Math.min(r.mes,12);
+      var pc=r.peso<p3w[mi]?{t:'< P3',c:'#c62828'}:r.peso<p50w[mi]?{t:'P3-P50',c:'#1565c0'}:r.peso<p97w[mi]?{t:'P50-P97',c:'#2e7d32'}:{t:'> P97',c:'#e65100'};
+      return [{text:r.mes===0?'Nascimento':r.mes+'a Orbita',style:'tCell'},{text:r.data?r.data.split('-').reverse().join('/'):'',style:'tCell'},{text:r.peso?r.peso+'kg':'-',style:'tCell',alignment:'right'},{text:g,style:'tCell',alignment:'right',color:g.startsWith('+')?'#2e7d32':'#c62828'},{text:r.altura?r.altura+'cm':'-',style:'tCell',alignment:'right'},{text:r.pc?r.pc+'cm':'-',style:'tCell',alignment:'right'},{text:pc.t,style:'tCell',color:pc.c,alignment:'center'}];
+    });
+    if(cRows.length>0){content.push({table:{headerRows:1,widths:[75,55,40,42,40,36,46],body:[[{text:'Orbita',style:'tHeader'},{text:'Data',style:'tHeader'},{text:'Peso',style:'tHeader',alignment:'right'},{text:'Ganho',style:'tHeader',alignment:'right'},{text:'Compr.',style:'tHeader',alignment:'right'},{text:'PC',style:'tHeader',alignment:'right'},{text:'Percentil',style:'tHeader',alignment:'center'}]].concat(cRows)},layout:_PDF_LAYOUT,margin:[0,0,0,14]});}
+    else{content.push({text:'Sem medidas registradas',fontSize:8,color:'#999',margin:[0,0,0,12]});}
+
+    // Graficos OMS (peso + altura + PC)
+    content.push({text:'Curva de Crescimento — Referencia OMS (Meninos 0-12 meses)',fontSize:10,bold:true,color:'#1a237e',margin:[0,4,0,8]});
+    var metricas=[{key:'peso',lbl:'Peso (kg)'},{key:'altura',lbl:'Comprimento (cm)'},{key:'pc',lbl:'Perimetro Cefalico (cm)'}];
+    metricas.forEach(function(met){
+      var temDados=(crescData||[]).some(function(r){return r[met.key]!=null;});
+      if(!temDados) return;
+      var imgData=_gerarGraficoOMSBase64(met.key,515,220);
+      if(imgData){
+        content.push({text:met.lbl,fontSize:8,color:'#555',margin:[0,0,0,2]});
+        content.push({image:imgData,width:515,margin:[0,0,0,10]});
+      }
+    });
+
+    // Legenda percentis
+    content.push({text:'Referencia de Percentis OMS',fontSize:10,bold:true,color:'#1a237e',margin:[0,4,0,6]});
+    content.push({table:{widths:['*','*'],body:[
+      [{text:[{text:'Abaixo do P3  ',bold:true,color:'#c62828'},'Abaixo do esperado, avaliar com pediatra'],fontSize:8},{text:[{text:'P3 - P50  ',bold:true,color:'#1565c0'},'Normal, abaixo da mediana'],fontSize:8}],
+      [{text:[{text:'P50 - P97  ',bold:true,color:'#2e7d32'},'Normal, acima da mediana'],fontSize:8},{text:[{text:'Acima do P97  ',bold:true,color:'#e65100'},'Acima do esperado, avaliar com pediatra'],fontSize:8}],
+    ]},layout:{hLineWidth:function(){return 0.3;},vLineWidth:function(){return 0;},hLineColor:function(){return '#ddd';},fillColor:function(r){return r%2===0?'#f5f7ff':null;}},margin:[0,0,0,0]});
   }
   else if (cardId === 'rel-card-vacinas') {
     var vSt=typeof vacStatus!=='undefined'?vacStatus:{},vEx=typeof vacExtras!=='undefined'?vacExtras:{};
@@ -10592,7 +10820,7 @@ async function exportarSecaoPDF(cardId, titulo) {
     if(!evF.length&&!evP.length)content.push({text:'Nenhuma consulta registrada',fontSize:8,color:'#999'});
   }
 
-  content.push({text:'Padawan Arthur · Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,14,0,0]});
+  content.push({text:'Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,14,0,0]});
 
   await _gerarPDF({content:content, styles:_PDF_ESTILOS, defaultStyle:{font:'Roboto',fontSize:9,color:'#222'}, pageSize:'A4', pageMargins:[40,40,40,40]}, 'Padawan-Arthur-'+titulo.replace(/[^a-zA-Z0-9]/g,'-')+'-'+hojeISO+'.pdf');
 }
@@ -10687,7 +10915,7 @@ async function exportarRelatorioCompleto() {
       // Capa
       {canvas:[{type:'rect',x:0,y:0,w:515,h:4,color:'#1a237e'}]},
       {text:'Arquivos do Templo Jedi', fontSize:20, bold:true, color:'#1a237e', margin:[0,8,0,2]},
-      {text:'Padawan Arthur · Cronicas da Forca', fontSize:12, color:'#333', margin:[0,0,0,2]},
+      {text:'Arquivos do Templo Jedi', fontSize:12, color:'#333', margin:[0,0,0,2]},
       {text:hoje+' · '+dias+' dias de vida', fontSize:9, color:'#666', margin:[0,0,0,12]},
       {canvas:[{type:'line',x1:0,y1:0,x2:515,y2:0,lineWidth:0.5,lineColor:'#ccc'}], margin:[0,0,0,18]},
 
@@ -10715,7 +10943,7 @@ async function exportarRelatorioCompleto() {
       evPas.length>0?{stack:[{text:'Consultas realizadas (ultimas 5)',fontSize:10,bold:true,color:'#555',margin:[0,8,0,4]},{table:{headerRows:1,widths:[50,32,'*',140],body:[evHeader].concat(evPas.map(evRow))},layout:_PDF_LAYOUT}]}:{},
 
       // Rodapé
-      {text:'Padawan Arthur · Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,16,0,0]},
+      {text:'Arquivos do Templo Jedi · '+new Date().toLocaleString('pt-BR'), fontSize:7, color:'#999', italics:true, alignment:'center', margin:[0,16,0,0]},
     ],
     styles: _PDF_ESTILOS,
     defaultStyle:{ font:'Roboto', fontSize:9, color:'#222' },
@@ -10886,9 +11114,6 @@ async function exportarRelatorioCompleto() {
 
 
 <script>
-// ══════════════════════════════════════════════════════════════
-// MOTOR PDF — pdfmake
-// ══════════════════════════════════════════════════════════════
 async function _carregarPdfmake() {
   if (window.pdfMake) return true;
   return new Promise(function(resolve) {
@@ -10905,7 +11130,7 @@ async function _carregarPdfmake() {
     document.head.appendChild(s1);
   });
 }
-const _PDF_ESTILOS = {
+var _PDF_ESTILOS = {
   header:   { fontSize:16, bold:true, color:'#1a237e', margin:[0,0,0,4] },
   sub:      { fontSize:9,  color:'#444', margin:[0,0,0,10] },
   secTitle: { fontSize:11, bold:true, color:'#1a237e', margin:[0,10,0,5], decoration:'underline', decorationColor:'#1a237e' },
@@ -10913,7 +11138,7 @@ const _PDF_ESTILOS = {
   tCell:    { fontSize:8,  margin:[3,3,3,3] },
   footer:   { fontSize:7,  color:'#999', italics:true },
 };
-const _PDF_LAYOUT = {
+var _PDF_LAYOUT = {
   hLineWidth: function(i,n) { return (i===0||i===1||i===n.table.body.length)?1:0.3; },
   vLineWidth: function()    { return 0; },
   hLineColor: function(i)   { return i<=1?'#1a237e':'#ddd'; },
@@ -10933,13 +11158,6 @@ async function _gerarPDF(docDef, nomeArquivo) {
   } catch(e) {
     showToast('Erro PDF: ' + (e.message||String(e)));
   }
-}
-function _limparCss(html) {
-  if (!html) return '';
-  return html
-    .replace(/var\(--[^)]+\)/g,'#333')
-    .replace(/rgba?\([^)]+\)/g,'#555')
-    .replace(/linear-gradient\([^)]+\)/g,'#f5f5f5');
 }
 </script>
 
